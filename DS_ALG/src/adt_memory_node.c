@@ -162,8 +162,10 @@ s16 MEMNODE_memSet(MemoryNode* node, u8 value) {
         return kErrorCode_DataNull;
     }
 
-    for (int i = 0; i < node->size_; i++) {
-        node->data_[i] = value;
+    u8* aux = (u8*)node->data_;
+
+    for (s32 i = 0; i < node->size_; i++) {
+        aux[i] = value;
     }
 
     return kErrorCode_Ok;
@@ -183,12 +185,19 @@ s16 MEMNODE_memCopy(MemoryNode* node, void* src, u16 bytes) {
         return kErrorCode_BytesZero;
     }
 
-    node->size_ = bytes;
-
-    for (int i = 0; i < src; i++) {
-        node->data_ = MM->malloc(sizeof(node->size_));
+    u8* tmp = MM->malloc(bytes);
+    if (NULL == tmp) {
+        return kErrorCode_MallocNull;
     }
+
+    u8* aux = (u8*)src;
+    for (s32 i = 0; i < bytes; i++) {
+        tmp[i] = aux[i];
+    }
+
     MM->free(node->data_);
+    node->data_ = tmp;
+    node->size_ = bytes;
 
     return kErrorCode_Ok;
 }
@@ -204,9 +213,26 @@ s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes) {
         return kErrorCode_SizeNull;
     }
 
-    u16 new_size;
-    new_size = node->size_ + bytes;
-    new_size = MM->malloc(sizeof(node->size_));
+    u8 new_size = node->size_ + bytes;
+
+    u8* tmp = MM->malloc(new_size);
+    if (NULL == tmp) {
+        return kErrorCode_MallocNull;
+    }
+
+    u8* aux_src = (u8*)src;
+    u8* aux_data = (u8*)node->data_;
+
+    for (s32 i = 0; i < new_size; i++) {
+        if (i < node->size_) {
+            tmp[i] = aux_data[i];
+        }
+        else {
+            tmp[i] = aux_src[i];
+        }
+    }
+
+    MM->free(node->data_);
 
     return kErrorCode_Ok;
 }
@@ -222,8 +248,11 @@ s16 MEMNODE_memMask(MemoryNode* node, u8 mask) {
         return kErrorCode_SizeNull;
     }
 
-    for (int i = 0; i < node->size_; i++) {
-        node->data_[i] = node->data_ & mask[i];
+    u8* aux_data = (u8*)node->data_;
+    u8* aux_mask = (u8)mask;
+
+    for (s32 i = 0; i < sizeof(mask); i++) {
+        aux_data[i] = aux_data[i] & aux_mask[i];
     }
 
     return kErrorCode_Ok;
