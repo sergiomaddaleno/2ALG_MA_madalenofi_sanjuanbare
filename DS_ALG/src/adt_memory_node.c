@@ -249,10 +249,10 @@ s16 MEMNODE_memMask(MemoryNode* node, u8 mask) {
     }
 
     u8* aux_data = (u8*)node->data_;
-    u8* aux_mask = (u8)mask;
+    /*u8* aux_mask = (u8)mask;*/
 
-    for (s32 i = 0; i < sizeof(mask); i++) {
-        aux_data[i] = aux_data[i] & aux_mask[i];
+    for (s8 i = 0; i < node->size_; i++) {
+        aux_data[i] = aux_data[i] & mask;
     }
 
     return kErrorCode_Ok;
