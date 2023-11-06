@@ -60,6 +60,9 @@ MemoryNode* MEMNODE_create() {
 }
 
 s16 MEMNODE_createFromRef(MemoryNode **node) {
+    if (NULL == *node) {
+        return kErrorCode_NodeNull;
+   }
   *node = MEMNODE_create();
   if (NULL == *node) {
 #ifdef VERBOSE_
@@ -137,6 +140,7 @@ s16 MEMNODE_free(MemoryNode* node) {
         return kErrorCode_NodeNull;
     }
     if (NULL == node->data_) {
+        MM->free(node);
         return kErrorCode_DataNull;
     }
     MM->free(node->data_);
@@ -175,9 +179,7 @@ s16 MEMNODE_memCopy(MemoryNode* node, void* src, u16 bytes) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
-    if (NULL == node->data_) {
-        return kErrorCode_DataNull;
-    }
+    
     if (NULL == src) {
         return kErrorCode_SrcNull;
     }
@@ -228,7 +230,7 @@ s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes) {
             tmp[i] = aux_data[i];
         }
         else {
-            tmp[i] = aux_src[i];
+            tmp[i] = aux_src[i- node->size_];
         }
     }
 
@@ -269,10 +271,14 @@ void MEMNODE_print(MemoryNode* node) {
         return kErrorCode_SizeNull;
     }
 
-    printf("[Node info] Adress: %s", &node);
-    printf("[Node info] Size: %s", node->size_);
-    printf("[Node info] Data Address: %s", &node->data_);
-    printf("[Node info] Data content: %s", node->data_);
-
+    printf("[Node info] Adress: %p", &node);
+    printf("[Node info] Size: %d", node->size_);
+    printf("[Node info] Data Address: %p", &node->data_);
+    
+    for (s8 i = 0; i < node->size_;i++) {
+        u8* aux_data = (u8*)node->data_;
+        printf("[Node info] Data content: %p", (void*)aux_data[i]);
+    }
+    
     return kErrorCode_Ok;
 }
