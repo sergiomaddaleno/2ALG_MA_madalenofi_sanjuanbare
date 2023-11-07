@@ -38,12 +38,12 @@ struct memory_node_ops_s memory_node_ops = { .data = MEMNODE_data,
                                              .reset = MEMNODE_reset,
                                              .softReset = MEMNODE_softReset,
                                              .free = MEMNODE_free,
-                                             . softFree = MEMNODE_softFree,
-                                             . memSet = MEMNODE_memSet,
-                                             . memCopy = MEMNODE_memCopy,
-                                             . memConcat = MEMNODE_memConcat,
-                                             . memMask = MEMNODE_memMask,
-                                             . print = MEMNODE_print,
+                                             .softFree = MEMNODE_softFree,
+                                             .memSet = MEMNODE_memSet,
+                                             .memCopy = MEMNODE_memCopy,
+                                             .memConcat = MEMNODE_memConcat,
+                                             .memMask = MEMNODE_memMask,
+                                             .print = MEMNODE_print,
 };
 
 // Memory Node Definitions
@@ -270,14 +270,14 @@ void MEMNODE_print(MemoryNode* node) {
     if (0 == node->size_) {
         return kErrorCode_SizeNull;
     }
-
+    
     printf("[Node info] Adress: %p", &node);
     printf("[Node info] Size: %d", node->size_);
     printf("[Node info] Data Address: %p", &node->data_);
-    
+    u8* aux_data = (u8*)node->data_;
     for (s8 i = 0; i < node->size_;i++) {
-        u8* aux_data = (u8*)node->data_;
-        printf("[Node info] Data content: %p", (void*)aux_data[i]);
+        
+        printf("[Node info] Data content: %c", aux_data[i]);
     }
     
     return kErrorCode_Ok;
