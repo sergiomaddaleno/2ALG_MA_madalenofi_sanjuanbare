@@ -198,8 +198,9 @@ s16 MEMNODE_memCopy(MemoryNode* node, void* src, u16 bytes) {
     for (s32 i = 0; i < bytes; i++) {
         tmp[i] = aux[i];
     }
-
-    MM->free(node->data_);
+    if (NULL != node->data_) {
+        MM->free(node->data_);
+    }
     node->data_ = tmp;
     node->size_ = bytes;
 
@@ -235,9 +236,9 @@ s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes) {
             tmp[i] = aux_src[i- node->size_];
         }
     }
-
-    MM->free(node->data_);
-
+    if (NULL != node->data_) {
+        MM->free(node->data_);
+    }
     return kErrorCode_Ok;
 }
 
