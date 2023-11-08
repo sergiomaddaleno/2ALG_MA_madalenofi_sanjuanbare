@@ -34,7 +34,7 @@ static void MEMNODE_print(MemoryNode* node);
 // Memory Node's API Definitions
 struct memory_node_ops_s memory_node_ops = { .data = MEMNODE_data,
                                              .size = MEMNODE_size,
-                                             .setData = MEMNODE_size,
+                                             .setData = MEMNODE_SetData,
                                              .reset = MEMNODE_reset,
                                              .softReset = MEMNODE_softReset,
                                              .free = MEMNODE_free,
@@ -60,10 +60,11 @@ MemoryNode* MEMNODE_create() {
 }
 
 s16 MEMNODE_createFromRef(MemoryNode **node) {
-    if (NULL == *node) {
+    if (NULL == node) {
         return kErrorCode_NodeNull;
-   }
+    }
   *node = MEMNODE_create();
+  
   if (NULL == *node) {
 #ifdef VERBOSE_
     printf("Error: [%s] not enough memory available\n", __FUNCTION__);
@@ -104,6 +105,7 @@ s16 MEMNODE_SetData(MemoryNode* node, void* src, u16 bytes) {
     if (0 == bytes) {
         return kErrorCode_BytesZero;
     }
+
     node->data_ = src;
     node->size_ = bytes;
     return kErrorCode_Ok;
@@ -215,7 +217,7 @@ s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes) {
         return kErrorCode_SizeNull;
     }
 
-    u8 new_size = node->size_ + bytes;
+    u16 new_size = node->size_ + bytes;
 
     u8* tmp = MM->malloc(new_size);
     if (NULL == tmp) {
@@ -262,23 +264,26 @@ s16 MEMNODE_memMask(MemoryNode* node, u8 mask) {
 
 void MEMNODE_print(MemoryNode* node) {
     if (NULL == node) {
+        
         return kErrorCode_NodeNull;
     }
     if (NULL == node->data_) {
+        
         return kErrorCode_DataNull;
     }
     if (0 == node->size_) {
         return kErrorCode_SizeNull;
     }
-    
-    printf("[Node info] Adress: %p", &node);
-    printf("[Node info] Size: %d", node->size_);
-    printf("[Node info] Data Address: %p", &node->data_);
+   
+    printf("\n[Node info] Adress: %p \n", &node);
+    printf("[Node info] Size: %d \n", node->size_);
+    printf("[Node info] Data Address: %p \n", &node->data_);
+    printf("[Node info] Data content:");
     u8* aux_data = (u8*)node->data_;
     for (s8 i = 0; i < node->size_;i++) {
         
-        printf("[Node info] Data content: %c", aux_data[i]);
+        printf("%c", aux_data[i]);
     }
     
-    return kErrorCode_Ok;
+    printf("\n");
 }
