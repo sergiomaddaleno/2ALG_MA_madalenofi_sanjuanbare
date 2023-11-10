@@ -13,12 +13,32 @@ static s16 VECTOR_destroy(Vector* vector);
 static s16 VECTOR_softReset(Vector* vector);
 static s16 VECTOR_reset(Vector* vector);
 static s16 VECTOR_resize(Vector* vector, u16 new_size);
+static s16 VECTOR_capacity(Vector* vector, u16 new_size);
+static s16 VECTOR_length(Vector* vector, u16 new_size);
 
 // Memory Node's API Definitions
-struct vector_ops_s vector_ops = { .destroy = VECTOR_destroy,
-                                   .softReset = VECTOR_softReset,
-                                   .reset = VECTOR_reset,
-                                   .resize = VECTOR_resize,
+struct vector_ops_s vector_ops = {
+    .destroy = VECTOR_destroy,
+    .softReset = VECTOR_softReset,
+    .reset = VECTOR_reset,
+    .resize = VECTOR_resize,
+    .capacity = VECTOR_capacity,
+    .length = VECTOR_length,
+    .isEmpty = VECTOR_isEmpty,
+    .isFull = VECTOR_isFull,
+    .first = VECTOR_first,
+    .last = VECTOR_last,
+    .at = VECTOR_at,
+    .insertFirst = VECTOR_insertFirst,
+    .insertLast = VECTOR_insertLast,
+    .insertAt = VECTOR_insertAt,
+    .extractFirst = VECTOR_extractFirst,
+    .extractLast = VECTOR_extractLast,
+    .extractAt = VECTOR_extractAt,
+    .concat = VECTOR_concat;
+    .traverse = VECTOR_traverse;
+    .print = VECTOR_print;
+
                                              
 };
 
