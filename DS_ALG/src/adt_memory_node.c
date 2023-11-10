@@ -241,7 +241,6 @@ s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes) {
     return kErrorCode_Ok;
 }
 
-
 s16 MEMNODE_memMask(MemoryNode* node, u8 mask) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
@@ -262,7 +261,6 @@ s16 MEMNODE_memMask(MemoryNode* node, u8 mask) {
     return kErrorCode_Ok;
 }
 
-
 void MEMNODE_print(MemoryNode* node) {
     if (NULL == node) {
         
@@ -276,9 +274,9 @@ void MEMNODE_print(MemoryNode* node) {
         return kErrorCode_SizeNull;
     }
    
-    printf("\n[Node info] Adress: %p \n", &node);
+    printf("\n[Node info] Adress: %p \n", node);
     printf("[Node info] Size: %d \n", node->size_);
-    printf("[Node info] Data Address: %p \n", &node->data_);
+    printf("[Node info] Data Address: %p \n", node->data_);
     printf("[Node info] Data content:");
     u8* aux_data = (u8*)node->data_;
     for (s8 i = 0; i < node->size_;i++) {
