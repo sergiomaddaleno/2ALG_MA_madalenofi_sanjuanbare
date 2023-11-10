@@ -13,8 +13,10 @@ static s16 VECTOR_destroy(Vector* vector);
 static s16 VECTOR_softReset(Vector* vector);
 static s16 VECTOR_reset(Vector* vector);
 static s16 VECTOR_resize(Vector* vector, u16 new_size);
-static s16 VECTOR_capacity(Vector* vector, u16 new_size);
-static s16 VECTOR_length(Vector* vector, u16 new_size);
+static u16 VECTOR_capacity(Vector* vector);
+static u16 VECTOR_length(Vector* vector);
+static boolean VECTOR_isEmpty(Vector* vector);
+static boolean VECTOR_isFull(Vector* vector);
 
 // Memory Node's API Definitions
 struct vector_ops_s vector_ops = {
