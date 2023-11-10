@@ -144,4 +144,4 @@ project "PR05_List"
     path.join(PROJ_DIR, "src/adt_list.c"),
     path.join(PROJ_DIR, "tests/test_list.c"),
   }
-  --]]
+  ]]--
