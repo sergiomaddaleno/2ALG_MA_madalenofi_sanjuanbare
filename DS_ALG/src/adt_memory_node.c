@@ -31,6 +31,8 @@ static s16 MEMNODE_memMask(MemoryNode* node, u8 mask);
 
 static void MEMNODE_print(MemoryNode* node);
 
+static s16 MEMNODE_createLite(MemoryNode* node);
+
 // Memory Node's API Definitions
 struct memory_node_ops_s memory_node_ops = { .data = MEMNODE_data,
                                              .size = MEMNODE_size,
@@ -72,6 +74,15 @@ s16 MEMNODE_createFromRef(MemoryNode **node) {
     return kErrorCode_Memory;
   }
   return kErrorCode_Ok;
+}
+
+s16 MEMNODE_createLite(MemoryNode* node) {
+    if (NULL == node) {
+        return kErrorCode_NodeNull;
+    }
+    node->data_ = NULL;
+    node->size_ = 0;
+    node->ops_ = &node;
 }
 
 s16 MEMNODE_initWithoutCheck(MemoryNode *node) {
