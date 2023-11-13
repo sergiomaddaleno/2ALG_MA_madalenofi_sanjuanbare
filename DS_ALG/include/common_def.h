@@ -23,7 +23,6 @@ typedef enum {
 
 	//Vecotr
 	kErrorCode_VectorNull = -20,
-	kErrorCode_CapacityZero = -21,
 
 } ErrorCode;
 
