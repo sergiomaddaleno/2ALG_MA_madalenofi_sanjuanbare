@@ -265,26 +265,20 @@ s16 MEMNODE_memMask(MemoryNode* node, u8 mask) {
 
 void MEMNODE_print(MemoryNode* node) {
     if (NULL == node) {
-        
+        printf("\t[Node Info] Address: NULL\n");
         return kErrorCode_NodeNull;
     }
+    printf("\t[Node Info] Address: %p\n", node);
+    printf("\t[Node Info] Size: %d\n", node->size_);
     if (NULL == node->data_) {
-        
+        printf("\t[Node Info] Data Address: NULL\n");
         return kErrorCode_DataNull;
     }
-    if (0 == node->size_) {
-        return kErrorCode_SizeNull;
+    printf("\t[Node Info] Data Address: %p\n", node->data_);
+    printf("\t[Node Info] Data Content: ");
+    u8* aux = (u8*)node->data_;
+    for (int i = 0; i < node->size_; i++) {
+        printf("%c", aux[i]);
     }
-   
-    printf("\n[Node info] Adress: %p \n", &node);
-    printf("[Node info] Size: %d \n", node->size_);
-    printf("[Node info] Data Address: %p \n", &node->data_);
-    printf("[Node info] Data content:");
-    u8* aux_data = (u8*)node->data_;
-    for (s8 i = 0; i < node->size_;i++) {
-        
-        printf("%c", aux_data[i]);
-    }
-    
     printf("\n");
 }
