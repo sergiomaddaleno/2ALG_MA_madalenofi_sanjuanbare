@@ -280,5 +280,6 @@ void MEMNODE_print(MemoryNode* node) {
     for (int i = 0; i < node->size_; i++) {
         printf("%c", aux[i]);
     }
+
     printf("\n");
 }
