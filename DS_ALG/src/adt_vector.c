@@ -80,12 +80,23 @@ s16 VECTOR_destroy(Vector* vector) {
         return kErrorCode_VectorNull;
     }
 
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    
+
     for (s16 i = 0; vector->tail_; i++) {
-        MM->free(&vector->storage_[i].data_);
+        if (&vector->storage_[i].data_ != NULL) {
+            MM->free(&vector->storage_[i].data_);
+        }
+        else {
+            return kErrorCode_Data_StorageNull;
+        }
     }
-    for (s16 i = 0; vector->capacity_; i++) {
-        MM->free(&vector->storage_[i]);
-    }
+    
+        MM->free(&vector->storage_);
+    
     MM->free(vector);
 
     return kErrorCode_Ok;
@@ -93,7 +104,7 @@ s16 VECTOR_destroy(Vector* vector) {
 
 u16 VECTOR_capacity(Vector* vector) {
     if (NULL == vector) {
-        return kErrorCode_VectorNull;
+        return 0;
     }
 
     return vector->capacity_;
@@ -101,19 +112,19 @@ u16 VECTOR_capacity(Vector* vector) {
 
 u16 VECTOR_length(Vector* vector) {
     if (NULL == vector) {
-        return kErrorCode_VectorNull;
+        return 0;
     }
 
-    return vector->tail_;
+    return vector->tail_- vector->head_;
 }
 
 boolean VECTOR_isEmpty(Vector* vector) {
     if (NULL == vector) {
-        return kErrorCode_VectorNull;
+        return False;
     }
 
     if (vector->head_ == vector->tail_) {
-        return 1;
+        return True;
     }
 
     return 0;
@@ -121,11 +132,11 @@ boolean VECTOR_isEmpty(Vector* vector) {
 
 boolean VECTOR_isFull(Vector* vector) {
     if (NULL == vector) {
-        return kErrorCode_VectorNull;
+        return False;
     }
 
     if (vector->tail_ == vector->capacity_) {
-        return 1;
+        return True;
     }
 
     return 0;
