@@ -25,7 +25,10 @@ typedef enum {
 	kErrorCode_VectorNull = -20,
 	kErrorCode_CapacityZero = -21,
 	kErrorCode_StrorageNull = -22,
-    kErrorCode_Data_StorageNull = -23,
+	kErrorCode_Data_StorageNull = -23,
+	kErrorCode_VectorFull = -24,
+	kErrorCode_VectorEmpty = -25,
+	kErrorCode_TailZero=-26,
 
 } ErrorCode;
 

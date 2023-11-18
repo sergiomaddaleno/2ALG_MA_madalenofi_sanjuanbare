@@ -17,8 +17,17 @@ static u16 VECTOR_capacity(Vector* vector);
 static u16 VECTOR_length(Vector* vector);
 static boolean VECTOR_isEmpty(Vector* vector);
 static boolean VECTOR_isFull(Vector* vector);
-
 static Vector* VECTOR_create(u16 capacity);
+static void* VECTOR_first(Vector* vector);
+static void* VECTOR_at(Vector* vector,u16 position);
+static void* VECTOR_last(Vector* vector);
+static s16 VECTOR_insertFirst(Vector* vector, void* data, u16 bytes);
+static s16 VECTOR_insertLast(Vector* vector, void* data, u16 bytes);
+static s16 VECTOR_insertAt(Vector* vector, void* data, u16 bytes,u16 position);
+static void* VECTOR_extractFirst(Vector* vector);
+static void* VECTOR_extractLast(Vector* vector);
+static void* VECTOR_extractAt(Vector* vector, u16 position);
+static s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*));
 
 // Memory Node's API Definitions
 struct vector_ops_s vector_ops = {
@@ -30,18 +39,21 @@ struct vector_ops_s vector_ops = {
     .length = VECTOR_length,
     .isEmpty = VECTOR_isEmpty,
     .isFull = VECTOR_isFull,
-    /*.first = VECTOR_first,
+    .first = VECTOR_first,
     .last = VECTOR_last,
     .at = VECTOR_at,
+    
     .insertFirst = VECTOR_insertFirst,
     .insertLast = VECTOR_insertLast,
     .insertAt = VECTOR_insertAt,
+    
     .extractFirst = VECTOR_extractFirst,
     .extractLast = VECTOR_extractLast,
+   
     .extractAt = VECTOR_extractAt,
     .concat = VECTOR_concat;
     .traverse = VECTOR_traverse;
-    .print = VECTOR_print;*/
+    .print = VECTOR_print;
 
                                              
 };
@@ -75,6 +87,67 @@ Vector* VECTOR_create(u16 capacity) {
     return v_temp;
 }
 
+s16 VECTOR_reset(Vector* vector) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    for (s16 i = vector->head_; i < vector->tail_; i++) {
+
+        MEMNODE_reset(vector->storage_[i]);
+
+    }
+    vector->tail_ = 0;
+
+    return  kErrorCode_Ok;
+
+}
+                                      
+
+s16 VECTOR_resize(Vector* vector, u16 new_size) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    MemoryNode* tmp = MM->malloc(sizeof(MemoryNode) * new_size);
+    
+    for (s16 i = 0; i < new_size; i++) {
+
+        MEMNODE_createLite(&tmp[i]);
+
+    }
+    vector->tail_ = new_size;
+
+    for (s16 i = vector->head_; i < vector->tail_; i++) {
+
+        tmp[i] = vector->storage_[i];
+
+    }
+
+    for (s16 i = vector->tail_; i < vector->capacity_; i++) {
+
+        MEMNODE_reset(vector->storage_[i]);
+
+    }
+
+
+    MM->free(vector->storage_);
+
+    vector->capacity_ = new_size;
+
+    return  kErrorCode_Ok;
+}
+
 s16 VECTOR_destroy(Vector* vector) {
     if (NULL == vector) {
         return kErrorCode_VectorNull;
@@ -86,7 +159,7 @@ s16 VECTOR_destroy(Vector* vector) {
 
     
 
-    for (s16 i = 0; vector->tail_; i++) {
+    for (s16 i = 0; i < vector->tail_; i++) {
         if (&vector->storage_[i].data_ != NULL) {
             MM->free(&vector->storage_[i].data_);
         }
@@ -95,7 +168,7 @@ s16 VECTOR_destroy(Vector* vector) {
         }
     }
     
-        MM->free(&vector->storage_);
+    MM->free(&vector->storage_);
     
     MM->free(vector);
 
@@ -140,4 +213,301 @@ boolean VECTOR_isFull(Vector* vector) {
     }
 
     return 0;
+}
+
+
+void* VECTOR_first(Vector* vector) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    return &vector->storage_[vector->head_].data_;
+
+
+}
+
+void* VECTOR_at(Vector* vector,u16 position) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    return &vector->storage_[position].data_;
+
+
+}
+
+void* VECTOR_last(Vector* vector) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    return &vector->storage_[vector->tail_].data_;
+
+
+}
+
+s16 VECTOR_insertFirst(Vector* vector, void* data, u16 bytes) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    if (NULL == data) {
+        return kErrorCode_DataNull;
+    }
+
+    if (bytes <= 0) {
+        return kErrorCode_BytesZero;
+    }
+    
+    if (vector->tail_ == vector->capacity_) {
+        return kErrorCode_VectorFull;
+    }
+    
+    vector->tail_++;
+
+    for (s16 i = vector->tail_; i < vector->head_; i--) {
+
+        vector->storage_[i] = vector->storage_[i-1];
+
+       
+
+    }
+
+    vector->storage_[vector->head_].data_ = data;
+    vector->storage_[vector->head_].size_ = bytes;
+
+    
+    return  kErrorCode_Ok;
+
+
+}
+
+
+s16 VECTOR_insertLast(Vector* vector, void* data, u16 bytes) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    if (NULL == data) {
+        return kErrorCode_DataNull;
+    }
+
+    if (bytes <= 0) {
+        return kErrorCode_BytesZero;
+    }
+
+    if (vector->tail_ == vector->capacity_) {
+        return kErrorCode_VectorFull;
+    }
+
+    vector->tail_++;
+
+    vector->storage_[vector->tail_].data_ = data;
+    vector->storage_[vector->tail_].size_ = bytes;
+
+      
+    return  kErrorCode_Ok;
+
+
+}
+
+s16 VECTOR_insertAt(Vector* vector, void* data, u16 bytes,u16 position) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    if (NULL == data) {
+        return kErrorCode_DataNull;
+    }
+
+    if (bytes <= 0) {
+        return kErrorCode_BytesZero;
+    }
+
+    if (position > vector->tail_) {
+
+        position = vector->tail_;
+    }
+
+    vector->tail_++;
+
+    
+    for (s16 i = vector->tail_; i < position; i--) {
+
+        vector->storage_[i] = vector->storage_[i - 1];
+      
+    }
+
+    vector->storage_[position].data_ = data;
+    vector->storage_[position].size_ = bytes;
+
+
+    return  kErrorCode_Ok;
+
+
+}
+
+void* VECTOR_extractFirst(Vector* vector) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    if (NULL == vector->storage_[vector->head_].data_) {
+        return kErrorCode_DataNull;
+    }
+
+    if (VECTOR_isEmpty(vector)) {
+
+        return kErrorCode_VectorEmpty;
+    }
+
+    void* tmp = vector->storage_[vector->head_].data_;
+
+    vector->tail_--;
+    
+
+    for (s16 i = vector->tail_; i < vector->head_; i--) {
+
+        vector->storage_[i] = vector->storage_[i - 1];
+
+    }
+
+    MEMNODE_softReset(vector->storage_[vector->tail_]);
+
+    return tmp;
+
+
+
+}
+
+void* VECTOR_extractLast(Vector* vector) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    if (NULL == vector->storage_->data_) {
+        return kErrorCode_DataNull;
+    }
+
+    if (VECTOR_isEmpty(vector)) {
+
+        return kErrorCode_VectorEmpty;
+    }
+
+    if (vector->tail_<=0) {
+
+        return kErrorCode_TailZero;
+    }
+
+    void* tmp = vector->storage_[vector->tail_].data_;
+
+    vector->tail_--;
+
+
+    MEMNODE_softReset(vector->storage_[vector->tail_]);
+
+    return tmp;
+
+
+
+}
+
+
+void* VECTOR_extractAt(Vector* vector, u16 position) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    if (NULL == vector->storage_->data_) {
+        return kErrorCode_DataNull;
+    }
+
+    if (VECTOR_isEmpty(vector)) {
+
+        return kErrorCode_VectorEmpty;
+    }
+
+    if (position > vector->tail_) {
+
+        position = vector->tail_;
+    }
+
+    void* tmp = vector->storage_[position].data_;
+    
+    vector->tail_--;
+
+    for (s16 i = vector->tail_; i < position; i--) {
+        
+        vector->storage_[i] = vector->storage_[i - 1];
+        
+    }
+
+    MEMNODE_softReset(vector->storage_[vector->tail_]);
+
+    return tmp;
+
+}
+
+s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*)){
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    for (s16 i = vector->head_; i < vector->tail_; i++) {
+
+        callback(&vector->storage_[i]);
+
+    }
+
+    return  kErrorCode_Ok;
+
 }
