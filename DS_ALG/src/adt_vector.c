@@ -51,9 +51,9 @@ struct vector_ops_s vector_ops = {
     .extractLast = VECTOR_extractLast,
    
     .extractAt = VECTOR_extractAt,
-    .concat = VECTOR_concat;
-    .traverse = VECTOR_traverse;
-    .print = VECTOR_print;
+    .concat = VECTOR_concat,
+    .traverse = VECTOR_traverse,
+    .print = VECTOR_print,
 
                                              
 };
