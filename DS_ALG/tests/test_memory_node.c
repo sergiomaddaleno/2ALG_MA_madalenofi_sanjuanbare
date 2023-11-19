@@ -29,7 +29,26 @@ void printFunctionResult(MemoryNode *mn, u8 *msg, s16 error_type) {
 		  strcpy((char *) error_msg, "");
 		  printf("FAIL with error %d (%s)", error_type, error_msg);
 		  break;
+
+	case -1:  printf("\nCODE NULL\n"); break;
+	case -2:  printf("\nMEMORY NULL\n"); break;
+
+	case -10:  printf("\nNODE NULL\n"); break;
+	case -11:  printf("\nSRC NULL\n"); break;
+	case -12:  printf("\nBYTES 0\n"); break;
+	case -13:  printf("\nDATA NULL\n"); break;
+	case -14:  printf("\nSIZE NULL\n"); break;
+	case -15:  printf("\nMALLOC NULL\n"); break;
+
+	case -20:  printf("\nVECTOR NULL\n"); break;
+	case -21:  printf("\nCAPACITY 0\n"); break;
+	case -22:  printf("\nSTORGAE NULL\n"); break;
+	case -23:  printf("\nDATA STORGAE NULL\n"); break;
+	case -24:  printf("\nVECTOR FULL\n"); break;
+	case -25:  printf("\nVECTOR EMPTY\n"); break;
+	case -26:  printf("\nTAIL 0\n"); break;
 	}
+
 	printf(" in address = %p", mn);
 	printf("\n");
 	MM->free(error_msg);

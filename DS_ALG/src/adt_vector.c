@@ -28,6 +28,8 @@ static void* VECTOR_extractFirst(Vector* vector);
 static void* VECTOR_extractLast(Vector* vector);
 static void* VECTOR_extractAt(Vector* vector, u16 position);
 static s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*));
+static s16 VECTOR_concat(Vector* vector, Vector* vector_src);
+static void VECTOR_print(Vector* vector);
 
 // Memory Node's API Definitions
 struct vector_ops_s vector_ops = {
@@ -106,6 +108,25 @@ s16 VECTOR_reset(Vector* vector) {
 
     return  kErrorCode_Ok;
 
+}
+
+s16 VECTOR_softReset(Vector* vector) {
+
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    for (s16 i = vector->head_; i < vector->tail_; i++) {
+        vector->storage_[i].data_ = NULL;
+        vector->storage_[i].size_ = 0;
+    }
+    vector->tail_ = 0;
+
+    return  kErrorCode_Ok;
 }
                                       
 
@@ -508,6 +529,64 @@ s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*)){
 
     }
 
-    return  kErrorCode_Ok;
+    return kErrorCode_Ok;
 
+}
+
+s16 VECTOR_concat(Vector* vector, Vector* vector_src) {
+    if (NULL == vector && NULL == vector_src) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_ && NULL == vector_src->storage_) {
+        return kErrorCode_StrorageNull;
+    }
+
+    MemoryNode* tmp = MM->malloc(sizeof(MemoryNode) * (vector->capacity_ + vector_src->capacity_));
+    if (NULL == tmp) {
+        return kErrorCode_MallocNull;
+    }
+    MEMNODE_createLite(tmp);
+
+    MEMNODE_SetData(&tmp, &vector->storage_->data_, vector->storage_->size_);
+    MEMNODE_memConcat(&tmp, &vector_src->storage_->data_, vector_src->storage_->size_);
+
+    vector_src->storage_ = tmp;
+    vector_src->tail_ += vector->tail_;
+    vector_src->capacity_ += vector->capacity_;
+    MM->free(vector);
+
+    return kErrorCode_Ok;
+}
+
+void VECTOR_print(Vector* vector) {
+    if (NULL == vector) {
+        printf("\t[Vector Info] vector: NULL\n");
+        return;
+    }
+
+    if (NULL == vector->storage_) {
+        printf("\t[Storage Info] vector storage: NULL\n");
+        return;
+    }
+
+    printf("\t[Vector info] Address: %p\n", vector);
+    printf("\t[Vector info] Head: %d\n", vector->head_);
+    printf("\t[Vector info] Tail: %d\n", vector->tail_);
+    printf("\t[Vector info] Capacity: %d\n", vector->capacity_);
+    printf("\t[Vector info] Address: %p\n", vector->ops_);
+
+    for (s16 i = vector->head_; vector->tail_; i++) {
+        printf("\t[Node info] Storgae: %d\n", i);
+        printf("\t[Node info] Address: %p\n", vector->storage_[i]);
+        printf("\t[Node info] Size: %p\n", vector->storage_[i].size_);
+        printf("\t[Node info] Data: %p\n", vector->storage_[i].data_);
+
+        printf("\t[Node info] Data Content: ");
+        u8* aux = (u8*)vector->storage_[i].data_;
+        for (int i = 0; i < vector->storage_[i].size_; i++) {
+            printf("%c\n", aux[i]);
+        }
+        printf("\t[Node info] Next Address: %p\n", vector->storage_[i].ops_);
+    }
 }
