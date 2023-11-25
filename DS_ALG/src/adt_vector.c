@@ -86,7 +86,6 @@ Vector* VECTOR_create(u16 capacity) {
     v_temp->capacity_ = capacity;
     v_temp->ops_ = &vector_ops;
 
-
     return v_temp;
 }
 
@@ -103,12 +102,10 @@ s16 VECTOR_reset(Vector* vector) {
     for (s16 i = vector->head_; i < vector->tail_; i++) {
 
         vector->storage_[i].ops_->reset(&vector->storage_[i]);
-
     }
     vector->tail_ = 0;
 
     return  kErrorCode_Ok;
-
 }
 
 s16 VECTOR_softReset(Vector* vector) {
@@ -148,33 +145,29 @@ s16 VECTOR_resize(Vector* vector, u16 new_size) {
     MemoryNode* tmp = MM->malloc(sizeof(MemoryNode) * new_size);
     if (NULL == tmp) {
         
-        return kErrorCode_StrorageNull;
+        return kErrorCode_MallocNull;
     }
 
-    
     for (s16 i = 0; i < new_size; i++) {
 
         MEMNODE_createLite(&tmp[i]);
-
     }
+
     if (new_size < vector->tail_) {
         for (s16 i = new_size; i < vector->tail_; i++) {
             vector->storage_[i].ops_->reset(&vector->storage_[i]);
-            vector->tail_ = new_size;
         }
-        
+        vector->tail_ = new_size;
     }
+
     for (s16 i = vector->head_; i < vector->tail_; i++) {
-
-        
+ 
         vector->storage_[i].ops_->setData(&tmp[i], vector->storage_[i].data_, vector->storage_[i].size_ );
-
     }
-
 
     MM->free(vector->storage_);
-    vector->storage_ = tmp;
 
+    vector->storage_ = tmp;
     vector->capacity_ = new_size;
 
     return  kErrorCode_Ok;
@@ -187,9 +180,7 @@ s16 VECTOR_destroy(Vector* vector) {
 
     if (NULL == vector->storage_) {
         return kErrorCode_StrorageNull;
-    }
-
-    
+    }   
 
     for (s16 i = vector->head_; i < vector->tail_; i++) {
         if (vector->storage_[i].data_ != NULL) {
@@ -198,7 +189,6 @@ s16 VECTOR_destroy(Vector* vector) {
     }
     
     MM->free(&vector->storage_);
-    
     MM->free(vector);
 
     return kErrorCode_Ok;
@@ -244,7 +234,6 @@ boolean VECTOR_isFull(Vector* vector) {
     return False;
 }
 
-
 void* VECTOR_first(Vector* vector) {
 
     if (NULL == vector) {
@@ -256,8 +245,6 @@ void* VECTOR_first(Vector* vector) {
     }
 
     return &vector->storage_[vector->head_].data_;
-
-
 }
 
 void* VECTOR_at(Vector* vector,u16 position) {
@@ -271,8 +258,6 @@ void* VECTOR_at(Vector* vector,u16 position) {
     }
 
     return &vector->storage_[position].data_;
-
-
 }
 
 void* VECTOR_last(Vector* vector) {
@@ -286,8 +271,6 @@ void* VECTOR_last(Vector* vector) {
     }
 
     return &vector->storage_[vector->tail_].data_;
-
-
 }
 
 s16 VECTOR_insertFirst(Vector* vector, void* data, u16 bytes) {
@@ -312,8 +295,6 @@ s16 VECTOR_insertFirst(Vector* vector, void* data, u16 bytes) {
         return kErrorCode_VectorFull;
     }
     
-    
-
     for (u16 i = vector->tail_; i > vector->head_; i--) {
         vector->storage_[i] = vector->storage_[i - 1];
     }
@@ -323,10 +304,7 @@ s16 VECTOR_insertFirst(Vector* vector, void* data, u16 bytes) {
 
     vector->tail_++;
     return  kErrorCode_Ok;
-
-
 }
-
 
 s16 VECTOR_insertLast(Vector* vector, void* data, u16 bytes) {
 
@@ -350,15 +328,11 @@ s16 VECTOR_insertLast(Vector* vector, void* data, u16 bytes) {
         return kErrorCode_VectorFull;
     }
 
-    
-
     vector->storage_[vector->tail_].data_ = data;
     vector->storage_[vector->tail_].size_ = bytes;
     vector->tail_++;
       
     return  kErrorCode_Ok;
-
-
 }
 
 s16 VECTOR_insertAt(Vector* vector, void* data, u16 bytes,u16 position) {
@@ -384,22 +358,15 @@ s16 VECTOR_insertAt(Vector* vector, void* data, u16 bytes,u16 position) {
         position = vector->tail_;
     }
 
-   
-   
-
     for(u16 i = vector->tail_ + 1; i > position; i--) {
         vector->storage_[i] = vector->storage_[i - 1];
     }
-
-   
 
     vector->storage_[position].data_ = data;
     vector->storage_[position].size_ = bytes;
     vector->tail_++;
 
     return  kErrorCode_Ok;
-
-
 }
 
 void* VECTOR_extractFirst(Vector* vector) {
@@ -412,7 +379,6 @@ void* VECTOR_extractFirst(Vector* vector) {
         return NULL;
     }
 
-
     if (VECTOR_isEmpty(vector)) {
 
         return NULL;
@@ -420,24 +386,15 @@ void* VECTOR_extractFirst(Vector* vector) {
 
     void* tmp = vector->storage_[vector->head_].data_;
 
-    
-    
-
     for(u16 i = vector->head_+1; i < vector->tail_; i++) {
 
         vector->storage_[i-1] = vector->storage_[i];
-       
-   
-
     }
-    
 
     vector->storage_[vector->tail_].ops_->softReset(&vector->storage_[vector->tail_]);
     vector->tail_--;
+
     return tmp;
-
-
-
 }
 
 void* VECTOR_extractLast(Vector* vector) {
@@ -466,17 +423,11 @@ void* VECTOR_extractLast(Vector* vector) {
 
     void* tmp = vector->storage_[vector->tail_].data_;
 
-   
-
-
     vector->storage_[vector->tail_].ops_->softReset(&vector->storage_[vector->tail_]);
     vector->tail_--;
+
     return tmp;
-
-
-
 }
-
 
 void* VECTOR_extractAt(Vector* vector, u16 position) {
 
@@ -504,19 +455,14 @@ void* VECTOR_extractAt(Vector* vector, u16 position) {
 
     void* tmp = vector->storage_[position].data_;
     
-    
-
     for(u16 i = position+1; i < vector->tail_; i++) {
         
         vector->storage_[i-1] = vector->storage_[i];
-       
-        
     }
     
     vector->storage_[vector->tail_].ops_->softReset(&vector->storage_[vector->tail_]);
     vector->tail_--;
     return tmp;
-
 }
 
 s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*)){
@@ -531,11 +477,9 @@ s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*)){
     for (s16 i = vector->head_; i < vector->tail_; i++) {
 
         callback(&vector->storage_[i]);
-
     }
 
     return kErrorCode_Ok;
-
 }
 
 s16 VECTOR_concat(Vector* vector, Vector* vector_src) {
@@ -554,7 +498,6 @@ s16 VECTOR_concat(Vector* vector, Vector* vector_src) {
     for (s16 i = 0; i < (vector->capacity_ + vector_src->capacity_); i++) {
 
         MEMNODE_createLite(&tmp[i]);
-
     }
   
     for (s16 i = vector->head_; i < vector->tail_; i++) {
@@ -563,9 +506,7 @@ s16 VECTOR_concat(Vector* vector, Vector* vector_src) {
     for (s16 i = vector_src->head_+ vector->tail_; i < vector_src->tail_; i++) {
         vector_src->storage_[i].ops_->memConcat(&tmp[i], &vector_src->storage_[i].data_, vector_src->storage_[i].size_);
     }
-    
-
-    
+     
     MM->free(vector->storage_);
 
     vector_src->storage_ = tmp;
