@@ -29,6 +29,7 @@ typedef enum {
 	kErrorCode_VectorFull = -24,
 	kErrorCode_VectorEmpty = -25,
 	kErrorCode_TailZero=-26,
+	
 
 } ErrorCode;
 
