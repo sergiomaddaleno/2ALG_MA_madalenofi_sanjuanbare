@@ -528,33 +528,24 @@ void VECTOR_print(Vector* vector) {
     printf("\t[Vector info] Tail: %d\n", vector->tail_);
     printf("\t[Vector info] Capacity: %d\n", vector->capacity_);
     printf("\t[Vector info] Address: %p\n", vector->ops_);
-    /*
-    for (s16 i = vector->head_; vector->tail_; i++) {
-        if (NULL == vector->storage_) {
-            printf("\t[Storage Info] vector storage: NULL\n");
-            return;
-        }
-        else {
-            //if (NULL == vector->storage_[i].data_) {
 
-              //  printf("\t[Storage Info] vector storage data: NULL\n");
-            //}
-            //else {
-                printf("\t[Node info] Storage: %d\n", i);
-                printf("\t[Node info] Address: %p\n", vector->storage_[i]);
-                printf("\t[Node info] Size: %d\n", vector->storage_[i].size_);
-                printf("\t[Node info] Data: %p\n", vector->storage_[i].data_);
-
-                printf("\t[Node info] Data Content: ");
-                u8* aux = (u8*)vector->storage_[i].data_;
-                for (int i = 0; i < vector->storage_[i].size_; i++) {
-                   // printf("%c\n", aux[i]);
-                }
-            //}
-       
-       }
-        
-        
+    if (NULL == vector->storage_) {
+        printf("\t[Storage Info] vector storage: NULL\n");
+        return;
     }
-    */
+
+    for (s16 i = vector->head_; i < vector->tail_; i++) {
+        printf("\t  [Vector Info] storage: #%d\n", i);
+        printf("\t      [Node info] Address: %p\n", &(vector->storage_[i]));
+        printf("\t      [Node info] Size: %d\n", vector->storage_[i].size_);
+        printf("\t      [Node info] Data Address: %p\n", vector->storage_[i].data_);
+        printf("\t      [Node info] Data Content: ");
+
+        u8* aux = (u8*)vector->storage_[i].data_;
+        for (int j = 0; j < vector->storage_[i].size_; j++) {
+            printf("%c", aux[j]);
+        }
+        printf("\n");
+    }
 }
+
