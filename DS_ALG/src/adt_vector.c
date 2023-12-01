@@ -458,16 +458,19 @@ void* VECTOR_extractAt(Vector* vector, u16 position) {
     }
 
     void* tmp = vector->storage_[position].data_;
-    
-    for(u16 i = position+1; i < vector->tail_; i++) {
-        
-        vector->storage_[i-1] = vector->storage_[i];
+
+    for (u16 i = position; i < vector->tail_; i++) {
+
+        vector->storage_[i].ops_->setData(&vector->storage_[i].ops_, &vector->storage_[i + 1].data_, vector->storage_[i + 1].size_);
     }
-    
-    vector->storage_[vector->tail_].ops_->softReset(&vector->storage_[vector->tail_]);
+
+    vector->storage_[vector->tail_ - 1].ops_->softReset(&vector->storage_[vector->tail_ - 1]);
     vector->tail_--;
+
+
     return tmp;
 }
+
 
 s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*)){
     if (NULL == vector) {
