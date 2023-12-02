@@ -199,7 +199,7 @@ s16 VECTOR_destroy(Vector* vector) {
 
     for (s16 i = vector->head_; i < vector->tail_; i++) {
         if (vector->storage_[i].data_ != NULL) {
-            MM->free(&vector->storage_[i].data_);
+            MM->free(vector->storage_[i].data_);
         }
     }
     
@@ -342,7 +342,6 @@ s16 VECTOR_insertLast(Vector* vector, void* data, u16 bytes) {
     if (vector->tail_ == vector->capacity_) {
         return kErrorCode_VectorFull;
     }
-
     
     vector->storage_[vector->tail_].data_ = data;
     vector->storage_[vector->tail_].size_ = bytes;
@@ -368,20 +367,17 @@ s16 VECTOR_insertAt(Vector* vector, void* data, u16 bytes,u16 position) {
         return kErrorCode_BytesZero;
     }
 
-    if (position > vector->tail_) {
-        position = vector->tail_;
-        
-    }
-
     if (vector->tail_ == vector->capacity_) {
         return kErrorCode_VectorFull;
     }
 
-    
+    if (position > vector->tail_) {
+        position = vector->tail_;
+    }
 
-    for (u16 i = position; i < vector->tail_; i++) {
+    for (u16 i = vector->tail_; i > position; i--) {
 
-        vector->storage_[i].ops_->setData(&vector->storage_[i].ops_, &vector->storage_[i + 1].data_, vector->storage_[i + 1].size_);
+        vector->storage_[i].ops_->setData(&vector->storage_[i], &vector->storage_[i - 1].data_, vector->storage_[i - 1].size_);
     }
 
     vector->storage_[position].data_ = data;
@@ -471,23 +467,20 @@ void* VECTOR_extractAt(Vector* vector, u16 position) {
         return NULL;
     }
 
-    if (position > vector->tail_) {
+    if (position >= vector->tail_) {
 
         position = vector->tail_;
     }
 
     void* tmp = vector->storage_[position].data_;
 
-    for (u16 i = position; i < vector->tail_; i++) {
+    for (u16 i = position; i < vector->tail_ - 1; i++) {
 
-        vector->storage_[i].ops_->setData(&vector->storage_[i].ops_, &vector->storage_[i + 1].data_, vector->storage_[i + 1].size_);
+        vector->storage_[i].ops_->setData(&vector->storage_[i], &vector->storage_[i + 1].data_, vector->storage_[i + 1].size_);
     }
 
     vector->storage_[vector->tail_ - 1].ops_->softReset(&vector->storage_[vector->tail_ - 1]);
     vector->tail_--;
-
-
-
 
     return tmp;
 }
