@@ -54,9 +54,7 @@ struct vector_ops_s vector_ops = {
     .extractAt = VECTOR_extractAt,
     .concat = VECTOR_concat,
     .traverse = VECTOR_traverse,
-    .print = VECTOR_print,
-
-                                             
+    .print = VECTOR_print,                            
 };
 
 //Function definitions:
@@ -127,30 +125,33 @@ s16 VECTOR_softReset(Vector* vector) {
     return  kErrorCode_Ok;
 }
                                       
-//revisar
 s16 VECTOR_resize(Vector* vector, u16 new_size) {
     if (NULL == vector) {
         return kErrorCode_VectorNull;
     }
+
     if (NULL == vector->storage_) {
         return kErrorCode_NodeNull;
     }
+
     if (0 == new_size) {
         return kErrorCode_SizeNull;
     }
-    u16 top = 0;
+
+    u16 elements_to_copy = 0;
+    
     if (vector->tail_ > new_size) {
-        top = new_size;
+        elements_to_copy = new_size;
         vector->tail_ = new_size;
+    }else {
+        elements_to_copy = vector->tail_;
     }
-    else {
-        top = vector->tail_;
-    }
+
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * new_size);
     for (u16 i = 0; i < new_size; i++) {
         MEMNODE_createLite(&aux[i]);
     }
-    for (u16 i = 0; i < top; i++) {
+    for (u16 i = 0; i < elements_to_copy; i++) {
         vector->storage_->ops_->memCopy(&aux[i], vector->storage_[i].data_, vector->storage_[i].size_);
     }
     for (u16 i = 0; i < vector->capacity_; i++) {
@@ -158,12 +159,13 @@ s16 VECTOR_resize(Vector* vector, u16 new_size) {
             MM->free(vector->storage_[i].data_);
         }
     }
+
     MM->free(vector->storage_);
     vector->capacity_ = new_size;
     vector->storage_ = aux;
+
     return kErrorCode_Ok;
 }
-
 
 s16 VECTOR_destroy(Vector* vector)
 {
@@ -471,7 +473,6 @@ void* VECTOR_extractAt(Vector* vector, u16 position) {
     return tmp;
 }
 
-
 s16 VECTOR_traverse(Vector* vector, void (*callback)(MemoryNode*)){
     if (NULL == vector) {
         return kErrorCode_VectorNull;
@@ -510,8 +511,6 @@ s16 VECTOR_concat(Vector* vector, Vector* vector_src)
     return kErrorCode_Ok;
 }
 
-
-//revisar
 void VECTOR_print(Vector* vector) {
     if (NULL == vector) {
         printf("\t[Vector Info] vector: NULL\n");
