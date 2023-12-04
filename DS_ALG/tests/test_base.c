@@ -237,9 +237,25 @@ void TESTBASE_printFunctionResult(void *address, u8 *msg, s16 error_type) {
 	}
 	printf(" [TEST] Function %s returns ", msg);
 	switch (error_type) {
-	case 0:
-		printf("OK");
-		break;
+		case 0: printf("OK"); break;
+		case -1: printf("kErrorCode_Null"); break;
+		case -2: printf("kErrorCode_Memory"); break;
+
+		case -10: printf("kErrorCode_NodeNull"); break;
+		case -11: printf("kErrorCode_SrcNull"); break;
+		case -12: printf("kErrorCode_BytesZero"); break;
+		case -13: printf("kErrorCode_DataNull"); break;
+		case -14: printf("kErrorCode_SizeNull"); break;
+		case -15: printf("kErrorCode_MallocNull"); break;
+
+		case -20: printf("kErrorCode_VectorNull"); break;
+		case -21: printf("kErrorCode_CapacityZero"); break; 
+		case -22: printf("kErrorCode_StorageNull"); break; 
+		case -23: printf("kErrorCode_Data_StorageNull"); break; 
+		case -24: printf("kErrorCode_VectorFull"); break; 
+		case -25: printf("kErrorCode_VectorEmpty"); break;
+		case -26: printf("kErrorCode_TailZero"); break;
+
 	default:
 		strcpy((char *)error_msg, "");
 		printf("FAIL with error %d (%s)", error_type, error_msg);
