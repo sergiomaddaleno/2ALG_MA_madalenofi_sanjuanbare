@@ -138,6 +138,10 @@ s16 VECTOR_resize(Vector* vector, u16 new_size) {
         return kErrorCode_SizeNull;
     }
 
+    if (vector->capacity_ == new_size) {
+        return kErrorCode_EqualCapacity;
+    }
+
     u16 elements_to_copy = 0;
     
     if (vector->tail_ > new_size) {
@@ -148,6 +152,11 @@ s16 VECTOR_resize(Vector* vector, u16 new_size) {
     }
 
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * new_size);
+
+    if (NULL == aux) {
+        return kErrorCode_MallocNull;
+    }
+
     for (u16 i = 0; i < new_size; i++) {
         MEMNODE_createLite(&aux[i]);
     }
@@ -192,7 +201,7 @@ s16 VECTOR_destroy(Vector* vector)
 
 u16 VECTOR_capacity(Vector* vector) {
     if (NULL == vector) {
-        return kErrorCode_VectorNull;
+        return 0;
     }
 
     return vector->capacity_;
@@ -200,7 +209,7 @@ u16 VECTOR_capacity(Vector* vector) {
 
 u16 VECTOR_length(Vector* vector) {
     if (NULL == vector) {
-        return kErrorCode_VectorNull;
+        return 0;
     }
 
     return vector->tail_- vector->head_;
@@ -253,6 +262,10 @@ void* VECTOR_at(Vector* vector,u16 position) {
         return NULL;
     }
 
+    if (position < 0){
+        return NULL;
+    }
+
     return vector->storage_[position].data_;
 }
 
@@ -263,6 +276,10 @@ void* VECTOR_last(Vector* vector) {
     }
 
     if (NULL == vector->storage_) {
+        return NULL;
+    }
+
+    if (vector->tail_ == 0) {
         return NULL;
     }
 

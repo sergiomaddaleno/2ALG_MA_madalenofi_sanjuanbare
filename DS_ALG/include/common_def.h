@@ -20,6 +20,7 @@ typedef enum {
 	kErrorCode_DataNull = -13,
 	kErrorCode_SizeNull = -14,
 	kErrorCode_MallocNull = -15,
+	kErrorCode_EqualCapacity = -16,
 
 	//Vecotr
 	kErrorCode_VectorNull = -20,

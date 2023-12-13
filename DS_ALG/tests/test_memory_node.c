@@ -39,6 +39,7 @@ void printFunctionResult(MemoryNode *mn, u8 *msg, s16 error_type) {
 	case -13:  printf("\nDATA NULL\n"); break;
 	case -14:  printf("\nSIZE NULL\n"); break;
 	case -15:  printf("\nMALLOC NULL\n"); break;
+	case -16:  printf("\nEqual Capacity\n"); break;
 
 	case -20:  printf("\nVECTOR NULL\n"); break;
 	case -21:  printf("\nCAPACITY 0\n"); break;

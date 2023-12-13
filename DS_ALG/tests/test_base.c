@@ -247,6 +247,7 @@ void TESTBASE_printFunctionResult(void *address, u8 *msg, s16 error_type) {
 		case -13: printf("kErrorCode_DataNull"); break;
 		case -14: printf("kErrorCode_SizeNull"); break;
 		case -15: printf("kErrorCode_MallocNull"); break;
+		case -16: printf("kErrorCode_EqualCapacity"); break;
 
 		case -20: printf("kErrorCode_VectorNull"); break;
 		case -21: printf("kErrorCode_CapacityZero"); break; 

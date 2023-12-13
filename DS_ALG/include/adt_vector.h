@@ -88,7 +88,7 @@ struct vector_ops_s {
  *
  * @param vector A pointer to the Vector for which the capacity is to be retrieved.
  * @return The capacity of the Vector.
- *         - kErrorCode_VectorNull if the input Vector pointer is NULL.
+ *         - Return 0, if vector = NULL.
  */
 	u16 (*capacity)(Vector *vector);	
 
@@ -100,7 +100,7 @@ struct vector_ops_s {
  *
  * @param vector A pointer to the Vector for which the length is to be retrieved.
  * @return The current length of the Vector.
- *         - kErrorCode_VectorNull if the input Vector pointer is NULL.
+ *         - Return 0, if vector = NULL.
  */
 	u16 (*length)(Vector *vector);
 
