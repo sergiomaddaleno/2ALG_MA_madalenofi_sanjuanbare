@@ -111,7 +111,7 @@ end --Function "GenerateProject" ends here.
 --Calling the Lua function:
 for i, prj in ipairs(PROJECT_NAMES) do
   GenerateProject(prj)
-end PR04_MovableVector
+end
 
 
 project "PR00_TestMemoryManager"
@@ -144,13 +144,14 @@ project "PR04_MovableVector"
     path.join(PROJ_DIR, "tests/test_movable_vector.c"),
   }
 
-/*project "PR09_Stack"
-  files {
-    path.join(PROJ_DIR, "include/adt_memory_node.h"),
-    path.join(PROJ_DIR, "src/adt_memory_node.c"),
-    path.join(PROJ_DIR, "include/adt_stack.h"),
-    path.join(PROJ_DIR, "src/adt_stack.c"),
-    path.join(PROJ_DIR, "tests/test_stack.c"),
-  }
-*/
+--project "PR09_Stack"
+--  files {
+--    path.join(PROJ_DIR, "include/adt_memory_node.h"),
+--    path.join(PROJ_DIR, "src/adt_memory_node.c"),
+--    path.join(PROJ_DIR, "include/adt_stack.h"),
+--    path.join(PROJ_DIR, "src/adt_stack.c"),
+--    path.join(PROJ_DIR, "tests/test_stack.c"),
+--  }
+
+
 

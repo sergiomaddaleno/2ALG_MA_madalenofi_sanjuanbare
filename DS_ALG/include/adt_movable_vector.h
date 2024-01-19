@@ -1,0 +1,79 @@
+// adt_movable_MovableVector.h
+// Escuela Superior de Arte y Tecnologia
+// Algoritmos & Inteligencia Artificial
+// ESAT 2020-2021
+//
+
+#ifndef __ADT_MOVABLE_VECTOR_H__
+#define __ADT_MOVABLE_VECTOR_H__
+
+#include "adt_memory_node.h"
+
+typedef struct adt_movable_vector_s {
+	u16 head_;
+	u16 tail_; // Corresponds to the first free place of the MovableVector
+	u16 capacity_;
+	MemoryNode *storage_;
+	struct MovableVector_ops_s *ops_;
+} MovableVector;
+
+struct movable_vector_ops_s {
+
+	s16 (*destroy)(MovableVector *movable_vector);
+
+	s16 (*softReset)(MovableVector *movable_vector);
+
+	s16 (*reset)(MovableVector *movable_vector);
+
+	s16 (*resize)(MovableVector *movable_vector, u16 new_size);
+
+	u16 (*capacity)(MovableVector *movable_vector);	
+
+	u16 (*length)(MovableVector *movable_vector);
+
+	boolean (*isEmpty)(MovableVector *movable_vector);
+
+	boolean (*isFull)(MovableVector *movable_vector);
+
+	void* (*first)(MovableVector *movable_vector); 
+
+	void* (*last)(MovableVector *movable_vector); 
+
+	void* (*at)(MovableVector *movable_vector, u16 position);
+
+	s16 (*insertFirst)(MovableVector *movable_vector, void *data, u16 bytes); 
+
+	s16 (*insertLast)(MovableVector *movable_vector, void *data, u16 bytes); 
+
+	s16 (*insertAt)(MovableVector *movable_vector, void *data, u16 bytes, u16 position); 
+
+	// Extraction
+	void* (*extractFirst)(MovableVector *movable_vector);
+
+  /*
+	// For debugging:
+#if DEBUG
+	void* (*extractFirst)(MovableVector *movable_vector, u16 *size);
+#endif // DEBUG
+	void* (*extractFirst)(MovableVector *movable_vector
+#if DEBUG
+	, u16 *size
+#endif // DEBUG
+		);
+  */
+
+
+	void* (*extractLast)(MovableVector *movable_vector);
+
+	void* (*extractAt)(MovableVector *movable_vector, u16 position);
+
+	// Miscellaneous s16 (*concat)(Vector *vector, Vector *vector_src); 
+	s16 (*concat)(MovableVector *movable_vector, MovableVector *movable_vector_src);
+
+	s16 (*traverse)(MovableVector *movable_vector, void (*callback)(MemoryNode *)); 
+
+	void (*print)(MovableVector *movable_vector);
+};
+
+MovableVector* MOVABLE_VECTOR_create(u16 capacity); // Creates a new MovableVector
+#endif //__ADT_MOVABLE_VECTOR_H__
