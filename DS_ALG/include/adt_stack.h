@@ -9,16 +9,6 @@
 
 #include "adt_memory_node.h"
 
-// typedef struct adt_vector_s {
-// 	u16 head_;
-// 	u16 tail_; // Corresponds to the first free place of the vector
-// 	u16 capacity_;
-// 	MemoryNode *storage_;
-// 	struct vector_ops_s *ops_;
-// } Vector;
 
-// struct vector_ops_s {
 
-// }
-
-#endif //__ADT_VECTOR_H__
+#endif //__ADT_STACK_H__
