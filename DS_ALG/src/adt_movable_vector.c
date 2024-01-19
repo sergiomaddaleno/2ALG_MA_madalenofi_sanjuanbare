@@ -9,26 +9,26 @@
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
 //Static prototipes
-static s16 MOVABLE_VECTOR_destroy(MovableVector * movable_vector);
-static s16 MOVABLE_VECTOR_softReset(MovableVector * movable_vector);
-static s16 MOVABLE_VECTOR_reset(MovableVector * movable_vector);
-static s16 MOVABLE_VECTOR_resize(MovableVector * movable_vector, u16 new_size);
-static u16 MOVABLE_VECTOR_capacity(MovableVector * movable_vector);
-static u16 MOVABLE_VECTOR_length(MovableVector * movable_vector);
-static boolean MOVABLE_VECTOR_isEmpty(MovableVector * movable_vector);
-static boolean MOVABLE_VECTOR_isFull(MovableVector * movable_vector);
-static void* MOVABLE_VECTOR_first(MovableVector * movable_vector);
-static void* MOVABLE_VECTOR_at(MovableVector * movable_vector,u16 position);
-static void* MOVABLE_VECTOR_last(MovableVector * movable_vector);
-static s16 MOVABLE_VECTOR_insertFirst(MovableVector * movable_vector, void* data, u16 bytes);
-static s16 MOVABLE_VECTOR_insertLast(MovableVector * movable_vector, void* data, u16 bytes);
-static s16 MOVABLE_VECTOR_insertAt(MovableVector * movable_vector, void* data, u16 bytes,u16 position);
-static void* MOVABLE_VECTOR_extractFirst(MovableVector * movable_vector);
-static void* MOVABLE_VECTOR_extractLast(MovableVector * movable_vector);
-static void* MOVABLE_VECTOR_extractAt(MovableVector * movable_vector, u16 position);
-static s16 MOVABLE_VECTOR_traverse(MovableVector * movable_vector, void (*callback)(MemoryNode*));
-static s16 MOVABLE_VECTOR_concat(MovableVector * movable_vector, MovableVector * movable_vector_src);
-static void MOVABLE_VECTOR_print(MovableVector * movable_vector);
+static s16 MOVABLE_VECTOR_destroy(MovableVector * vector);
+static s16 MOVABLE_VECTOR_softReset(MovableVector * vector);
+static s16 MOVABLE_VECTOR_reset(MovableVector * vector);
+static s16 MOVABLE_VECTOR_resize(MovableVector * vector, u16 new_size);
+static u16 MOVABLE_VECTOR_capacity(MovableVector * vector);
+static u16 MOVABLE_VECTOR_length(MovableVector * vector);
+static boolean MOVABLE_VECTOR_isEmpty(MovableVector * vector);
+static boolean MOVABLE_VECTOR_isFull(MovableVector * vector);
+static void* MOVABLE_VECTOR_first(MovableVector * vector);
+static void* MOVABLE_VECTOR_at(MovableVector * vector,u16 position);
+static void* MOVABLE_VECTOR_last(MovableVector * vector);
+static s16 MOVABLE_VECTOR_insertFirst(MovableVector * vector, void* data, u16 bytes);
+static s16 MOVABLE_VECTOR_insertLast(MovableVector * vector, void* data, u16 bytes);
+static s16 MOVABLE_VECTOR_insertAt(MovableVector * vector, void* data, u16 bytes,u16 position);
+static void* MOVABLE_VECTOR_extractFirst(MovableVector * vector);
+static void* MOVABLE_VECTOR_extractLast(MovableVector * vector);
+static void* MOVABLE_VECTOR_extractAt(MovableVector * vector, u16 position);
+static s16 MOVABLE_VECTOR_traverse(MovableVector * vector, void (*callback)(MemoryNode*));
+static s16 MOVABLE_VECTOR_concat(MovableVector * vector, MovableVector * vector_src);
+static void MOVABLE_VECTOR_print(MovableVector * vector);
 
 // Memory Node's API Definitions
 struct movable_vector_ops_s movable_vector_ops = {
@@ -69,13 +69,13 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
         return NULL;
     }
 
-    v_temp->storage_ = MM->malloc(sizeof(MemoryNode) * capacity);
+    v_temp->storage_ = MM->malloc(sizeof(MemoryNode) * capacity* 2);
     if (NULL == v_temp->storage_) {
         MM->free(v_temp);
         return NULL;
     }
 
-    for (s16 i = 0; i < capacity; i++) {
+    for (s16 i = 0; i < capacity*2; i++) {
         MEMNODE_createLite(&v_temp->storage_[i]);
     }
 
@@ -87,7 +87,7 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
     return v_temp;
 }
 
-s16 VECTOR_reset(MovableVector * movable_vector) {
+s16 MOVABLE_VECTOR_reset(MovableVector* vector) {
 
     if (NULL == vector) {
         return kErrorCode_VectorNull;
@@ -97,7 +97,7 @@ s16 VECTOR_reset(MovableVector * movable_vector) {
         return kErrorCode_StorageNull;
     }
 
-    for (s16 i = vector->head_; i < vector->tail_; i++) {
+    for (s16 i = vector->head_+ vector->capacity_/2; i < (vector->tail_)+ (vector->capacity_ / 2) + ; i++) {
 
         vector->storage_[i].ops_->reset(&vector->storage_[i]);
     }
@@ -106,7 +106,7 @@ s16 VECTOR_reset(MovableVector * movable_vector) {
     return  kErrorCode_Ok;
 }
 
-s16 MOVABLE_VECTOR_softReset(MovableVector * movable_vector) {
+s16 MOVABLE_VECTOR_softReset(MovableVector* vector) {
 
     if (NULL == vector) {
         return kErrorCode_VectorNull;
@@ -125,7 +125,7 @@ s16 MOVABLE_VECTOR_softReset(MovableVector * movable_vector) {
     return  kErrorCode_Ok;
 }
 
-s16 MOVABLE_VECTOR_resize(MovableVector * movable_vector, u16 new_size) {
+s16 MOVABLE_VECTOR_resize(MovableVector* vector, u16 new_size) {
     if (NULL == vector) {
         return kErrorCode_VectorNull;
     }
@@ -177,7 +177,7 @@ s16 MOVABLE_VECTOR_resize(MovableVector * movable_vector, u16 new_size) {
     return kErrorCode_Ok;
 }
 
-s16 MOVABLE_VECTOR_destroy(MovableVector * movable_vector)
+s16 MOVABLE_VECTOR_destroy(MovableVector* vector)
 {
     if (NULL == vector)
     {
@@ -200,7 +200,7 @@ s16 MOVABLE_VECTOR_destroy(MovableVector * movable_vector)
     return kErrorCode_Ok;
 }
 
-u16 MOVABLE_VECTOR_capacity(MovableVector * movable_vector) {
+u16 MOVABLE_VECTOR_capacity(MovableVector* vector) {
     if (NULL == vector) {
         return 0;
     }
@@ -208,7 +208,7 @@ u16 MOVABLE_VECTOR_capacity(MovableVector * movable_vector) {
     return vector->capacity_;
 }
 
-u16 MOVABLE_VECTOR_length(MovableVector * movable_vector) {
+u16 MOVABLE_VECTOR_length(MovableVector* vector) {
     if (NULL == vector) {
         return 0;
     }
@@ -216,7 +216,7 @@ u16 MOVABLE_VECTOR_length(MovableVector * movable_vector) {
     return vector->tail_ - vector->head_;
 }
 
-boolean MOVABLE_VECTOR_isEmpty(MovableVector * movable_vector) {
+boolean MOVABLE_VECTOR_isEmpty(MovableVector* vector) {
     if (NULL == vector) {
         return False;
     }
@@ -228,7 +228,7 @@ boolean MOVABLE_VECTOR_isEmpty(MovableVector * movable_vector) {
     return False;
 }
 
-boolean MOVABLE_VECTOR_isFull(MovableVector * movable_vector) {
+boolean MOVABLE_VECTOR_isFull(MovableVector* vector) {
     if (NULL == vector) {
         return False;
     }
@@ -240,7 +240,7 @@ boolean MOVABLE_VECTOR_isFull(MovableVector * movable_vector) {
     return False;
 }
 
-void* MOVABLE_VECTOR_first(MovableVector * movable_vector) {
+void* MOVABLE_VECTOR_first(MovableVector* vector) {
 
     if (NULL == vector) {
         return NULL;
@@ -253,7 +253,7 @@ void* MOVABLE_VECTOR_first(MovableVector * movable_vector) {
     return vector->storage_[vector->head_].data_;
 }
 
-void* MOVABLE_VECTOR_at(MovableVector * movable_vector, u16 position) {
+void* MOVABLE_VECTOR_at(MovableVector* vector, u16 position) {
 
     if (NULL == vector) {
         return NULL;
@@ -270,7 +270,7 @@ void* MOVABLE_VECTOR_at(MovableVector * movable_vector, u16 position) {
     return vector->storage_[position].data_;
 }
 
-void* MOVABLE_VECTOR_last(MovableVector * movable_vector) {
+void* MOVABLE_VECTOR_last(MovableVector* vector) {
 
     if (NULL == vector) {
         return NULL;
@@ -287,7 +287,7 @@ void* MOVABLE_VECTOR_last(MovableVector * movable_vector) {
     return vector->storage_[vector->tail_ - 1].data_;
 }
 
-s16 MOVABLE_VECTOR_insertFirst(MovableVector * movable_vector, void* data, u16 bytes) {
+s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
 
     if (NULL == vector) {
         return kErrorCode_VectorNull;
@@ -320,7 +320,7 @@ s16 MOVABLE_VECTOR_insertFirst(MovableVector * movable_vector, void* data, u16 b
     return  kErrorCode_Ok;
 }
 
-s16 MOVABLE_VECTOR_insertLast(MovableVector * movable_vector, void* data, u16 bytes) {
+s16 MOVABLE_VECTOR_insertLast(MovableVector* vector, void* data, u16 bytes) {
 
     if (NULL == vector) {
         return kErrorCode_VectorNull;
@@ -348,7 +348,7 @@ s16 MOVABLE_VECTOR_insertLast(MovableVector * movable_vector, void* data, u16 by
     return  kErrorCode_Ok;
 }
 
-s16 MOVABLE_VECTOR_insertAt(MovableVector * movable_vector, void* data, u16 bytes, u16 position) {
+s16 MOVABLE_VECTOR_insertAt(MovableVector* vector, void* data, u16 bytes, u16 position) {
 
     if (NULL == vector) {
         return kErrorCode_VectorNull;
@@ -387,7 +387,7 @@ s16 MOVABLE_VECTOR_insertAt(MovableVector * movable_vector, void* data, u16 byte
     return  kErrorCode_Ok;
 }
 
-void* MOVABLE_VECTOR_extractFirst(MovableVector * movable_vector) {
+void* MOVABLE_VECTOR_extractFirst(MovableVector* vector) {
 
     if (NULL == vector) {
         return NULL;
@@ -415,7 +415,7 @@ void* MOVABLE_VECTOR_extractFirst(MovableVector * movable_vector) {
     return tmp;
 }
 
-void* MOVABLE_VECTOR_extractLast(MovableVector * movable_vector) {
+void* MOVABLE_VECTOR_extractLast(MovableVector* vector) {
 
     if (NULL == vector) {
         return NULL;
@@ -447,7 +447,7 @@ void* MOVABLE_VECTOR_extractLast(MovableVector * movable_vector) {
     return tmp;
 }
 
-void* MOVABLE_VECTOR_extractAt(MovableVector * movable_vector, u16 position) {
+void* MOVABLE_VECTOR_extractAt(MovableVector* vector, u16 position) {
 
     if (NULL == vector) {
         return NULL;
@@ -491,7 +491,7 @@ void* MOVABLE_VECTOR_extractAt(MovableVector * movable_vector, u16 position) {
     return tmp;
 }
 
-s16 MOVABLE_VECTOR_traverse(MovableVector * movable_vector, void (*callback)(MemoryNode*)) {
+s16 MOVABLE_VECTOR_traverse(MovableVector* vector, void (*callback)(MemoryNode*)) {
     if (NULL == vector) {
         return kErrorCode_VectorNull;
     }
@@ -509,7 +509,7 @@ s16 MOVABLE_VECTOR_traverse(MovableVector * movable_vector, void (*callback)(Mem
 }
 
 
-s16 MOVABLE_VECTOR_concat(MovableVector * movable_vector, MovableVector * movable_vector_src)
+s16 MOVABLE_VECTOR_concat(MovableVector* vector, MovableVector * vector_src)
 {
     if (NULL == vector || NULL == vector_src)
     {
@@ -530,7 +530,7 @@ s16 MOVABLE_VECTOR_concat(MovableVector * movable_vector, MovableVector * movabl
     return kErrorCode_Ok;
 }
 
-void MOVABLE_VECTOR_print(MovableVector * movable_vector) {
+void MOVABLE_VECTOR_print(MovableVector* vector) {
     if (NULL == vector) {
         printf("\t[MovableVector Info] vector: NULL\n");
         return;
