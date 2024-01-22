@@ -69,7 +69,7 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
         return NULL;
     }
 
-    v_temp->storage_ = MM->malloc(sizeof(MemoryNode) * capacity* 2);
+    v_temp->storage_ = MM->malloc(sizeof(MemoryNode) * capacity * 2);
     if (NULL == v_temp->storage_) {
         MM->free(v_temp);
         return NULL;
@@ -80,7 +80,7 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
     }
 
     v_temp->tail_ = 0;
-    v_temp->head_ = 0;
+    v_temp->head_ = capacity/2;
     v_temp->capacity_ = capacity;
     v_temp->ops_ = &movable_vector_ops;
 
@@ -96,11 +96,21 @@ s16 MOVABLE_VECTOR_reset(MovableVector* vector) {
     if (NULL == vector->storage_) {
         return kErrorCode_StorageNull;
     }
-
-    for (s16 i = vector->head_+ vector->capacity_/2; i < (vector->tail_)+ (vector->capacity_ / 2) + ; i++) {
+    
+    for (s16 i = vector->head_ ;  i < vector->head_  + (vector->tail_) - 1; i++) {
+        
 
         vector->storage_[i].ops_->reset(&vector->storage_[i]);
     }
+    
+    /*
+    for (s16 i = vector->head_; i < vector->tail_; i++) {
+
+
+        vector->storage_[i].ops_->reset(&vector->storage_[i]);
+    }
+
+    */
     vector->tail_ = 0;
 
     return  kErrorCode_Ok;
@@ -309,13 +319,10 @@ s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
         return kErrorCode_VectorFull;
     }
 
-    for (u16 i = vector->tail_; i > vector->head_; i--) {
-        vector->storage_[i] = vector->storage_[i - 1];
-    }
 
-    vector->storage_[vector->head_].data_ = data;
-    vector->storage_[vector->head_].size_ = bytes;
-
+    vector->storage_[vector->head_  -1].data_ = data;
+    vector->storage_[vector->head_  -1].size_ = bytes;
+    vector->head_--;
     vector->tail_++;
     return  kErrorCode_Ok;
 }
@@ -547,11 +554,11 @@ void MOVABLE_VECTOR_print(MovableVector* vector) {
         return;
     }
 
-    for (s16 i = vector->head_; i < vector->tail_; i++) {
+    for (s16 i = vector->head_; i < vector->tail_ + vector->head_; i++) {
         printf("\t  [MovableVector Info] storage: #%d\n", i);
-        printf("\t      [Node info] Address: %p\n", &(vector->storage_[i]));
-        printf("\t      [Node info] Size: %d\n", vector->storage_[i].size_);
-        printf("\t      [Node info] Data Address: %p\n", vector->storage_[i].data_);
+        printf("\t      [Node info] Address: %p\n", &(vector->storage_[i+vector->capacity_/2]));
+        printf("\t      [Node info] Size: %d\n", vector->storage_[i + vector->capacity_ / 2].size_);
+        printf("\t      [Node info] Data Address: %p\n", vector->storage_[i + vector->capacity_ / 2].data_);
         printf("\t      [Node info] Data Content: ");
 
         u8* aux = (u8*)vector->storage_[i].data_;
