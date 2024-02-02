@@ -69,7 +69,7 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
         return NULL;
     }
 
-    v_temp->storage_ = MM->malloc(sizeof(MemoryNode) * capacity * 2);
+    v_temp->storage_ = MM->malloc(sizeof(MemoryNode) * capacity*2 );
     if (NULL == v_temp->storage_) {
         MM->free(v_temp);
         return NULL;
@@ -80,7 +80,7 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
     }
 
     v_temp->tail_ = 0;
-    v_temp->head_ = capacity/2;
+    v_temp->head_ = 0;
     v_temp->capacity_ = capacity;
     v_temp->ops_ = &movable_vector_ops;
 
@@ -97,7 +97,7 @@ s16 MOVABLE_VECTOR_reset(MovableVector* vector) {
         return kErrorCode_StorageNull;
     }
     
-    for (s16 i = vector->head_ ;  i < vector->head_  + (vector->tail_) - 1; i++) {
+    for (s16 i = vector->head_ ;  i <  vector->tail_; i++) {
         
 
         vector->storage_[i].ops_->reset(&vector->storage_[i]);
@@ -298,7 +298,7 @@ void* MOVABLE_VECTOR_last(MovableVector* vector) {
 }
 
 s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
-
+    /*
     if (NULL == vector) {
         return kErrorCode_VectorNull;
     }
@@ -323,6 +323,35 @@ s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
     vector->storage_[vector->head_  -1].data_ = data;
     vector->storage_[vector->head_  -1].size_ = bytes;
     vector->head_--;
+    vector->tail_++;
+    return  kErrorCode_Ok;*/
+    if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StorageNull;
+    }
+
+    if (NULL == data) {
+        return kErrorCode_DataNull;
+    }
+
+    if (bytes <= 0) {
+        return kErrorCode_BytesZero;
+    }
+
+    if (vector->tail_ == vector->capacity_) {
+        return kErrorCode_VectorFull;
+    }
+
+    for (u16 i = vector->tail_; i > vector->head_; i--) {
+        vector->storage_[i] = vector->storage_[i - 1];
+    }
+
+    vector->storage_[vector->head_].data_ = data;
+    vector->storage_[vector->head_].size_ = bytes;
+
     vector->tail_++;
     return  kErrorCode_Ok;
 }
@@ -539,26 +568,26 @@ s16 MOVABLE_VECTOR_concat(MovableVector* vector, MovableVector * vector_src)
 
 void MOVABLE_VECTOR_print(MovableVector* vector) {
     if (NULL == vector) {
-        printf("\t[MovableVector Info] vector: NULL\n");
+        printf("\t[Vector Info] vector: NULL\n");
         return;
     }
 
-    printf("\t[MovableVector info] Address: %p\n", vector);
-    printf("\t[MovableVector info] Head: %d\n", vector->head_);
-    printf("\t[MovableVector info] Tail: %d\n", vector->tail_);
-    printf("\t[MovableVector info] Capacity: %d\n", vector->capacity_);
-    printf("\t[MovableVector info] Address: %p\n", vector->ops_);
+    printf("\t[Vector info] Address: %p\n", vector);
+    printf("\t[Vector info] Head: %d\n", vector->head_);
+    printf("\t[Vector info] Tail: %d\n", vector->tail_);
+    printf("\t[Vector info] Capacity: %d\n", vector->capacity_);
+    printf("\t[Vector info] Address: %p\n", vector->ops_);
 
     if (NULL == vector->storage_) {
         printf("\t[Storage Info] vector storage: NULL\n");
         return;
     }
 
-    for (s16 i = vector->head_; i < vector->tail_ + vector->head_; i++) {
-        printf("\t  [MovableVector Info] storage: #%d\n", i);
-        printf("\t      [Node info] Address: %p\n", &(vector->storage_[i+vector->capacity_/2]));
-        printf("\t      [Node info] Size: %d\n", vector->storage_[i + vector->capacity_ / 2].size_);
-        printf("\t      [Node info] Data Address: %p\n", vector->storage_[i + vector->capacity_ / 2].data_);
+    for (s16 i = vector->head_; i < vector->tail_; i++) {
+        printf("\t  [Vector Info] storage: #%d\n", i);
+        printf("\t      [Node info] Address: %p\n", &(vector->storage_[i]));
+        printf("\t      [Node info] Size: %d\n", vector->storage_[i].size_);
+        printf("\t      [Node info] Data Address: %p\n", vector->storage_[i].data_);
         printf("\t      [Node info] Data Content: ");
 
         u8* aux = (u8*)vector->storage_[i].data_;
