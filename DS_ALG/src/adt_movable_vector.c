@@ -79,9 +79,9 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
         MEMNODE_createLite(&v_temp->storage_[i]);
     }
 
-    v_temp->tail_ = 0;
-    v_temp->head_ = 0;
-    v_temp->capacity_ = capacity;
+    v_temp->tail_ = capacity / 2;
+    v_temp->head_ = capacity / 2;
+    v_temp->capacity_ = capacity * 2;
     v_temp->ops_ = &movable_vector_ops;
 
     return v_temp;
@@ -97,7 +97,7 @@ s16 MOVABLE_VECTOR_reset(MovableVector* vector) {
         return kErrorCode_StorageNull;
     }
     
-    for (s16 i = vector->head_ ;  i <  vector->tail_; i++) {
+    for (s16 i = vector->head_;  i<vector->tail_; i++) {
         
 
         vector->storage_[i].ops_->reset(&vector->storage_[i]);
@@ -111,7 +111,7 @@ s16 MOVABLE_VECTOR_reset(MovableVector* vector) {
     }
 
     */
-    vector->tail_ = 0;
+    vector->tail_ = vector->capacity_ / 2;
 
     return  kErrorCode_Ok;
 }
@@ -130,7 +130,7 @@ s16 MOVABLE_VECTOR_softReset(MovableVector* vector) {
         vector->storage_[i].data_ = NULL;
         vector->storage_[i].size_ = 0;
     }
-    vector->tail_ = 0;
+    vector->tail_ = vector->capacity_ / 2;
 
     return  kErrorCode_Ok;
 }
@@ -298,7 +298,7 @@ void* MOVABLE_VECTOR_last(MovableVector* vector) {
 }
 
 s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
-    /*
+    
     if (NULL == vector) {
         return kErrorCode_VectorNull;
     }
@@ -315,17 +315,19 @@ s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
         return kErrorCode_BytesZero;
     }
 
-    if (vector->tail_ == vector->capacity_) {
+    //Mirar esta condición
+    if (vector->head_ == 0) {
         return kErrorCode_VectorFull;
     }
 
-
-    vector->storage_[vector->head_  -1].data_ = data;
-    vector->storage_[vector->head_  -1].size_ = bytes;
     vector->head_--;
-    vector->tail_++;
-    return  kErrorCode_Ok;*/
-    if (NULL == vector) {
+
+    vector->storage_[vector->head_].data_ = data;
+    vector->storage_[vector->head_].size_ = bytes;
+   
+    return  kErrorCode_Ok;
+    
+    /*if (NULL == vector) {
         return kErrorCode_VectorNull;
     }
 
@@ -353,12 +355,37 @@ s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
     vector->storage_[vector->head_].size_ = bytes;
 
     vector->tail_++;
-    return  kErrorCode_Ok;
+    return  kErrorCode_Ok;*/
 }
 
 s16 MOVABLE_VECTOR_insertLast(MovableVector* vector, void* data, u16 bytes) {
 
     if (NULL == vector) {
+        return kErrorCode_VectorNull;
+    }
+
+    if (NULL == vector->storage_) {
+        return kErrorCode_StorageNull;
+    }
+
+    if (NULL == data) {
+        return kErrorCode_DataNull;
+    }
+
+    if (bytes <= 0) {
+        return kErrorCode_BytesZero;
+    }
+    //Mirar condición
+    if (vector->tail_ == vector->capacity_/2 + vector->head_) {
+        return kErrorCode_VectorFull;
+    }
+
+    vector->storage_[vector->tail_].data_ = data;
+    vector->storage_[vector->tail_].size_ = bytes;
+    vector->tail_++;
+    return  kErrorCode_Ok;
+
+    /*if (NULL == vector) {
         return kErrorCode_VectorNull;
     }
 
@@ -381,7 +408,7 @@ s16 MOVABLE_VECTOR_insertLast(MovableVector* vector, void* data, u16 bytes) {
     vector->storage_[vector->tail_].data_ = data;
     vector->storage_[vector->tail_].size_ = bytes;
     vector->tail_++;
-    return  kErrorCode_Ok;
+    return  kErrorCode_Ok;*/
 }
 
 s16 MOVABLE_VECTOR_insertAt(MovableVector* vector, void* data, u16 bytes, u16 position) {
