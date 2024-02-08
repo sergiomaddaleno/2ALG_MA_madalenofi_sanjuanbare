@@ -316,8 +316,8 @@ s16 MOVABLE_VECTOR_insertFirst(MovableVector* vector, void* data, u16 bytes) {
         return kErrorCode_BytesZero;
     }
 
-    //Mirar esta condición
-    if (vector->head_ == 0) {
+    
+    if (vector->ops_->length(vector) == vector->capacity_ >> 1) {
         return kErrorCode_VectorFull;
     }
 
@@ -376,8 +376,8 @@ s16 MOVABLE_VECTOR_insertLast(MovableVector* vector, void* data, u16 bytes) {
     if (bytes <= 0) {
         return kErrorCode_BytesZero;
     }
-    //Mirar condición
-    if (vector->tail_ == vector->capacity_/2 + vector->head_) {
+    
+    if (vector->ops_->length(vector) == vector->capacity_ >> 1) {
         return kErrorCode_VectorFull;
     }
 
@@ -430,13 +430,17 @@ s16 MOVABLE_VECTOR_insertAt(MovableVector* vector, void* data, u16 bytes, u16 po
         return kErrorCode_BytesZero;
     }
 
-    if (vector->tail_ == vector->capacity_) {
+    if (vector->ops_->length(vector) == vector->capacity_ >> 1) {
         return kErrorCode_VectorFull;
     }
+
+    position = position + vector->head_;
 
     if (position >= vector->tail_) {
         position = vector->tail_;
     }
+
+    
 
     for (u16 i = vector->tail_; i > position; i--) {
 
@@ -468,13 +472,11 @@ void* MOVABLE_VECTOR_extractFirst(MovableVector* vector) {
 
     void* tmp = vector->storage_[vector->head_].data_;
 
-    for (u16 i = vector->head_ + 1; i < vector->tail_; i++) {
+    
+    vector->storage_[vector->head_].ops_->softReset(&vector->storage_[vector->head_]);
 
-        vector->storage_[i - 1] = vector->storage_[i];
-    }
+    vector->head_++;
 
-
-    vector->tail_--;
 
     return tmp;
 }
@@ -502,10 +504,12 @@ void* MOVABLE_VECTOR_extractLast(MovableVector* vector) {
 
         return  NULL;
     }
-
+    
     void* tmp = vector->storage_[vector->tail_ - 1].data_;
 
-    //vector->storage_[vector->tail_-1].ops_->softReset(&vector->storage_[vector->tail_-1]);
+    
+    vector->storage_[vector->tail_-1].ops_->softReset(&vector->storage_[vector->tail_-1]);
+    
     vector->tail_--;
 
     return tmp;
@@ -531,25 +535,27 @@ void* MOVABLE_VECTOR_extractAt(MovableVector* vector, u16 position) {
     }
 
     void* tmp = NULL;
+    
+    position = position + vector->head_;
+    tmp = vector->storage_[position].data_;
 
     if (position >= vector->tail_) {
 
         position = vector->tail_;
         tmp = vector->storage_[position - 1].data_;
     }
-    else {
+    
+        
+    
 
-        tmp = vector->storage_[position].data_;
-    }
+    vector->storage_[position].ops_->softReset(&vector->storage_[position]);
 
-
-
-    for (u16 i = position; i < vector->tail_; i++) {
+    for (u16 i = position; i < vector->tail_ - 1 ; i++) {
 
         vector->storage_[i] = vector->storage_[i + 1];
     }
 
-    //vector->storage_[vector->tail_-1].ops_->softReset(&vector->storage_[vector->tail_ - 1]);
+    
     vector->tail_--;
 
     return tmp;
