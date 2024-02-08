@@ -79,8 +79,8 @@ MovableVector* MOVABLE_VECTOR_create(u16 capacity) {
         MEMNODE_createLite(&v_temp->storage_[i]);
     }
 
-    v_temp->tail_ = capacity / 2;
     v_temp->head_ = capacity / 2;
+    v_temp->tail_ = capacity / 2;
     v_temp->capacity_ = capacity * 2;
     v_temp->ops_ = &movable_vector_ops;
 
@@ -111,6 +111,7 @@ s16 MOVABLE_VECTOR_reset(MovableVector* vector) {
     }
 
     */
+    vector->head_ = vector->capacity_ / 2;
     vector->tail_ = vector->capacity_ / 2;
 
     return  kErrorCode_Ok;
@@ -131,7 +132,7 @@ s16 MOVABLE_VECTOR_softReset(MovableVector* vector) {
         vector->storage_[i].size_ = 0;
     }
     vector->tail_ = vector->capacity_ / 2;
-
+    vector->head_ = vector->capacity_ / 2;
     return  kErrorCode_Ok;
 }
 
@@ -215,7 +216,7 @@ u16 MOVABLE_VECTOR_capacity(MovableVector* vector) {
         return 0;
     }
 
-    return vector->capacity_;
+    return vector->capacity_ >> 1;
 }
 
 u16 MOVABLE_VECTOR_length(MovableVector* vector) {
@@ -243,7 +244,7 @@ boolean MOVABLE_VECTOR_isFull(MovableVector* vector) {
         return False;
     }
 
-    if (vector->tail_ == vector->capacity_) {
+    if (vector->ops_->length(vector) == vector->capacity_ >> 1) {
         return True;
     }
 
