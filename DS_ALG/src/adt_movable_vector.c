@@ -152,7 +152,7 @@ s16 MOVABLE_VECTOR_resize(MovableVector* vector, u16 new_size) {
     if (vector->capacity_ == new_size) {
         return kErrorCode_EqualCapacity;
     }
-
+    /*
     u16 elements_to_copy = 0;
 
     if (vector->tail_ > new_size) {
@@ -162,18 +162,30 @@ s16 MOVABLE_VECTOR_resize(MovableVector* vector, u16 new_size) {
     else {
         elements_to_copy = vector->tail_;
     }
+    */
+    //modificar
+    u16 elements_to_copy = 0;
+    if (vector->tail_ - vector->head_ < new_size) {
+        elements_to_copy = vector->tail_ - vector->head_;
+    }
+    else {
+        elements_to_copy = new_size;
+    }
+  
 
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * new_size);
+    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * new_size * 2);
 
     if (NULL == aux) {
         return kErrorCode_MallocNull;
     }
 
-    for (u16 i = 0; i < new_size; i++) {
+    for (u16 i = 0; i < new_size*2; i++) {
         MEMNODE_createLite(&aux[i]);
     }
+
+
     for (u16 i = 0; i < elements_to_copy; i++) {
-        vector->storage_->ops_->memCopy(&aux[i], vector->storage_[i].data_, vector->storage_[i].size_);
+        vector->storage_->ops_->memCopy(&aux[new_size/2+i], vector->storage_[vector->head_+i].data_, vector->storage_[vector->head_ + i].size_);
     }
     for (u16 i = 0; i < vector->capacity_; i++) {
         if (NULL != vector->storage_[i].data_) {
@@ -182,7 +194,9 @@ s16 MOVABLE_VECTOR_resize(MovableVector* vector, u16 new_size) {
     }
 
     MM->free(vector->storage_);
-    vector->capacity_ = new_size;
+    vector->capacity_ = new_size*2;
+    vector->head_ = new_size / 2;
+    vector->tail_ = new_size / 2 + elements_to_copy;
     vector->storage_ = aux;
 
     return kErrorCode_Ok;
@@ -537,24 +551,27 @@ void* MOVABLE_VECTOR_extractAt(MovableVector* vector, u16 position) {
     void* tmp = NULL;
     
     position = position + vector->head_;
-    tmp = vector->storage_[position].data_;
 
     if (position >= vector->tail_) {
 
         position = vector->tail_;
         tmp = vector->storage_[position - 1].data_;
+        vector->storage_[position-1].ops_->softReset(&vector->storage_[position-1]);
+        
+    }
+    else {
+
+       
+        tmp = vector->storage_[position].data_;
+        vector->storage_[position].ops_->softReset(&vector->storage_[position]);
+        for (u16 i = position; i < vector->tail_; i++) {
+
+            vector->storage_[i] = vector->storage_[i + 1];
+        }
     }
     
         
-    
-
-    vector->storage_[position].ops_->softReset(&vector->storage_[position]);
-
-    for (u16 i = position; i < vector->tail_ - 1 ; i++) {
-
-        vector->storage_[i] = vector->storage_[i + 1];
-    }
-
+   
     
     vector->tail_--;
 
