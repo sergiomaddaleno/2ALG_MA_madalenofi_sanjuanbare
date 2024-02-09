@@ -149,21 +149,10 @@ s16 MOVABLE_VECTOR_resize(MovableVector* vector, u16 new_size) {
         return kErrorCode_SizeNull;
     }
 
-    if (vector->capacity_ == new_size) {
+    if (vector->capacity_  == new_size) {
         return kErrorCode_EqualCapacity;
     }
-    /*
-    u16 elements_to_copy = 0;
 
-    if (vector->tail_ > new_size) {
-        elements_to_copy = new_size;
-        vector->tail_ = new_size;
-    }
-    else {
-        elements_to_copy = vector->tail_;
-    }
-    */
-    //modificar
     u16 elements_to_copy = 0;
     if (vector->tail_ - vector->head_ < new_size) {
         elements_to_copy = vector->tail_ - vector->head_;
@@ -292,7 +281,7 @@ void* MOVABLE_VECTOR_at(MovableVector* vector, u16 position) {
         return NULL;
     }
 
-    return vector->storage_[position].data_;
+    return vector->storage_[position+vector->head_].data_;
 }
 
 void* MOVABLE_VECTOR_last(MovableVector* vector) {
@@ -594,14 +583,15 @@ s16 MOVABLE_VECTOR_concat(MovableVector* vector, MovableVector * vector_src)
     {
         return kErrorCode_NodeNull;
     }
-    u16 new_capacity = vector->capacity_ + vector_src->capacity_;
+    u16 new_capacity = vector->capacity_  + vector_src->capacity_ ;
+  
     vector->ops_->resize(vector, new_capacity);
     u16 index = vector->tail_;
-    for (u16 i = 0; i < vector_src->tail_; i++) {
-        vector->storage_->ops_->memCopy(&vector->storage_[index], vector_src->storage_[i].data_, vector_src->storage_[i].size_);
+    for (u16 i = 0; i < vector_src->tail_ - vector_src->head_; i++) {
+        vector->storage_->ops_->memCopy(&vector->storage_[index], vector_src->storage_[i+ vector_src->head_].data_, vector_src->storage_[i + vector_src->head_].size_);
         index++;
     }
-    vector->tail_ += vector_src->tail_;
+    vector->tail_ = vector->tail_+vector_src->tail_ - vector_src->head_;
     return kErrorCode_Ok;
 }
 
