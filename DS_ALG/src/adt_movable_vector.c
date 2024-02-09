@@ -505,10 +505,6 @@ void* MOVABLE_VECTOR_extractLast(MovableVector* vector) {
         return NULL;
     }
 
-    if (NULL == vector->storage_->data_) {
-        return NULL;
-    }
-
     if (MOVABLE_VECTOR_isEmpty(vector)) {
 
         return  NULL;
@@ -539,10 +535,6 @@ void* MOVABLE_VECTOR_extractAt(MovableVector* vector, u16 position) {
         return NULL;
     }
 
-    if (NULL == vector->storage_->data_) {
-        return NULL;
-    }
-
     if (MOVABLE_VECTOR_isEmpty(vector)) {
 
         return NULL;
@@ -556,12 +548,11 @@ void* MOVABLE_VECTOR_extractAt(MovableVector* vector, u16 position) {
 
         position = vector->tail_;
         tmp = vector->storage_[position - 1].data_;
-        vector->storage_[position-1].ops_->softReset(&vector->storage_[position-1]);
-        
+        vector->storage_[position - 1].ops_->softReset(&vector->storage_[position - 1]);
+
     }
     else {
 
-       
         tmp = vector->storage_[position].data_;
         vector->storage_[position].ops_->softReset(&vector->storage_[position]);
         for (u16 i = position; i < vector->tail_; i++) {
@@ -569,10 +560,7 @@ void* MOVABLE_VECTOR_extractAt(MovableVector* vector, u16 position) {
             vector->storage_[i] = vector->storage_[i + 1];
         }
     }
-    
-        
-   
-    
+
     vector->tail_--;
 
     return tmp;
