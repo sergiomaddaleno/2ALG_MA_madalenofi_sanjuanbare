@@ -1,4 +1,4 @@
-// adt_stack.h
+// adt_list.h
 // Escuela Superior de Arte y Tecnologia
 // Algoritmos & Inteligencia Artificial
 // ESAT 2020-2021
@@ -30,9 +30,9 @@ struct list_ops_s {
     s16(*isEmpty)(const List* list);
     s16(*isFull)(const List* list);
 
-    MemoryNode* (*first)(const List* list);
-    MemoryNode* (*last)(const List* list);
-    MemoryNode* (*at)(const List* list, u16 index);
+    void* (*first)(const List* list);
+    void* (*last)(const List* list);
+    void* (*at)(const List* list, u16 index);
 
     s16(*insertFirst)(List* list);
     s16(*insertLast)(List* list, void* data);
@@ -53,5 +53,6 @@ struct list_ops_s {
     void (*print)(List* list);
 };
 
+List* LIST_create(u16 capacity);
 
-#endif //__ADT_STACK_H__
+#endif //__ADT_LIST_H__

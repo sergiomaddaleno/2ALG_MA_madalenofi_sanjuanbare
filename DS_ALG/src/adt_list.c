@@ -20,9 +20,9 @@ static u16 LIST_length(const List* list);
 static s16 LIST_isEmpty(const List* list);
 static s16 LIST_isFull(const List* list);
 
-static MemoryNode* LIST_first(const List* list);
-static MemoryNode* LIST_last(const List* list);
-static MemoryNode* LIST_at(const List* list, u16 index);
+static void* LIST_first(const List* list);
+static void* LIST_last(const List* list);
+static void* LIST_at(const List* list, u16 index);
 
 static s16 LIST_insertFirst(List* list);
 static s16 LIST_insertLast(List* list, void* data);
@@ -70,12 +70,41 @@ struct list_ops_s list_ops = {
     .print = LIST_print
 };
 
+List* LIST_create(u16 capacity) {
+    if (capacity <= 0) {
+        return NULL;
+    }
+
+    List* l_temp = MM->malloc(sizeof(List));
+    if (NULL == l_temp) {
+        return NULL;
+    }
+
+    l_temp->storage_ = MM->malloc(sizeof(MemoryNode) * capacity);
+    if (NULL == l_temp->storage_) {
+        MM->free(l_temp);
+        return NULL;
+    }
+
+    for (s16 i = 0; i < capacity; i++) {
+        MEMNODE_createLite(&l_temp->storage_[i]);
+    }
+
+    l_temp->length_ = 0;
+    l_temp->capacity_ = 0;
+    /*l_temp->head_ = 0;
+    l_temp->tail_ = 0;
+    */
+
+    return l_temp;
+}
+
 //s16 LIST_destroy(List* list) {}
 //s16 LIST_reset(List* list) {}
 //s16 LIST_softReset(List* list) {}
 //s16 LIST_resize(List* list, u16 newCapacity) {}
 
-u16 LIST_capacity(const List* list) {
+/*u16 LIST_capacity(const List* list) {
     if (NULL == list) {
         return NULL;
     }
@@ -98,11 +127,11 @@ s16 LIST_isFull(const List* list) {
         return NULL;
     }
     //return list->length_ == list->capacity_;
-}
+}*/
 
-//MemoryNode* LIST_first(const List* list){}
-//MemoryNode* LIST_last(const List* list){}
-//MemoryNode* LIST_at(const List* list, u16 index){}
+//void* LIST_first(const List* list){}
+//void* LIST_last(const List* list){}
+//void* LIST_at(const List* list, u16 index){}
 
 //s16 LIST_insertFirst(List* list){}
 //s16 LIST_insertLast(List* list, void* data){}
