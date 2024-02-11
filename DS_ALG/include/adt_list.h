@@ -23,7 +23,7 @@ struct list_ops_s {
     s16(*destroy)(List* list);
     s16(*reset)(List* list);
     s16(*softReset)(List* list);
-    s16(*resize)(List* list, u16 newCapacity);
+    s16(*resize)(List* list, u16 new_size);
 
     u16(*capacity)(const List* list);
     u16(*length)(const List* list);
@@ -32,23 +32,23 @@ struct list_ops_s {
 
     void* (*first)(const List* list);
     void* (*last)(const List* list);
-    void* (*at)(const List* list, u16 index);
+    void* (*at)(const List* list, u16 position);
 
     s16(*insertFirst)(List* list);
     s16(*insertLast)(List* list, void* data);
-    s16(*insertAt)(List* list, u16 index, void* data);
+    s16(*insertAt)(List* list, u16 position, void* data);
 
     s16(*extractFirst)(List* list);
     s16(*extractLast)(List* list);
     s16(*extractAt)(List* list, u16 position);
 
-    s16(*concat)(List* list1, const List* list2);
+    s16(*concat)(List* list, const List* list_src);
     void (*traverse)(const List* list, void (*callback)(MemoryNode*));
 
     MemoryNode* (*next)(List* list);
     MemoryNode* (*previous)(List* list);
-    void (*setNext)(MemoryNode* node, MemoryNode* nextNode);
-    void (*setPrevious)(MemoryNode* node, MemoryNode* previousNode);
+    void (*setNext)(MemoryNode* node, MemoryNode* next_node);
+    void (*setPrevious)(MemoryNode* node, MemoryNode* previous_node);
 
     void (*print)(List* list);
 };
