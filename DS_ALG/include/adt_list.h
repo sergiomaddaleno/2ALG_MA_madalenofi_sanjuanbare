@@ -43,7 +43,7 @@ struct list_ops_s {
     s16(*extractAt)(List* list, u16 position);
 
     s16(*concat)(List* list1, const List* list2);
-    void (*traverse)(const List* list, void (*visit)(void* data));
+    void (*traverse)(const List* list, void (*callback)(MemoryNode*));
 
     MemoryNode* (*next)(List* list);
     MemoryNode* (*previous)(List* list);

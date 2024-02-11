@@ -13,8 +13,8 @@
 typedef struct memory_node_s {
   void *data_;
   u16 size_;
-  //MemoryNode* next_;
   struct memory_node_ops_s *ops_;
+  struct memory_node_s *next_;
 } MemoryNode;
 
 // Memory Node's API Declarations
