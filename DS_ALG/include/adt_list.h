@@ -34,7 +34,7 @@ struct list_ops_s {
     void* (*last)(const List* list);
     void* (*at)(const List* list, u16 position);
 
-    s16(*insertFirst)(List* list);
+    s16(*insertFirst)(List* list, void* data);
     s16(*insertLast)(List* list, void* data);
     s16(*insertAt)(List* list, u16 position, void* data);
 
@@ -43,7 +43,7 @@ struct list_ops_s {
     s16(*extractAt)(List* list, u16 position);
 
     s16(*concat)(List* list, const List* list_src);
-    void (*traverse)(const List* list, void (*callback)(MemoryNode*));
+    s16 (*traverse)(const List* list, void (*callback)(MemoryNode*));
 
     MemoryNode* (*next)(List* list);
     MemoryNode* (*previous)(List* list);

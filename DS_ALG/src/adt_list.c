@@ -24,7 +24,7 @@ static void* LIST_first(const List* list);
 static void* LIST_last(const List* list);
 static void* LIST_at(const List* list, u16 position);
 
-static s16 LIST_insertFirst(List* list);
+static s16 LIST_insertFirst(List* list, void* data);
 static s16 LIST_insertLast(List* list, void* data);
 static s16 LIST_insertAt(List* list, u16 position, void* data);
 
@@ -33,7 +33,7 @@ static s16 LIST_extractLast(List* list);
 static s16 LIST_extractAt(List* list, u16 position);
 
 static s16 LIST_concat(List* list, const List* list_src);
-static void LIST_traverse(const List* list, void (*callback)(MemoryNode*));
+static s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*));
 
 static MemoryNode* LIST_next(List* list);
 static MemoryNode* LIST_previous(List* list);
@@ -56,18 +56,18 @@ struct list_ops_s list_ops = {
     .last = LIST_last,
     .at = LIST_at,
     .insertFirst = LIST_insertFirst,
-    .insertLast = LIST_insertLast,
-    .insertAt = LIST_insertAt,
-    .extractFirst = LIST_extractFirst,
-    .extractLast = LIST_extractLast,
-    .extractAt = LIST_extractAt,
+    //.insertLast = LIST_insertLast,
+    //.insertAt = LIST_insertAt,
+    //.extractFirst = LIST_extractFirst,
+    //.extractLast = LIST_extractLast,
+    //.extractAt = LIST_extractAt,
     .concat = LIST_concat,
     .traverse = LIST_traverse,
     .next = LIST_next,
-    .previous = LIST_previous,
-    .setNext = LIST_setNext,
-    .setPrevious = LIST_setPrevious,
-    .print = LIST_print
+    //.previous = LIST_previous,
+    //.setNext = LIST_setNext,
+    //.setPrevious = LIST_setPrevious,
+    //.print = LIST_print
 };
 
 List* LIST_create(u16 capacity) {
@@ -95,7 +95,6 @@ List* LIST_create(u16 capacity) {
     l_temp->head_ = NULL;
     l_temp->tail_ = NULL;
     
-
     return l_temp;
 }
 
@@ -301,7 +300,15 @@ void* LIST_at(const List* list, u16 position){
     return list->storage_[position].data_;
 }
 
-//s16 LIST_insertFirst(List* list){}
+s16 LIST_insertFirst(List* list){
+    if (NULL == list) {
+        return kErrorCode_ListNull;
+    }
+
+    if (NULL == list->storage_) {
+        return kErrorCode_StorageNull;
+    }
+}
 //s16 LIST_insertLast(List* list, void* data){}
 //s16 LIST_insertAt(List* list, u16 position, void* data){}
 
@@ -332,7 +339,7 @@ s16 LIST_concat(List* list, const List* list_src) {
     return kErrorCode_Ok;
 }
 
-void LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
+s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
     
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -350,7 +357,6 @@ void LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
     return kErrorCode_Ok;
 }
 
-//MemoryNode* LIST_next(List* list){}
 //MemoryNode* LIST_previous(List* list){}
 //void LIST_setNext(MemoryNode* node, MemoryNode* next_node){}
 //void LIST_setPrevious(MemoryNode* node, MemoryNode* previous_node){}

@@ -82,6 +82,7 @@ s16 MEMNODE_createLite(MemoryNode* node) {
     node->data_ = NULL;
     node->size_ = 0;
     node->ops_ = &memory_node_ops;
+    node->next_ = NULL;
 
     return kErrorCode_Ok;
 }
