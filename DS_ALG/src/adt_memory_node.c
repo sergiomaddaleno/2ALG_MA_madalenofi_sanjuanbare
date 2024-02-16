@@ -29,6 +29,11 @@ static s16 MEMNODE_memCopy(MemoryNode* node, void* src, u16 bytes);
 static s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes);
 static s16 MEMNODE_memMask(MemoryNode* node, u8 mask);
 
+static MemoryNode* MEMNODE_next(List* list);
+//static MemoryNode* MEMNODE_previous(List* list);
+static void MEMNODE_setNext(MemoryNode* node, MemoryNode* next_node);
+//static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node);
+
 static void MEMNODE_print(MemoryNode* node);
 
 
@@ -45,6 +50,10 @@ struct memory_node_ops_s memory_node_ops = { .data = MEMNODE_data,
                                              .memConcat = MEMNODE_memConcat,
                                              .memMask = MEMNODE_memMask,
                                              .print = MEMNODE_print,
+                                             .next = MEMNODE_next,
+                                             //.previous = MEMNODE_previous,
+                                             .setNext = MEMNODE_setNext,
+                                             //.setPrevious = MEMNODE_setPrevious,
 };
 
 // Memory Node Definitions
@@ -293,3 +302,29 @@ void MEMNODE_print(MemoryNode* node) {
     }
     printf("\n");
 }
+
+                                
+static MemoryNode* MEMNODE_next(MemoryNode* node) {
+
+    if (NULL == node) {
+        return kErrorCode_NodeNull;
+    }
+
+    return node->next_;
+
+
+}
+
+//static MemoryNode* MEMNODE_previous(List* list) {}
+
+static void MEMNODE_setNext(MemoryNode* node, MemoryNode* next_node){
+   
+    if (NULL == node) {
+        return kErrorCode_NodeNull;
+    }
+
+    node->next_ = next_node->next_;
+
+}
+
+//static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node){}

@@ -36,7 +36,7 @@ struct list_ops_s {
 
     s16(*insertFirst)(List* list, void* data, u16 bytes);
     s16(*insertLast)(List* list, void* data, u16 bytes);
-    s16(*insertAt)(List* list, u16 position, void* data);
+    s16(*insertAt)(List* list, void* data, u16 bytes, u16 position);
 
     s16(*extractFirst)(List* list);
     s16(*extractLast)(List* list);
@@ -44,11 +44,6 @@ struct list_ops_s {
 
     s16(*concat)(List* list, const List* list_src);
     s16 (*traverse)(const List* list, void (*callback)(MemoryNode*));
-
-    MemoryNode* (*next)(List* list);
-    MemoryNode* (*previous)(List* list);
-    void (*setNext)(MemoryNode* node, MemoryNode* next_node);
-    void (*setPrevious)(MemoryNode* node, MemoryNode* previous_node);
 
     void (*print)(List* list);
 };
