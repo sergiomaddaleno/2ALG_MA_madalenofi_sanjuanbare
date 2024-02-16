@@ -41,7 +41,6 @@ struct list_ops_s {
     s16(*extractFirst)(List* list);
     s16(*extractLast)(List* list);
     s16(*extractAt)(List* list, u16 position);
-
     s16(*concat)(List* list, const List* list_src);
     s16 (*traverse)(const List* list, void (*callback)(MemoryNode*));
 

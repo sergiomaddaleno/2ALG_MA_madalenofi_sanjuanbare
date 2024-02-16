@@ -29,7 +29,7 @@ static s16 MEMNODE_memCopy(MemoryNode* node, void* src, u16 bytes);
 static s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes);
 static s16 MEMNODE_memMask(MemoryNode* node, u8 mask);
 
-static MemoryNode* MEMNODE_next(List* list);
+static MemoryNode* MEMNODE_next(MemoryNode* node);
 //static MemoryNode* MEMNODE_previous(List* list);
 static void MEMNODE_setNext(MemoryNode* node, MemoryNode* next_node);
 //static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node);

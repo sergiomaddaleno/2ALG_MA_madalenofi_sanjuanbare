@@ -52,7 +52,7 @@ struct list_ops_s list_ops = {
     .at = LIST_at,
     .insertFirst = LIST_insertFirst,
     .insertLast = LIST_insertLast,
-    //.insertAt = LIST_insertAt,
+    .insertAt = LIST_insertAt,
     //.extractFirst = LIST_extractFirst,
     //.extractLast = LIST_extractLast,
     //.extractAt = LIST_extractAt,
@@ -436,7 +436,7 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
         list->tail_ = aux;
 
         aux->data_ = data;
-
+        aux->size_ = bytes;
 
         list->length_++;
 
@@ -445,28 +445,44 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
     else {
 
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+        MemoryNode* countaux = MM->malloc(sizeof(MemoryNode) * 1);
 
 
-       /*
-       
-       
-       
-       HACER
-       
-       
-       
-       */
+        if (position >= list->length_) {
+            position = list->length_;
+        }
+
+        int count = 0;
+        
+            while (count < position) {
+                if (countaux == NULL) {
+                    aux = list->head_;
+                    countaux= list->head_;
+                }
+                else {
+
+                    countaux = aux->next;
+
+                }
+                count++;
+            }
+
+        aux->next_ = countaux->next;
+        countaux->next = aux;
+        
+
+
+        aux->data_ = data;
+        aux->size_ = bytes;
+
 
 
         list->length_++;
+       
     }
 
 
     return kErrorCode_Ok;
-
-
-
-
 
 
 }
