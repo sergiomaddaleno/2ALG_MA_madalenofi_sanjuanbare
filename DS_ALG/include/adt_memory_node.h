@@ -187,15 +187,13 @@ struct memory_node_ops_s {
   void(*print) (MemoryNode *node);
 
 
-  MemoryNode*(*next) (List* list);
+  MemoryNode*(*next) (MemoryNode* node);
 
   //MemoryNode* (*previous)(List* list);
 
   void(*setNext) (MemoryNode* node, MemoryNode* next_node);
 
   //void (*setPrevious)(MemoryNode* node, MemoryNode* previous_node);
-
-
 };
 
 /**
