@@ -51,12 +51,12 @@ struct list_ops_s list_ops = {
     .insertFirst = LIST_insertFirst,
     .insertLast = LIST_insertLast,
     .insertAt = LIST_insertAt,
-    //.extractFirst = LIST_extractFirst,
-    //.extractLast = LIST_extractLast,
+    .extractFirst = LIST_extractFirst,
+    .extractLast = LIST_extractLast,
     //.extractAt = LIST_extractAt,
     .concat = LIST_concat,
     .traverse = LIST_traverse,
-    //.print = LIST_print
+    .print = LIST_print
 
 };
 
@@ -75,7 +75,7 @@ List* LIST_create(u16 capacity) {
     l_temp->capacity_ = capacity;
     l_temp->head_ = NULL;
     l_temp->tail_ = NULL;
-
+    l_temp->storage_ = NULL;
     l_temp->ops_ = &list_ops;
     
     return l_temp;
@@ -131,7 +131,7 @@ s16 LIST_reset(List* list) {
     list->length_ = 0;
     list->head_ = NULL;
     list->tail_ = NULL;
-
+    list->storage_ = NULL;
     return  kErrorCode_Ok;
 }
 
@@ -257,7 +257,11 @@ void* LIST_first(const List* list){
         return NULL;
     }
 
-    if (list->head_) {
+    if (NULL == list->storage_) {
+        return NULL;
+    }
+
+    if (NULL == list->head_) {
         return NULL;
     }
 
@@ -316,7 +320,9 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
 
     if(NULL==list->head_){
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-
+        if (NULL == aux) {
+            return 0;
+        }
         aux->data_ = data;
         aux->size_ = bytes;
 
@@ -329,7 +335,9 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
     else {
 
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-
+        if (NULL == aux) {
+            return 0;
+        }
         aux->data_ = data;
         aux->size_ = bytes;
 
@@ -380,9 +388,9 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
 
-        aux->next_ = list->tail_;
+        list->tail_->next_ = aux;
         list->tail_ = aux;
-
+        list->tail_->next_ = NULL;
 
         aux->data_ = data;
         aux->size_ = bytes;
@@ -399,7 +407,7 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
 
 s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
 
-    /*if (NULL == list) {
+    if (NULL == list) {
         return kErrorCode_ListNull;
     }
 
@@ -445,44 +453,110 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
                 }
                 else {
 
-                    countaux = aux->next;
+                    countaux = aux->next_;
 
                 }
                 count++;
             }
+        if (count > 0) {
+                aux->next_ = countaux->next_;
+                countaux->next_ = aux;
+        }
+        else {
 
-        aux->next_ = countaux->next;
-        countaux->next = aux;
+            LIST_insertFirst(list,data,bytes);
+
+        }
+       
+
         
-        aux->data_ = data;
-        aux->size_ = bytes;
-
-        list->length_++;
-    }*/
+    }
     return kErrorCode_Ok;
 }
 
 void* LIST_extractFirst(List* list) {
     if (NULL == list) {
-        return kErrorCode_ListNull;
+        return NULL;
     }
 
     if (LIST_isEmpty(list)) {
         return NULL;
     }
 
-    MemoryNode* aux = list->head_;
-    list->head_ = aux->next_;
+    if (list->head_ == NULL) {
 
-    MM->free(aux);
+        return NULL;
+
+    }
+
+    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+    MemoryNode* data = MM->malloc(sizeof(MemoryNode) * 1);
+
+    aux = list->head_->next_;
+    data = list->head_->data_;
+    MM->free(list->head_);
+    list->head_ = aux;
+    
+    
 
     list->length_--;
 
-    return aux;
+    return data;
+
+    
 }
 
 void* LIST_extractLast(List* list) {
+    if (NULL == list) {
+        return NULL;
+    }
 
+    if (LIST_isEmpty(list)) {
+        return NULL;
+    }
+
+    if (list->head_ == NULL) {
+
+        return NULL;
+
+    }
+
+   
+    MemoryNode* data = MM->malloc(sizeof(MemoryNode) * 1);
+    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+    MemoryNode* countaux = MM->malloc(sizeof(MemoryNode) * 1);
+   
+    data = list->tail_->data_;
+    MM->free(list->tail_);
+   
+    int count = 0;
+
+    list->length_--;
+
+    while (count < list->length_) {
+        if (countaux == NULL) {
+            aux = list->head_;
+            countaux = list->head_;
+        }
+        else {
+
+            countaux = aux->next_;
+
+        }
+        count++;
+    }
+    if(count>0){
+        list->tail_ = countaux;
+        countaux->next_ = NULL;
+    }
+    else {
+
+        list->tail_ = NULL;
+        list->head_ = NULL;
+    }
+   
+
+    return data;
 }
 
 //void* LIST_extractAt(List* list, u16 position){}
