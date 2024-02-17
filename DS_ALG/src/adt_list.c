@@ -7,8 +7,6 @@
 
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
-#include <stdlib.h>
-
 // Static prototypes
 static s16 LIST_destroy(List* list);
 static s16 LIST_reset(List* list);
@@ -78,11 +76,10 @@ List* LIST_create(u16 capacity) {
     l_temp->head_ = NULL;
     l_temp->tail_ = NULL;
 
+    l_temp->ops_ = &list_ops;
     
     return l_temp;
 }
-
-
 
 s16 LIST_destroy(List* list) {
 
@@ -95,10 +92,9 @@ s16 LIST_destroy(List* list) {
         MM->free(list);
         return kErrorCode_StorageNull;
     }
+
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-    
-    
-        
+   
     while (NULL != list->head_) {
 
         MM->free(list->head_->data_);
@@ -138,6 +134,8 @@ s16 LIST_reset(List* list) {
 
     return  kErrorCode_Ok;
 }
+
+
 
 s16 LIST_softReset(List* list) {
 
@@ -319,12 +317,12 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
     if(NULL==list->head_){
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
+        aux->data_ = data;
+        aux->size_ = bytes;
+
         aux->next_ = NULL;
         list->head_ = aux;
         list->tail_ = aux;
-
-        aux->data_ = data;
-        aux->size_ = bytes;
 
         list->length_++;
     }
@@ -332,12 +330,11 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
 
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
-        aux->next_ = list->head_;
-        list->head_ = aux;
-
-
         aux->data_ = data;
         aux->size_ = bytes;
+
+        aux->next_ = list->head_;
+        list->head_ = aux;
 
         list->length_++;
     }
@@ -402,7 +399,7 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
 
 s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
 
-    if (NULL == list) {
+    /*if (NULL == list) {
         return kErrorCode_ListNull;
     }
 
@@ -461,7 +458,7 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
         aux->size_ = bytes;
 
         list->length_++;
-    }
+    }*/
     return kErrorCode_Ok;
 }
 
@@ -532,8 +529,39 @@ s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
 }
 
 
+void LIST_print(List* list) {
+    printf("Entering LIST_print function\n");
+    if (NULL == list) {
+        printf("\t[List Info] list: NULL\n");
+        return;
+    }
 
-//void LIST_print(List* list);
+    printf("\t[List Info] Address: %p\n", list);
+    printf("\t[List Info] Length: %d\n", list->length_);
+    printf("\t[List Info] Capacity: %d\n", list->capacity_);
+    printf("\t[List Info] First address: %p\n", list->head_);
+    printf("\t[List Info] Last Address: %p\n", list->tail_);
+
+    if (NULL == list->head_) {
+        printf("\t[List Info] list is empty\n");
+        return;
+    }
+
+    MemoryNode* currentNode = list->head_;
+
+    while (currentNode != NULL) {
+        printf("\t  [List Info] Storage #%p\n", currentNode);
+        printf("\t      [Node info] Address: %p\n", currentNode);
+        printf("\t      [Node info] Size: %d\n", currentNode->size_);
+        printf("\t      [Node info] Data Address: %p\n", currentNode->data_);
+        printf("\t      [Node info] Data Content: %s\n", currentNode->data_);
+
+        printf("\t      [Node info] Next address: %p\n", currentNode->next_);
+
+        currentNode = currentNode->next_;
+    }
+}
+
 
 
 

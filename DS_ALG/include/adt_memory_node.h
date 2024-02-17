@@ -8,7 +8,6 @@
 #define __ADT_MEMORY_NODE_H__
 
 #include "EDK_MemoryManager/edk_platform_types.h"
-#include "adt_list.h"
 
 // Memory Node type
 typedef struct memory_node_s {
