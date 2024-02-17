@@ -135,8 +135,6 @@ s16 LIST_reset(List* list) {
     return  kErrorCode_Ok;
 }
 
-
-
 s16 LIST_softReset(List* list) {
 
     if (NULL == list) {
@@ -370,7 +368,6 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
     if (NULL == list->head_) {
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
-
         aux->next_ = NULL;
         list->head_ = aux;
         list->tail_ = aux;
@@ -378,15 +375,10 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
         aux->data_ = data;
         aux->size_ = bytes;
 
-
         list->length_++;
-
-
     }
     else {
-
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-
 
         list->tail_->next_ = aux;
         list->tail_ = aux;
@@ -395,18 +387,12 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
         aux->data_ = data;
         aux->size_ = bytes;
 
-
         list->length_++;
     }
-
-
     return kErrorCode_Ok;
-
 }
 
-
-s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
-
+s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -419,60 +405,50 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position){
         return kErrorCode_DataNull;
     }
 
-    if (position < 0) {
-        return kErrorCode_BytesZero;
+    if (position > list->length_) {
+        position = list->length_;
     }
 
-    if (NULL == list->head_) {
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+    MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
+    if (aux == NULL) {
+        return kErrorCode_MallocNull;
+    }
 
+    aux->data_ = data;
+    aux->size_ = bytes;
+
+    if (NULL == list->head_) {
         aux->next_ = NULL;
         list->head_ = aux;
         list->tail_ = aux;
-
-        aux->data_ = data;
-        aux->size_ = bytes;
-
-        list->length_++;
     }
     else {
-
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-        MemoryNode* countaux = MM->malloc(sizeof(MemoryNode) * 1);
-
-        if (position >= list->length_) {
-            position = list->length_;
-        }
-
-        int count = 0;
-        
-            while (count < position) {
-                if (countaux == NULL) {
-                    aux = list->head_;
-                    countaux= list->head_;
-                }
-                else {
-
-                    countaux = aux->next_;
-
-                }
-                count++;
-            }
-        if (count > 0) {
-                aux->next_ = countaux->next_;
-                countaux->next_ = aux;
+        if (position == 0) {
+            aux->next_ = list->head_;
+            list->head_ = aux;
         }
         else {
+            MemoryNode* countaux = list->head_;
+            int count = 0;
 
-            LIST_insertFirst(list,data,bytes);
+            while (count < position - 1) {
+                countaux = countaux->next_;
+                count++;
+            }
 
+            aux->next_ = countaux->next_;
+            countaux->next_ = aux;
         }
-       
 
-        
+        if (aux->next_ == NULL) {
+            list->tail_ = aux;
+        }
     }
+    list->length_++;
+
     return kErrorCode_Ok;
 }
+
 
 void* LIST_extractFirst(List* list) {
     if (NULL == list) {
@@ -604,7 +580,7 @@ s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
 
 
 void LIST_print(List* list) {
-    printf("Entering LIST_print function\n");
+
     if (NULL == list) {
         printf("\t[List Info] list: NULL\n");
         return;
@@ -622,9 +598,10 @@ void LIST_print(List* list) {
     }
 
     MemoryNode* currentNode = list->head_;
+    int count = 0;
 
     while (currentNode != NULL) {
-        printf("\t  [List Info] Storage #%p\n", currentNode);
+        printf("\t  [List Info] Storage #%d\n", count);
         printf("\t      [Node info] Address: %p\n", currentNode);
         printf("\t      [Node info] Size: %d\n", currentNode->size_);
         printf("\t      [Node info] Data Address: %p\n", currentNode->data_);
@@ -633,6 +610,7 @@ void LIST_print(List* list) {
         printf("\t      [Node info] Next address: %p\n", currentNode->next_);
 
         currentNode = currentNode->next_;
+        count++;
     }
 }
 
