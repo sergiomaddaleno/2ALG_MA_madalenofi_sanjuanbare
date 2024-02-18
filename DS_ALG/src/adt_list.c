@@ -53,7 +53,7 @@ struct list_ops_s list_ops = {
     .insertAt = LIST_insertAt,
     .extractFirst = LIST_extractFirst,
     .extractLast = LIST_extractLast,
-    //.extractAt = LIST_extractAt,
+    .extractAt = LIST_extractAt,
     .concat = LIST_concat,
     .traverse = LIST_traverse,
     .print = LIST_print
@@ -180,44 +180,72 @@ s16 LIST_resize(List* list, u16 new_size) {
         return kErrorCode_EqualCapacity;
     }
 
-    u16 elements_to_copy = 0;
+
 
     if (list->length_ > new_size) {
-        elements_to_copy = new_size;
-        list->length_ = new_size;
+        
+        
+        list->capacity_ = new_size;
+        
+        MemoryNode* countaux = MM->malloc(sizeof(MemoryNode));
+        MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
+        if (countaux == NULL) {
+            return kErrorCode_MallocNull;
+        }
+
+
+        if (new_size > 1) {
+
+            countaux = list->head_;
+
+            int count = 0;
+
+            while (count < new_size - 1) {
+                countaux = countaux->next_;
+                count++;
+            }
+
+            aux = countaux;
+
+            while (count <= list->length_ - 1) {
+                countaux = countaux->next_;
+                MM->free(countaux->data_);
+                MM->free(countaux);
+                count++;
+            }
+
+            list->length_ = new_size;
+            list->capacity_ = new_size;
+            list->tail_ = aux;
+            aux->next_ = NULL;
+        }
+        else {
+            int count = 0;
+            
+            aux = list->head_;
+            countaux = list->head_;
+            
+            while (count < list->length_ - 1) {
+                countaux = countaux->next_;
+                MM->free(countaux);
+                count++;
+            }
+            
+            list->length_ = new_size;
+            list->capacity_ = new_size;
+            list->tail_ = aux;
+            list->head_ = aux;
+            aux->next_ = NULL;
+
+        }
     }
     else {
-        elements_to_copy = list->length_;
+        //elements_to_copy = list->length_;
+        list->capacity_ = new_size;
     }
 
-    List* aux = MM->malloc(sizeof(List));
-    aux->storage_ = MM->malloc(sizeof(MemoryNode) * new_size);
-
-    if (NULL == aux) {
-        return kErrorCode_MallocNull;
-    }
-
-    for (u16 i = 0; i < new_size; i++) {
-        MEMNODE_createLite(&aux[i]);
-    }
-    for (u16 i = 0; i < elements_to_copy; i++) {
-        list->storage_->ops_->memCopy(&aux[i], list->storage_[i].data_, list->storage_[i].size_);
-        aux->storage_[i].next_= list->storage_[i].next_;
-    }
-    for (u16 i = elements_to_copy; i < list->length_; i++) {
-        if (NULL != list->storage_[i].data_) {
-            MM->free(list->storage_[i].data_);
-        }
-        list->storage_[i].next_ = NULL;
-        MM->free(&list->storage_[i]);
-        
-    }
     
-    list->storage_ = aux;
-    list->storage_[list->length_-1].next_ = NULL;
-    list->tail_ = &list->storage_[list->length_ - 1];
-    list->capacity_ = new_size;
-    
+   
     return kErrorCode_Ok;
 }
 
@@ -507,7 +535,7 @@ void* LIST_extractLast(List* list) {
    
     int count = 0;
 
-    list->length_--;
+   
 
     while (count < list->length_) {
         if (countaux == NULL) {
@@ -531,11 +559,93 @@ void* LIST_extractLast(List* list) {
         list->head_ = NULL;
     }
    
-
+    list->length_--;
     return data;
 }
 
-//void* LIST_extractAt(List* list, u16 position){}
+void* LIST_extractAt(List* list, u16 position){
+
+    if (NULL == list) {
+        return kErrorCode_ListNull;
+    }
+
+    if (list->capacity_ == list->length_) {
+        return kErrorCode_EqualCapacity;
+    }
+
+
+    if (position > list->length_) {
+        position = list->length_;
+    }
+
+    if (NULL == list->head_) {
+
+        return kErrorCode_StorageNull;
+    }
+
+    MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
+    if (aux == NULL) {
+        return kErrorCode_MallocNull;
+    }
+
+    MemoryNode* countaux = list->head_;
+    MemoryNode* deleteaux = list->head_;
+    
+    int count = 0;
+
+        if (position == 0) {
+            aux->next_ = list->head_->next_;
+            MM->free(list->head_);
+            list->head_ = aux;
+
+        }
+        else {
+            if(position+1<list->length_-1){
+                
+               
+               
+                while (count < position - 1) {
+                    countaux = countaux->next_;
+
+                    count++;
+                }
+                
+                deleteaux = countaux->next_;
+                
+                countaux->next_ = aux;
+
+                
+                aux->next_ = deleteaux->next_;
+
+                MM->free(deleteaux);
+            
+            }
+            else {
+                while (count < position - 1) {
+                    countaux = countaux->next_;
+                    count++;
+                }
+                MM->free(list->tail_);
+                list->tail_ = countaux;
+                countaux->next_ = NULL;
+                
+
+            }
+          
+
+        }
+
+        
+    
+    list->length_--;
+
+    return kErrorCode_Ok;
+
+
+
+
+
+}
 
 s16 LIST_concat(List* list, const List* list_src) {
 
