@@ -207,7 +207,7 @@ s16 LIST_resize(List* list, u16 new_size) {
 
             aux = countaux;
 
-            while (count <= list->length_ - 1) {
+            while (count < list->length_ - 1) {
                 countaux = countaux->next_;
                 MM->free(countaux->data_);
                 MM->free(countaux);
@@ -324,7 +324,15 @@ void* LIST_at(const List* list, u16 position){
         return NULL;
     }
 
-    return list->storage_[position].data_;
+    MemoryNode* countaux = list->head_;
+    int count = 0;
+
+    while (count < position - 1) {
+        countaux = countaux->next_;
+        count++;
+    }
+
+    return countaux->data_;
 }
 
 s16 LIST_insertFirst(List* list, void* data, u16 bytes){
@@ -544,10 +552,10 @@ void* LIST_extractLast(List* list) {
         countaux = countaux->next_;
 
         count++;
-
-       
-        count++;
+    
     }
+
+
     if(count>0){
         list->tail_ = countaux;
         countaux->next_ = NULL;
