@@ -494,7 +494,7 @@ void* LIST_extractFirst(List* list) {
     }
 
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-    MemoryNode* data = MM->malloc(sizeof(MemoryNode) * 1);
+    void* data = MM->malloc(sizeof(void) * 1);
 
     aux = list->head_->next_;
     data = list->head_->data_;
@@ -526,7 +526,7 @@ void* LIST_extractLast(List* list) {
     }
 
    
-    MemoryNode* data = MM->malloc(sizeof(MemoryNode) * 1);
+    void* data = MM->malloc(sizeof(void) * 1);
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
     MemoryNode* countaux = MM->malloc(sizeof(MemoryNode) * 1);
    
@@ -536,17 +536,16 @@ void* LIST_extractLast(List* list) {
     int count = 0;
 
    
+    countaux = list->head_;
 
-    while (count < list->length_) {
-        if (countaux == NULL) {
-            aux = list->head_;
-            countaux = list->head_;
-        }
-        else {
+    while (count < list->length_-1) {
+       
 
-            countaux = aux->next_;
+        countaux = countaux->next_;
 
-        }
+        count++;
+
+       
         count++;
     }
     if(count>0){
@@ -566,35 +565,35 @@ void* LIST_extractLast(List* list) {
 void* LIST_extractAt(List* list, u16 position){
 
     if (NULL == list) {
-        return kErrorCode_ListNull;
+        return NULL;
     }
 
     if (list->capacity_ == list->length_) {
-        return kErrorCode_EqualCapacity;
+        return NULL;
     }
 
 
-    if (position > list->length_) {
+    if (position >= list->length_) {
         position = list->length_;
     }
 
     if (NULL == list->head_) {
 
-        return kErrorCode_StorageNull;
+        return NULL;
     }
 
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
     if (aux == NULL) {
-        return kErrorCode_MallocNull;
+        return NULL;
     }
 
     MemoryNode* countaux = list->head_;
     MemoryNode* deleteaux = list->head_;
-    
+    void* data = MM->malloc(sizeof(void) * 1);
     int count = 0;
 
         if (position == 0) {
-            aux->next_ = list->head_->next_;
+            aux = list->head_->next_;
             MM->free(list->head_);
             list->head_ = aux;
 
@@ -609,14 +608,12 @@ void* LIST_extractAt(List* list, u16 position){
 
                     count++;
                 }
+                aux = countaux;
                 
                 deleteaux = countaux->next_;
-                
-                countaux->next_ = aux;
 
-                
-                aux->next_ = deleteaux->next_;
-
+               aux->next_ = deleteaux->next_;
+               data = deleteaux->data_;
                 MM->free(deleteaux);
             
             }
@@ -639,7 +636,7 @@ void* LIST_extractAt(List* list, u16 position){
     
     list->length_--;
 
-    return kErrorCode_Ok;
+    return data;
 
 
 
