@@ -14,7 +14,7 @@ typedef struct adt_list_s {
 	MemoryNode* tail_; 
 	u16 length_;
 	u16 capacity_;
-	MemoryNode* storage_;
+	//MemoryNode* storage_;
 	struct list_ops_s* ops_;
 } List;
 

@@ -11,7 +11,7 @@
 static s16 LIST_destroy(List* list);
 static s16 LIST_reset(List* list);
 static s16 LIST_softReset(List* list);
-static s16 LIST_resize(List* list, u16 new_size);   //repasar
+static s16 LIST_resize(List* list, u16 new_size);   
 
 static u16 LIST_capacity(const List* list);
 static u16 LIST_length(const List* list);
@@ -26,11 +26,11 @@ static s16 LIST_insertFirst(List* list, void* data, u16 bytes);
 static s16 LIST_insertLast(List* list, void* data, u16 bytes);
 static s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position);
 
-static void* LIST_extractFirst(List* list); //hacer
-static void* LIST_extractLast(List* list); //hacer
-static void* LIST_extractAt(List* list, u16 position); //hacer
+static void* LIST_extractFirst(List* list); 
+static void* LIST_extractLast(List* list); 
+static void* LIST_extractAt(List* list, u16 position); 
 
-static s16 LIST_concat(List* list, const List* list_src); //repasar
+static s16 LIST_concat(List* list, const List* list_src); 
 static s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*));
 
 static void LIST_print(List* list);
@@ -75,7 +75,7 @@ List* LIST_create(u16 capacity) {
     l_temp->capacity_ = capacity;
     l_temp->head_ = NULL;
     l_temp->tail_ = NULL;
-    l_temp->storage_ = NULL;
+    //l_temp->storage_ = NULL;
     l_temp->ops_ = &list_ops;
     
     return l_temp;
@@ -83,26 +83,31 @@ List* LIST_create(u16 capacity) {
 
 s16 LIST_destroy(List* list) {
 
-    if (NULL == list)
-    {
+    if(NULL == list) {
         return kErrorCode_ListNull;
     }
-    if (NULL == list->head_)
-    {
-        MM->free(list);
+
+    if (NULL == list->head_) {
         return kErrorCode_StorageNull;
+
+        MM->free(list);
     }
 
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-   
-    while (NULL != list->head_) {
+    MemoryNode* current = list->head_;
+    MemoryNode* next;
 
-        MM->free(list->head_->data_);
-        aux = list->head_->next_;
-        MM->free(list->head_);
-        list->head_ = aux;
+    while (current != NULL) {
+        next = current->next_;
+        if (current->data_ != NULL) {
+            MM->free(current->data_);
+        }
+        
+        MM->free(current);
+        
+      
+        current = next;
     }
-    
+
     MM->free(list);
 
     return kErrorCode_Ok;
@@ -121,8 +126,9 @@ s16 LIST_reset(List* list) {
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
     while (NULL != list->head_) {
-
-        MM->free(list->head_->data_);
+        if (list->head_->data_ != NULL) {
+            MM->free(list->head_->data_);
+        }
         aux = list->head_->next_;
         MM->free(list->head_);
         list->head_ = aux;
@@ -131,7 +137,7 @@ s16 LIST_reset(List* list) {
     list->length_ = 0;
     list->head_ = NULL;
     list->tail_ = NULL;
-    list->storage_ = NULL;
+    //list->storage_ = NULL;
     return  kErrorCode_Ok;
 }
 
@@ -158,7 +164,7 @@ s16 LIST_softReset(List* list) {
     list->length_ = 0;
     list->head_ = NULL;
     list->tail_ = NULL;
-    list->storage_ = NULL;
+    //list->storage_ = NULL;
     return  kErrorCode_Ok;
 }
 
@@ -283,9 +289,7 @@ void* LIST_first(const List* list){
         return NULL;
     }
 
-    if (NULL == list->storage_) {
-        return NULL;
-    }
+   
 
     if (NULL == list->head_) {
         return NULL;
@@ -298,11 +302,11 @@ void* LIST_last(const List* list){
     if (NULL == list) {
         return NULL;
     }
-
-    if (NULL == list->storage_) {
+    if (NULL == list->head_) {
         return NULL;
     }
 
+   
     if (list->length_ == 0) {
         return NULL;
     }
@@ -316,9 +320,10 @@ void* LIST_at(const List* list, u16 position){
         return NULL;
     }
 
-    if (NULL == list->storage_) {
+    if (NULL == list->head_) {
         return NULL;
     }
+
 
     if (position < 0){
         return NULL;
@@ -327,7 +332,7 @@ void* LIST_at(const List* list, u16 position){
     MemoryNode* countaux = list->head_;
     int count = 0;
 
-    while (count < position - 1) {
+    while (count < position ) {
         countaux = countaux->next_;
         count++;
     }
@@ -441,6 +446,10 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
         return kErrorCode_DataNull;
     }
 
+    if (bytes <= 0) {
+        return kErrorCode_BytesZero;
+    }
+
     if (position > list->length_) {
         position = list->length_;
     }
@@ -502,7 +511,7 @@ void* LIST_extractFirst(List* list) {
     }
 
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-    void* data = MM->malloc(sizeof(void) * 1);
+    void* data = MM->malloc(sizeof(void*) * 1);
 
     aux = list->head_->next_;
     data = list->head_->data_;
@@ -519,55 +528,31 @@ void* LIST_extractFirst(List* list) {
 }
 
 void* LIST_extractLast(List* list) {
-    if (NULL == list) {
+    if (list == NULL || LIST_isEmpty(list)) {
         return NULL;
     }
 
-    if (LIST_isEmpty(list)) {
-        return NULL;
-    }
+    void* data = list->tail_->data_;
 
-    if (list->head_ == NULL) {
-
-        return NULL;
-
-    }
-
-   
-    void* data = MM->malloc(sizeof(void) * 1);
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-    MemoryNode* countaux = MM->malloc(sizeof(MemoryNode) * 1);
-   
-    data = list->tail_->data_;
-    MM->free(list->tail_);
-   
-    int count = 0;
-
-   
-    countaux = list->head_;
-
-    while (count < list->length_-1) {
-       
-
-        countaux = countaux->next_;
-
-        count++;
-    
-    }
-
-
-    if(count>0){
-        list->tail_ = countaux;
-        countaux->next_ = NULL;
-    }
-    else {
-
+    if (list->length_ == 1) {
+        MM->free(list->tail_);
         list->tail_ = NULL;
         list->head_ = NULL;
     }
-   
+    else {
+        MemoryNode* secondToLast = list->head_;
+        while (secondToLast->next_ != list->tail_) {
+            secondToLast = secondToLast->next_;
+        }
+
+        MM->free(list->tail_);
+        list->tail_ = secondToLast;
+        list->tail_->next_ = NULL;
+    }
+
     list->length_--;
     return data;
+
 }
 
 void* LIST_extractAt(List* list, u16 position){
@@ -580,6 +565,9 @@ void* LIST_extractAt(List* list, u16 position){
         return NULL;
     }
 
+    if (LIST_isEmpty(list)) {
+        return NULL;
+    }
 
     if (position >= list->length_) {
         position = list->length_;
@@ -597,7 +585,7 @@ void* LIST_extractAt(List* list, u16 position){
 
     MemoryNode* countaux = list->head_;
     MemoryNode* deleteaux = list->head_;
-    void* data = MM->malloc(sizeof(void) * 1);
+    void* data = MM->malloc(sizeof(void*) * 1);
     int count = 0;
 
         if (position == 0) {
@@ -654,24 +642,22 @@ void* LIST_extractAt(List* list, u16 position){
 
 s16 LIST_concat(List* list, const List* list_src) {
 
-    if (NULL == list || NULL == list_src)
-    {
+    if (NULL == list || NULL == list_src) {
         return kErrorCode_ListNull;
     }
-    if (NULL == list->storage_ || NULL == list_src->storage_)
-    {
-        return kErrorCode_StorageNull;
-    }
-    u16 new_capacity = list->capacity_ + list_src->capacity_;
-    list->ops_->resize(list, new_capacity);
-    u16 index = list->tail_;
-    for (u16 i = 0; i < list_src->length_; i++) {
-        list->storage_->ops_->memCopy(&list->storage_[index], list_src->storage_[i].data_, list_src->storage_[i].size_);
-        index++;
 
+    if (NULL == list->head_) {
+        list->head_ = list_src->head_;
+        list->tail_ = list_src->tail_;
     }
+    else {
+        list->tail_->next_ = list_src->head_;
+        list->tail_ = list_src->tail_;
+    }
+
     list->length_ += list_src->length_;
-    
+    list->capacity_ += list_src->capacity_;
+
     return kErrorCode_Ok;
 }
 
@@ -681,13 +667,17 @@ s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
         return kErrorCode_ListNull;
     }
 
-    if (NULL == list->storage_) {
+    if (NULL == list->head_) {
         return kErrorCode_StorageNull;
     }
+    
+    MemoryNode* countaux = list->head_;
 
-    for (s16 i = 0; i < list->length_; i++) {
+    for (s16 i = 0; i < list->length_-1; i++) {
+        
+        callback(countaux);
+        countaux = countaux->next_;
 
-        callback(&list->storage_[i]);
     }
 
     return kErrorCode_Ok;
