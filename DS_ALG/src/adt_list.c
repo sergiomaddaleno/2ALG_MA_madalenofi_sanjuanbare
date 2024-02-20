@@ -68,6 +68,7 @@ List* LIST_create(u16 capacity) {
 
     List* l_temp = MM->malloc(sizeof(List));
     if (NULL == l_temp) {
+        MM->free(l_temp);
         return NULL;
     }
 
@@ -87,23 +88,17 @@ s16 LIST_destroy(List* list) {
         return kErrorCode_ListNull;
     }
 
-    if (NULL == list->head_) {
-        
-        MM->free(list);
-        return kErrorCode_StorageNull;
-
-        
-    }
+    
 
     MemoryNode* current = list->head_;
     MemoryNode* next;
 
     while (current != NULL) {
         next = current->next_;
-        if (current->data_ != NULL) {
+        
             MM->free(current->data_);
            
-        }
+        
         
         MM->free(current);
         
@@ -112,6 +107,7 @@ s16 LIST_destroy(List* list) {
     }
 
     MM->free(list);
+   
 
     return kErrorCode_Ok;
 }
@@ -122,16 +118,13 @@ s16 LIST_reset(List* list) {
         return kErrorCode_ListNull;
     }
 
-    if (NULL == list->head_) {
-        return kErrorCode_StorageNull;
-    }
 
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
     while (NULL != list->head_) {
-        if (list->head_->data_ != NULL) {
+       
             MM->free(list->head_->data_);
-        }
+        
         aux = list->head_->next_;
         MM->free(list->head_);
         list->head_ = aux;
@@ -252,7 +245,7 @@ s16 LIST_resize(List* list, u16 new_size) {
         }
     }
     else {
-        //elements_to_copy = list->length_;
+        
         list->capacity_ = new_size;
     }
 
@@ -535,10 +528,9 @@ void* LIST_extractFirst(List* list) {
 }
 
 void* LIST_extractLast(List* list) {
-    if (list == NULL || LIST_isEmpty(list)) {
+    if (list == NULL || LIST_isEmpty(list) || list->head_ == NULL) {
         return NULL;
     }
-
 
 
     void* data = list->tail_->data_;
@@ -560,6 +552,7 @@ void* LIST_extractLast(List* list) {
     }
 
     list->length_--;
+    
     return data;
 
 }
@@ -586,6 +579,7 @@ void* LIST_extractAt(List* list, u16 position){
 
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
     if (aux == NULL) {
+        MM->free(aux);
         return NULL;
     }
 
@@ -655,9 +649,6 @@ s16 LIST_concat(List* list, const List* list_src) {
     
         return kErrorCode_StorageNull;
     }
-
-
-   
 
 
     MemoryNode* current_src = list_src->head_;
