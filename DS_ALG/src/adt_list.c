@@ -657,11 +657,7 @@ s16 LIST_concat(List* list, const List* list_src) {
     }
 
 
-    if (list_src->head_ == NULL || list->head_ == NULL)
-    {
-
-        return kErrorCode_StorageNull;
-    }
+   
 
 
     MemoryNode* current_src = list_src->head_;
