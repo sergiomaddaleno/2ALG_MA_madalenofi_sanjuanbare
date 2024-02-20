@@ -88,9 +88,11 @@ s16 LIST_destroy(List* list) {
     }
 
     if (NULL == list->head_) {
+        
+        MM->free(list);
         return kErrorCode_StorageNull;
 
-        MM->free(list);
+        
     }
 
     MemoryNode* current = list->head_;
@@ -594,6 +596,7 @@ void* LIST_extractAt(List* list, u16 position){
 
         if (position == 0) {
             aux = list->head_->next_;
+            data = list->head_->data_;
             MM->free(list->head_);
             list->head_ = aux;
 
@@ -622,6 +625,7 @@ void* LIST_extractAt(List* list, u16 position){
                     countaux = countaux->next_;
                     count++;
                 }
+                data = list->tail_->data_;
                 MM->free(list->tail_);
                 list->tail_ = countaux;
                 countaux->next_ = NULL;
@@ -646,12 +650,18 @@ void* LIST_extractAt(List* list, u16 position){
 
 s16 LIST_concat(List* list, const List* list_src) {
 
-    if(list_src!=NULL|| list != NULL)
+    if(list_src==NULL|| list == NULL)
         {
     
         return kErrorCode_StorageNull;
     }
 
+
+    if (list_src->head_ == NULL || list->head_ == NULL)
+    {
+
+        return kErrorCode_StorageNull;
+    }
 
 
     MemoryNode* current_src = list_src->head_;
@@ -677,9 +687,7 @@ s16 LIST_concat(List* list, const List* list_src) {
             tmp[i] = aux[i];
         }
        
-        if (NULL != current_src->data_) {
-            MM->free(current_src->data_);
-        }
+        
 
         new_node->data_ = tmp;
         new_node->size_ = current_src->size_;
