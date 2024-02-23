@@ -157,9 +157,9 @@ project "PR05_List"
   files {
     path.join(PROJ_DIR, "include/adt_memory_node.h"),
     path.join(PROJ_DIR, "src/adt_memory_node.c"),
-    path.join(PROJ_DIR, "include/adt_ddl_list.h"),
-    path.join(PROJ_DIR, "src/adt_ddl_list.c"),
-    path.join(PROJ_DIR, "tests/test_ddl_list.c"),
+    path.join(PROJ_DIR, "include/adt_dll_list.h"),
+    path.join(PROJ_DIR, "src/adt_dll_list.c"),
+    path.join(PROJ_DIR, "tests/test_dll_list.c"),
   }
 
 --project "PR09_Stack"
