@@ -355,6 +355,7 @@ s16 DLL_LIST_insertFirst(List* list, void* data, u16 bytes){
     }
 
     if(NULL==list->head_){
+       
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
         if (NULL == aux) {
             return 0;
@@ -381,6 +382,7 @@ s16 DLL_LIST_insertFirst(List* list, void* data, u16 bytes){
         aux->next_ = list->head_;
         list->head_->previous_ = aux;
         list->head_ = aux;
+        aux->previous_ = NULL;
 
         list->length_++;
     }
@@ -504,7 +506,7 @@ s16 DLL_LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
             }
             else {
                 MemoryNode* countaux = list->tail_;
-                int count = list->capacity_;
+                int count = list->length_;
 
                 while (count > position - 1) {
                     countaux = countaux->previous_;
@@ -549,6 +551,7 @@ void* DLL_LIST_extractFirst(List* list) {
     MM->free(list->head_);
     
     list->head_ = aux;
+    list->head_->previous_ = NULL;
     list->length_--;
 
     return data;
@@ -567,10 +570,8 @@ void* DLL_LIST_extractLast(List* list) {
         list->head_ = NULL;
     }
     else {
-        MemoryNode* secondToLast = list->head_;
-        while (secondToLast->next_ != list->tail_) {
-            secondToLast = secondToLast->next_;
-        }
+        MemoryNode* secondToLast = list->tail_->previous_;
+        
 
         MM->free(list->tail_);
         list->tail_ = secondToLast;
@@ -584,72 +585,80 @@ void* DLL_LIST_extractLast(List* list) {
 
 void* DLL_LIST_extractAt(List* list, u16 position){
 
-    if (NULL == list) {
-        return NULL;
-    }
-
-    if (DLL_LIST_isEmpty(list)) {
-        return NULL;
-    }
-
-    if (position >= list->length_) {
-        position = list->length_;
-    }
-
-    if (NULL == list->head_) {
-
-        return NULL;
-    }
-
-    MemoryNode* aux = list->head_->next_;
-    if (aux == NULL) {
-        MM->free(aux);
-        return NULL;
-    }
-    
-    // ALopezESAT: This part is a bit chaotic, you might want to rewrite this after giving it a think.
-    // It also has memory leaks.
-    MemoryNode* countaux = list->head_;
-    MemoryNode* deleteaux = list->head_;
+   
     void* data = list->head_->data_;
     int count = 0;
+
+    if (list->length_ < list->capacity_ / 2) {
+
+        MemoryNode* aux = NULL;
+        if (aux == NULL) {
+            MM->free(aux);
+            return NULL;
+        }
+        MemoryNode* countaux = list->head_;
 
         if (position == 0) {
             aux = list->head_->next_;
             data = list->head_->data_;
             MM->free(list->head_);
             list->head_ = aux;
-
+            list->head_->previous_ = NULL;
         }
         else {
-            if(position+1<list->length_-1){
-                
-                while (count < position - 1) {
-                    countaux = countaux->next_;
-                    count++;
-                }
-                aux = countaux;
-                
-                deleteaux = countaux->next_;
 
-               aux->next_ = deleteaux->next_;
-               data = deleteaux->data_;
-               MM->free(deleteaux);
-            
-            }
-            else {
-                while (count < position - 1) {
-                    countaux = countaux->next_;
-                    count++;
-                }
-                data = list->tail_->data_;
-                MM->free(list->tail_);
-                list->tail_ = countaux;
-                countaux->next_ = NULL;
-                
+            count = 0;
 
+            while (count < position ) {
+                countaux = countaux->next_;
+                count++;
             }
-        }   
+           //repasar
+            aux = countaux->next_;
+            countaux->next_ = aux;
+            aux->previous_ = countaux->previous_;
+
+            data = countaux->data_;
+            MM->free(countaux);
+        
+        }
+    }else {
+
+        MemoryNode* aux = NULL;
+        if (aux == NULL) {
+            MM->free(aux);
+            return NULL;
+        }
+        MemoryNode* countaux = list->tail_;
+
+        if (position == list->length_) {
+            aux = list->tail_->previous_;
+            data = list->tail_->data_;
+            MM->free(list->tail_);
+            list->tail_ = aux;
+            list->tail_->next_ = NULL;
+        }
+        else {
+            count = list->length_;
+
+            while (count > position) {
+                countaux = countaux->previous_;
+                count--;
+            }
+            //repasar
+            aux = countaux->next_;
+            countaux->next_ = aux;
+            aux->previous_ = countaux->previous_;
+
+            data = countaux->data_;
+            MM->free(countaux);
+
+        }
+
+
+
+    }
+
     list->length_--;
 
     return data;

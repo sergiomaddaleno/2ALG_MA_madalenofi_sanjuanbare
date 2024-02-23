@@ -30,9 +30,9 @@ static s16 MEMNODE_memConcat(MemoryNode* node, void* src, u16 bytes);
 static s16 MEMNODE_memMask(MemoryNode* node, u8 mask);
 
 static MemoryNode* MEMNODE_next(MemoryNode* node);
-//static MemoryNode* MEMNODE_previous(List* list);
+static MemoryNode* MEMNODE_previous(MemoryNode* node);
 static void MEMNODE_setNext(MemoryNode* node, MemoryNode* next_node);
-//static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node);
+static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node);
 
 static void MEMNODE_print(MemoryNode* node);
 
@@ -51,9 +51,9 @@ struct memory_node_ops_s memory_node_ops = { .data = MEMNODE_data,
                                              .memMask = MEMNODE_memMask,
                                              .print = MEMNODE_print,
                                              .next = MEMNODE_next,
-                                             //.previous = MEMNODE_previous,
+                                             .previous = MEMNODE_previous,
                                              .setNext = MEMNODE_setNext,
-                                             //.setPrevious = MEMNODE_setPrevious,
+                                             .setPrevious = MEMNODE_setPrevious,
 };
 
 // Memory Node Definitions
