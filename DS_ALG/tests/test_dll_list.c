@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "adt_list.h"
+#include "adt_dll_list.h"
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
 #include "./../tests/test_base.c"
@@ -25,7 +25,7 @@ int main() {
 
 	// list created just to have a reference to the operations
 	List *ls = NULL;
-	ls = LIST_create(1);
+	ls = DLL_LIST_create(1);
 	if (NULL == ls) {
 		printf("\n create returned a null node in list for ops");
 		return -1;
@@ -34,17 +34,17 @@ int main() {
 	List *list_1 = NULL;
 	List *list_2 = NULL;
 	List *list_3 = NULL;
-	list_1 = LIST_create(kCapacityList1);
+	list_1 = DLL_LIST_create(kCapacityList1);
 	if (NULL == list_1) {
 		printf("\n create returned a null node in list_1\n");
 		return -1;
 	}
-	list_2 = LIST_create(kCapacityList2);
+	list_2 = DLL_LIST_create(kCapacityList2);
 	if (NULL == list_2) {
 		printf("\n create returned a null node in list_2\n");
 		return -1;
 	}
-	list_3 = LIST_create(kCapacityList3);
+	list_3 = DLL_LIST_create(kCapacityList3);
 	if (NULL == list_3) {
 		printf("\n create returned a null node in list_3\n");
 		return -1;

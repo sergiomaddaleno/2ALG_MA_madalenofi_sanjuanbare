@@ -3,64 +3,64 @@
 #include <stdlib.h>
 
 #include "common_def.h"
-#include "adt_list.h"
+#include "adt_dll_list.h"
 
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
 // Static prototypes
-static s16 LIST_destroy(List* list);
-static s16 LIST_reset(List* list);
-static s16 LIST_softReset(List* list);
-static s16 LIST_resize(List* list, u16 new_size);   
+static s16 DLL_LIST_destroy(List* list);
+static s16 DLL_LIST_reset(List* list);
+static s16 DLL_LIST_softReset(List* list);
+static s16 DLL_LIST_resize(List* list, u16 new_size);   
 
-static u16 LIST_capacity(const List* list);
-static u16 LIST_length(const List* list);
-static s16 LIST_isEmpty(const List* list);
-static s16 LIST_isFull(const List* list);
+static u16 DLL_LIST_capacity(const List* list);
+static u16 DLL_LIST_length(const List* list);
+static s16 DLL_LIST_isEmpty(const List* list);
+static s16 DLL_LIST_isFull(const List* list);
 
-static void* LIST_first(const List* list);
-static void* LIST_last(const List* list);
-static void* LIST_at(const List* list, u16 position);
+static void* DLL_LIST_first(const List* list);
+static void* DLL_LIST_last(const List* list);
+static void* DLL_LIST_at(const List* list, u16 position);
 
-static s16 LIST_insertFirst(List* list, void* data, u16 bytes);
-static s16 LIST_insertLast(List* list, void* data, u16 bytes);
-static s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position);
+static s16 DLL_LIST_insertFirst(List* list, void* data, u16 bytes);
+static s16 DLL_LIST_insertLast(List* list, void* data, u16 bytes);
+static s16 DLL_LIST_insertAt(List* list, void* data, u16 bytes, u16 position);
 
-static void* LIST_extractFirst(List* list); 
-static void* LIST_extractLast(List* list); 
-static void* LIST_extractAt(List* list, u16 position); 
+static void* DLL_LIST_extractFirst(List* list); 
+static void* DLL_LIST_extractLast(List* list); 
+static void* DLL_LIST_extractAt(List* list, u16 position); 
 
-static s16 LIST_concat(List* list, const List* list_src); 
-static s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*));
+static s16 DLL_LIST_concat(List* list, const List* list_src); 
+static s16 DLL_LIST_traverse(const List* list, void (*callback)(MemoryNode*));
 
-static void LIST_print(List* list);
+static void DLL_LIST_print(List* list);
 
 // Memory Node's API Definitions
-struct list_ops_s list_ops = {
-    .destroy = LIST_destroy,
-    .reset = LIST_reset,
-    .softReset = LIST_softReset,
-    .resize = LIST_resize,
-    .capacity = LIST_capacity,
-    .length = LIST_length,
-    .isEmpty = LIST_isEmpty,
-    .isFull = LIST_isFull,
-    .first = LIST_first,
-    .last = LIST_last,
-    .at = LIST_at,
-    .insertFirst = LIST_insertFirst,
-    .insertLast = LIST_insertLast,
-    .insertAt = LIST_insertAt,
-    .extractFirst = LIST_extractFirst,
-    .extractLast = LIST_extractLast,
-    .extractAt = LIST_extractAt,
-    .concat = LIST_concat,
-    .traverse = LIST_traverse,
-    .print = LIST_print
+struct dll_list_ops_s list_ops = {
+    .destroy = DLL_LIST_destroy,
+    .reset = DLL_LIST_reset,
+    .softReset = DLL_LIST_softReset,
+    .resize = DLL_LIST_resize,
+    .capacity = DLL_LIST_capacity,
+    .length = DLL_LIST_length,
+    .isEmpty = DLL_LIST_isEmpty,
+    .isFull = DLL_LIST_isFull,
+    .first = DLL_LIST_first,
+    .last = DLL_LIST_last,
+    .at = DLL_LIST_at,
+    .insertFirst = DLL_LIST_insertFirst,
+    .insertLast = DLL_LIST_insertLast,
+    .insertAt = DLL_LIST_insertAt,
+    .extractFirst = DLL_LIST_extractFirst,
+    .extractLast = DLL_LIST_extractLast,
+    .extractAt = DLL_LIST_extractAt,
+    .concat = DLL_LIST_concat,
+    .traverse = DLL_LIST_traverse,
+    .print = DLL_LIST_print
 
 };
 
-List* LIST_create(u16 capacity) {
+List* DLL_LIST_create(u16 capacity) {
     
     if (capacity <= 0) {
         return NULL;
@@ -82,7 +82,7 @@ List* LIST_create(u16 capacity) {
     return l_temp;
 }
 
-s16 LIST_destroy(List* list) {
+s16 DLL_LIST_destroy(List* list) {
 
     if(NULL == list) {
         return kErrorCode_ListNull;
@@ -104,7 +104,7 @@ s16 LIST_destroy(List* list) {
     return kErrorCode_Ok;
 }
 
-s16 LIST_reset(List* list) {
+s16 DLL_LIST_reset(List* list) {
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -130,7 +130,7 @@ s16 LIST_reset(List* list) {
     return  kErrorCode_Ok;
 }
 
-s16 LIST_softReset(List* list) {
+s16 DLL_LIST_softReset(List* list) {
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -158,7 +158,7 @@ s16 LIST_softReset(List* list) {
     return  kErrorCode_Ok;
 }
 
-s16 LIST_resize(List* list, u16 new_size) {
+s16 DLL_LIST_resize(List* list, u16 new_size) {
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -242,35 +242,35 @@ s16 LIST_resize(List* list, u16 new_size) {
     return kErrorCode_Ok;
 }
 
-u16 LIST_capacity(const List* list) {
+u16 DLL_LIST_capacity(const List* list) {
     if (NULL == list) {
         return 0;
     }
     return list->capacity_;
 }
 
-u16 LIST_length(const List* list) {
+u16 DLL_LIST_length(const List* list) {
     if (NULL == list) {
         return 0;
     }
     return list->length_;
 }
 
-s16 LIST_isEmpty(const List* list) {
+s16 DLL_LIST_isEmpty(const List* list) {
     if (NULL == list) {
         return 0;
     }
     return list->length_ == 0;
 }
 
-s16 LIST_isFull(const List* list) {
+s16 DLL_LIST_isFull(const List* list) {
     if (NULL == list) {
         return 0;
     }
     return list->length_ == list->capacity_;
 }
 
-void* LIST_first(const List* list){
+void* DLL_LIST_first(const List* list){
 
     if (NULL == list) {
         return NULL;
@@ -283,7 +283,7 @@ void* LIST_first(const List* list){
     return list->head_->data_;
 }
 
-void* LIST_last(const List* list){
+void* DLL_LIST_last(const List* list){
     if (NULL == list) {
         return NULL;
     }
@@ -298,7 +298,7 @@ void* LIST_last(const List* list){
     return list->tail_->data_;
 }
 
-void* LIST_at(const List* list, u16 position){
+void* DLL_LIST_at(const List* list, u16 position){
 
     if (NULL == list) {
         return NULL;
@@ -324,7 +324,7 @@ void* LIST_at(const List* list, u16 position){
     return countaux->data_;
 }
 
-s16 LIST_insertFirst(List* list, void* data, u16 bytes){
+s16 DLL_LIST_insertFirst(List* list, void* data, u16 bytes){
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -372,7 +372,7 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
     return kErrorCode_Ok;
 }
 
-s16 LIST_insertLast(List* list, void* data, u16 bytes){
+s16 DLL_LIST_insertLast(List* list, void* data, u16 bytes){
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -417,7 +417,7 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
     return kErrorCode_Ok;
 }
 
-s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
+s16 DLL_LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -478,13 +478,12 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
     return kErrorCode_Ok;
 }
 
-
-void* LIST_extractFirst(List* list) {
+void* DLL_LIST_extractFirst(List* list) {
     if (NULL == list) {
         return NULL;
     }
 
-    if (LIST_isEmpty(list)) {
+    if (DLL_LIST_isEmpty(list)) {
         return NULL;
     }
 
@@ -507,8 +506,8 @@ void* LIST_extractFirst(List* list) {
     return data;
 }
 
-void* LIST_extractLast(List* list) {
-    if (list == NULL || LIST_isEmpty(list) || list->head_ == NULL) {
+void* DLL_LIST_extractLast(List* list) {
+    if (list == NULL || DLL_LIST_isEmpty(list) || list->head_ == NULL) {
         return NULL;
     }
 
@@ -535,13 +534,13 @@ void* LIST_extractLast(List* list) {
     return data;
 }
 
-void* LIST_extractAt(List* list, u16 position){
+void* DLL_LIST_extractAt(List* list, u16 position){
 
     if (NULL == list) {
         return NULL;
     }
 
-    if (LIST_isEmpty(list)) {
+    if (DLL_LIST_isEmpty(list)) {
         return NULL;
     }
 
@@ -608,7 +607,7 @@ void* LIST_extractAt(List* list, u16 position){
     return data;
 }
 
-s16 LIST_concat(List* list, const List* list_src) {
+s16 DLL_LIST_concat(List* list, const List* list_src) {
 
     if(list_src==NULL|| list == NULL)
         {
@@ -659,7 +658,7 @@ s16 LIST_concat(List* list, const List* list_src) {
     return kErrorCode_Ok;
 }
 
-s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
+s16 DLL_LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
     
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -681,8 +680,7 @@ s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
     return kErrorCode_Ok;
 }
 
-
-void LIST_print(List* list) {
+void DLL_LIST_print(List* list) {
 
     if (NULL == list) {
         printf("\t[List Info] list: NULL\n");

@@ -9,16 +9,16 @@
 
 #include "adt_memory_node.h"
 
-typedef struct adt_list_s {
+typedef struct adt_dll_list_s {
 	MemoryNode* head_;
 	MemoryNode* tail_; 
 	u16 length_;
 	u16 capacity_;
 	//MemoryNode* storage_;
-	struct list_ops_s* ops_;
+	struct dll_list_ops_s* ops_;
 } List;
 
-struct list_ops_s {
+struct dll_list_ops_s {
 
     s16(*destroy)(List* list);
     s16(*reset)(List* list);
@@ -48,6 +48,6 @@ struct list_ops_s {
     void (*print)(List* list);
 };
 
-List* LIST_create(u16 capacity);
+List* DLL_LIST_create(u16 capacity);
 
 #endif //__ADT_LIST_H__
