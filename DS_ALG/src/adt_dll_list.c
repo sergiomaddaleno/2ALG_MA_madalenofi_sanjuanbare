@@ -312,16 +312,29 @@ void* DLL_LIST_at(const List* list, u16 position){
     /*if (position < 0){
         return NULL;
     }*/
+    if (list->length_ < list->capacity_ / 2) {
+        MemoryNode* countaux = list->head_;
+        int count = 0;
 
-    MemoryNode* countaux = list->head_;
-    int count = 0;
+        while (count < position) {
+            countaux = countaux->next_;
+            count++;
+        }
 
-    while (count < position ) {
-        countaux = countaux->next_;
-        count++;
+        return countaux->data_;
     }
+    else {
+        MemoryNode* countaux = list->tail_;
+        int count = list->capacity_;
 
-    return countaux->data_;
+        while (count < position) {
+            countaux = countaux->previous_;
+            count--;
+        }
+
+        return countaux->data_;
+    }
+    
 }
 
 s16 DLL_LIST_insertFirst(List* list, void* data, u16 bytes){
@@ -352,11 +365,12 @@ s16 DLL_LIST_insertFirst(List* list, void* data, u16 bytes){
         aux->next_ = NULL;
         list->head_ = aux;
         list->tail_ = aux;
+        aux->previous_ = NULL;
 
         list->length_++;
     }
     else {
-
+       
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
         if (NULL == aux) {
             return 0;
@@ -365,6 +379,7 @@ s16 DLL_LIST_insertFirst(List* list, void* data, u16 bytes){
         aux->size_ = bytes;
 
         aux->next_ = list->head_;
+        list->head_->previous_ = aux;
         list->head_ = aux;
 
         list->length_++;
@@ -396,7 +411,7 @@ s16 DLL_LIST_insertLast(List* list, void* data, u16 bytes){
         aux->next_ = NULL;
         list->head_ = aux;
         list->tail_ = aux;
-
+        aux->previous_ = NULL;
         aux->data_ = data;
         aux->size_ = bytes;
 
@@ -406,6 +421,7 @@ s16 DLL_LIST_insertLast(List* list, void* data, u16 bytes){
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
         list->tail_->next_ = aux;
+        aux->previous_ = list->tail_;
         list->tail_ = aux;
         list->tail_->next_ = NULL;
 
@@ -446,31 +462,63 @@ s16 DLL_LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
     aux->data_ = data;
     aux->size_ = bytes;
 
+
     if (NULL == list->head_) {
         aux->next_ = NULL;
         list->head_ = aux;
         list->tail_ = aux;
+        aux->previous_ = NULL;
     }
     else {
-        if (position == 0) {
-            aux->next_ = list->head_;
-            list->head_ = aux;
-        }
-        else {
-            MemoryNode* countaux = list->head_;
-            int count = 0;
+        if (list->length_ < list->capacity_ / 2) {
+            if (position == 0) {
+                aux->next_ = list->head_;
+                list->head_->previous_ = aux;
+                list->head_ = aux;
+                aux->previous_ = NULL;
 
-            while (count < position - 1) {
-                countaux = countaux->next_;
-                count++;
+
+            }
+            else {
+                MemoryNode* countaux = list->head_;
+                int count = 0;
+
+                while (count < position - 1) {
+                    countaux = countaux->next_;
+                    count++;
+                }
+
+                aux->next_ = countaux->next_;
+                countaux->next_ = aux;
+                aux->previous_ = countaux;
             }
 
-            aux->next_ = countaux->next_;
-            countaux->next_ = aux;
+            if (aux->next_ == NULL) {
+                list->tail_ = aux;
+            }
         }
+        else {
+            if (position == list->capacity_) {
+                aux->previous_ = list->tail_;
+                list->tail_ = aux;
+            }
+            else {
+                MemoryNode* countaux = list->tail_;
+                int count = list->capacity_;
 
-        if (aux->next_ == NULL) {
-            list->tail_ = aux;
+                while (count > position - 1) {
+                    countaux = countaux->previous_;
+                    count--;
+                }
+
+                aux->next_ = countaux->next_;
+                countaux->next_ = aux;
+                aux->previous_ = countaux;
+            }
+
+            if (aux->next_ == NULL) {
+                list->tail_ = aux;
+            }
         }
     }
     list->length_++;

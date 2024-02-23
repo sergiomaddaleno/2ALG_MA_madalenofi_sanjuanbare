@@ -92,6 +92,8 @@ s16 MEMNODE_createLite(MemoryNode* node) {
     node->size_ = 0;
     node->ops_ = &memory_node_ops;
     node->next_ = NULL;
+    node->previous_ = NULL;
+
 
     return kErrorCode_Ok;
 }
@@ -311,11 +313,15 @@ static MemoryNode* MEMNODE_next(MemoryNode* node) {
     }
 
     return node->next_;
-
-
 }
 
-//static MemoryNode* MEMNODE_previous(List* list) {}
+static MemoryNode* MEMNODE_previous(MemoryNode* node) {
+    if (NULL == node) {
+        return kErrorCode_NodeNull;
+    }
+
+    return node->previous_;
+}
 
 static void MEMNODE_setNext(MemoryNode* node, MemoryNode* next_node){
    
@@ -327,4 +333,10 @@ static void MEMNODE_setNext(MemoryNode* node, MemoryNode* next_node){
 
 }
 
-//static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node){}
+static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node){
+    if (NULL == node) {
+        return kErrorCode_NodeNull;
+    }
+
+    node->previous_ = previous_node->previous_;
+}

@@ -15,6 +15,7 @@ typedef struct memory_node_s {
   u16 size_;
   struct memory_node_ops_s *ops_;
   struct memory_node_s *next_;
+  struct memory_node_s *previous_;
 } MemoryNode;
 
 // Memory Node's API Declarations
@@ -188,11 +189,11 @@ struct memory_node_ops_s {
 
   MemoryNode*(*next) (MemoryNode* node);
 
-  //MemoryNode* (*previous)(List* list);
+  MemoryNode* (*previous)(MemoryNode* node);
 
   void(*setNext) (MemoryNode* node, MemoryNode* next_node);
 
-  //void (*setPrevious)(MemoryNode* node, MemoryNode* previous_node);
+  void (*setPrevious)(MemoryNode* node, MemoryNode* previous_node);
 };
 
 /**
