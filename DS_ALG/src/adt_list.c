@@ -579,7 +579,6 @@ void* LIST_extractAt(List* list, u16 position){
                 
                 while (count < position - 1) {
                     countaux = countaux->next_;
-
                     count++;
                 }
                 aux = countaux;
