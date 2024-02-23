@@ -88,26 +88,18 @@ s16 LIST_destroy(List* list) {
         return kErrorCode_ListNull;
     }
 
-    
-
     MemoryNode* current = list->head_;
     MemoryNode* next;
 
     while (current != NULL) {
         next = current->next_;
         
-            MM->free(current->data_);
-           
-        
-        
+        MM->free(current->data_);
         MM->free(current);
-        
-      
         current = next;
     }
 
     MM->free(list);
-   
 
     return kErrorCode_Ok;
 }
@@ -120,11 +112,11 @@ s16 LIST_reset(List* list) {
     
     // ALopezESAT: Creating a memory node to then point aux to something else is a memory leak
     // LIST_reset should not have any malloc at all.
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+    MemoryNode* aux = list->head_;
 
     while (NULL != list->head_) {
        
-            MM->free(list->head_->data_);
+        MM->free(list->head_->data_);
         
         aux = list->head_->next_;
         MM->free(list->head_);
@@ -149,11 +141,10 @@ s16 LIST_softReset(List* list) {
     }
 
     // ALopezESAT: Same as in LIST_reset
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+    MemoryNode* aux = list->head_;
 
     while (NULL != list->head_) {
 
-      
         aux = list->head_->next_;
         MM->free(list->head_);
        
@@ -185,20 +176,17 @@ s16 LIST_resize(List* list, u16 new_size) {
         return kErrorCode_EqualCapacity;
     }
 
-
-
     if (list->length_ > new_size) {
         
         
         list->capacity_ = new_size;
         
         // ALopezESAT: Same as in LIST_reset
-        MemoryNode* countaux = MM->malloc(sizeof(MemoryNode));
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
+        MemoryNode* countaux = list->head_;
+        MemoryNode* aux = list->head_;
         if (countaux == NULL) {
             return kErrorCode_MallocNull;
         }
-
 
         if (new_size > 1) {
 
@@ -248,12 +236,9 @@ s16 LIST_resize(List* list, u16 new_size) {
         }
     }
     else {
-        
         list->capacity_ = new_size;
     }
 
-    
-   
     return kErrorCode_Ok;
 }
 
@@ -291,8 +276,6 @@ void* LIST_first(const List* list){
         return NULL;
     }
 
-   
-
     if (NULL == list->head_) {
         return NULL;
     }
@@ -308,7 +291,6 @@ void* LIST_last(const List* list){
         return NULL;
     }
 
-   
     if (list->length_ == 0) {
         return NULL;
     }
@@ -327,9 +309,9 @@ void* LIST_at(const List* list, u16 position){
     }
 
     // ALopezESAT: Position is unsigned, it will never be less than 0
-    if (position < 0){
+    /*if (position < 0){
         return NULL;
-    }
+    }*/
 
     MemoryNode* countaux = list->head_;
     int count = 0;
@@ -509,33 +491,26 @@ void* LIST_extractFirst(List* list) {
     if (list->head_ == NULL) {
 
         return NULL;
-
     }
     
     // ALopezESAT: Same as in LIST_reset, same for data
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
-    void* data = MM->malloc(sizeof(void*) * 1);
+    MemoryNode* aux = list->head_->next_;
+    void* data = list->head_->data_;
 
     aux = list->head_->next_;
     data = list->head_->data_;
     MM->free(list->head_);
     
     list->head_ = aux;
-    
-    
-
     list->length_--;
 
     return data;
-
-    
 }
 
 void* LIST_extractLast(List* list) {
     if (list == NULL || LIST_isEmpty(list) || list->head_ == NULL) {
         return NULL;
     }
-
 
     void* data = list->tail_->data_;
 
@@ -558,7 +533,6 @@ void* LIST_extractLast(List* list) {
     list->length_--;
     
     return data;
-
 }
 
 void* LIST_extractAt(List* list, u16 position){
@@ -566,7 +540,6 @@ void* LIST_extractAt(List* list, u16 position){
     if (NULL == list) {
         return NULL;
     }
-
 
     if (LIST_isEmpty(list)) {
         return NULL;
@@ -581,7 +554,7 @@ void* LIST_extractAt(List* list, u16 position){
         return NULL;
     }
 
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
+    MemoryNode* aux = list->head_->next_;
     if (aux == NULL) {
         MM->free(aux);
         return NULL;
@@ -591,7 +564,7 @@ void* LIST_extractAt(List* list, u16 position){
     // It also has memory leaks.
     MemoryNode* countaux = list->head_;
     MemoryNode* deleteaux = list->head_;
-    void* data = MM->malloc(sizeof(void*) * 1);
+    void* data = list->head_->data_;
     int count = 0;
 
         if (position == 0) {
@@ -604,8 +577,6 @@ void* LIST_extractAt(List* list, u16 position){
         else {
             if(position+1<list->length_-1){
                 
-               
-               
                 while (count < position - 1) {
                     countaux = countaux->next_;
 
@@ -617,7 +588,7 @@ void* LIST_extractAt(List* list, u16 position){
 
                aux->next_ = deleteaux->next_;
                data = deleteaux->data_;
-                MM->free(deleteaux);
+               MM->free(deleteaux);
             
             }
             else {
@@ -632,20 +603,10 @@ void* LIST_extractAt(List* list, u16 position){
                 
 
             }
-          
-
-        }
-
-        
-    
+        }   
     list->length_--;
 
     return data;
-
-
-
-
-
 }
 
 s16 LIST_concat(List* list, const List* list_src) {
@@ -656,10 +617,8 @@ s16 LIST_concat(List* list, const List* list_src) {
         return kErrorCode_StorageNull;
     }
 
-
     MemoryNode* current_src = list_src->head_;
 
-    
     while (current_src != NULL) {
 
         MemoryNode* new_node = MM->malloc(sizeof(MemoryNode));
@@ -667,8 +626,6 @@ s16 LIST_concat(List* list, const List* list_src) {
             MM->free(new_node);
             return kErrorCode_StorageNull;
         }
-
-        
 
         u8* tmp = MM->malloc(current_src->size_);
         if (NULL == tmp) {
@@ -679,15 +636,10 @@ s16 LIST_concat(List* list, const List* list_src) {
         for (s32 i = 0; i < current_src->size_; i++) {
             tmp[i] = aux[i];
         }
-       
-        
 
         new_node->data_ = tmp;
         new_node->size_ = current_src->size_;
-
-
         new_node->next_ = NULL;
- 
 
         if (NULL == list->head_) {
             list->head_ = new_node;
@@ -702,8 +654,6 @@ s16 LIST_concat(List* list, const List* list_src) {
         current_src = current_src->next_;
     }
 
-    
-    
     list->length_ += list_src->length_;
     list->capacity_ += list_src->capacity_;
 
