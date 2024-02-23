@@ -76,7 +76,6 @@ List* LIST_create(u16 capacity) {
     l_temp->capacity_ = capacity;
     l_temp->head_ = NULL;
     l_temp->tail_ = NULL;
-    //l_temp->storage_ = NULL;
     l_temp->ops_ = &list_ops;
     
     return l_temp;
@@ -110,8 +109,6 @@ s16 LIST_reset(List* list) {
         return kErrorCode_ListNull;
     }
     
-    // ALopezESAT: Creating a memory node to then point aux to something else is a memory leak
-    // LIST_reset should not have any malloc at all.
     MemoryNode* aux = list->head_;
 
     while (NULL != list->head_) {
@@ -126,7 +123,7 @@ s16 LIST_reset(List* list) {
     list->length_ = 0;
     list->head_ = NULL;
     list->tail_ = NULL;
-    //list->storage_ = NULL;
+
     return  kErrorCode_Ok;
 }
 
@@ -140,7 +137,6 @@ s16 LIST_softReset(List* list) {
         return kErrorCode_StorageNull;
     }
 
-    // ALopezESAT: Same as in LIST_reset
     MemoryNode* aux = list->head_;
 
     while (NULL != list->head_) {
@@ -154,7 +150,7 @@ s16 LIST_softReset(List* list) {
     list->length_ = 0;
     list->head_ = NULL;
     list->tail_ = NULL;
-    //list->storage_ = NULL;
+
     return  kErrorCode_Ok;
 }
 
@@ -178,12 +174,11 @@ s16 LIST_resize(List* list, u16 new_size) {
 
     if (list->length_ > new_size) {
         
-        
         list->capacity_ = new_size;
         
-        // ALopezESAT: Same as in LIST_reset
         MemoryNode* countaux = list->head_;
         MemoryNode* aux = list->head_;
+
         if (countaux == NULL) {
             return kErrorCode_MallocNull;
         }
@@ -307,11 +302,6 @@ void* LIST_at(const List* list, u16 position){
     if (NULL == list->head_) {
         return NULL;
     }
-
-    // ALopezESAT: Position is unsigned, it will never be less than 0
-    /*if (position < 0){
-        return NULL;
-    }*/
 
     MemoryNode* countaux = list->head_;
     int count = 0;
@@ -478,7 +468,6 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
     return kErrorCode_Ok;
 }
 
-
 void* LIST_extractFirst(List* list) {
     if (NULL == list) {
         return NULL;
@@ -492,13 +481,10 @@ void* LIST_extractFirst(List* list) {
 
         return NULL;
     }
-    
-    // ALopezESAT: Same as in LIST_reset, same for data
+
     MemoryNode* aux = list->head_->next_;
     void* data = list->head_->data_;
 
-    aux = list->head_->next_;
-    data = list->head_->data_;
     MM->free(list->head_);
     
     list->head_ = aux;
@@ -521,6 +507,7 @@ void* LIST_extractLast(List* list) {
     }
     else {
         MemoryNode* secondToLast = list->head_;
+
         while (secondToLast->next_ != list->tail_) {
             secondToLast = secondToLast->next_;
         }
@@ -555,54 +542,48 @@ void* LIST_extractAt(List* list, u16 position){
     }
 
     MemoryNode* aux = list->head_->next_;
-    if (aux == NULL) {
-        MM->free(aux);
-        return NULL;
-    }
-    
-    // ALopezESAT: This part is a bit chaotic, you might want to rewrite this after giving it a think.
-    // It also has memory leaks.
     MemoryNode* countaux = list->head_;
     MemoryNode* deleteaux = list->head_;
     void* data = list->head_->data_;
+
     int count = 0;
 
-        if (position == 0) {
-            aux = list->head_->next_;
-            data = list->head_->data_;
-            MM->free(list->head_);
-            list->head_ = aux;
+    if (position == 0) {
+        aux = list->head_->next_;
+        data = list->head_->data_;
 
+        MM->free(list->head_);
+        list->head_ = aux;
+    }
+    else {
+        if(position+1<list->length_-1){
+            
+           while (count < position - 1) {
+               countaux = countaux->next_;
+               count++;
+           }
+           aux = countaux;
+            
+           deleteaux = countaux->next_;
+           aux->next_ = deleteaux->next_;
+
+           data = deleteaux->data_;
+           MM->free(deleteaux);
         }
         else {
-            if(position+1<list->length_-1){
-                
-                while (count < position - 1) {
-                    countaux = countaux->next_;
-                    count++;
-                }
-                aux = countaux;
-                
-                deleteaux = countaux->next_;
 
-               aux->next_ = deleteaux->next_;
-               data = deleteaux->data_;
-               MM->free(deleteaux);
-            
+            while (count < position - 1) {
+                countaux = countaux->next_;
+                count++;
             }
-            else {
-                while (count < position - 1) {
-                    countaux = countaux->next_;
-                    count++;
-                }
-                data = list->tail_->data_;
-                MM->free(list->tail_);
-                list->tail_ = countaux;
-                countaux->next_ = NULL;
-                
 
-            }
-        }   
+            data = list->tail_->data_;
+            MM->free(list->tail_);
+
+            list->tail_ = countaux;
+            countaux->next_ = NULL;
+        }
+    }   
     list->length_--;
 
     return data;
@@ -675,7 +656,6 @@ s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
         
         callback(countaux);
         countaux = countaux->next_;
-
     }
 
     return kErrorCode_Ok;

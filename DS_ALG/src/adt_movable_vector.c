@@ -572,7 +572,6 @@ s16 MOVABLE_VECTOR_traverse(MovableVector* vector, void (*callback)(MemoryNode*)
     return kErrorCode_Ok;
 }
 
-
 s16 MOVABLE_VECTOR_concat(MovableVector* vector, MovableVector * vector_src)
 {
     if (NULL == vector || NULL == vector_src)
