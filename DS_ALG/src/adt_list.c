@@ -117,8 +117,9 @@ s16 LIST_reset(List* list) {
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
-
-
+    
+    // ALopezESAT: Creating a memory node to then point aux to something else is a memory leak
+    // LIST_reset should not have any malloc at all.
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
     while (NULL != list->head_) {
@@ -147,6 +148,7 @@ s16 LIST_softReset(List* list) {
         return kErrorCode_StorageNull;
     }
 
+    // ALopezESAT: Same as in LIST_reset
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
 
     while (NULL != list->head_) {
@@ -190,6 +192,7 @@ s16 LIST_resize(List* list, u16 new_size) {
         
         list->capacity_ = new_size;
         
+        // ALopezESAT: Same as in LIST_reset
         MemoryNode* countaux = MM->malloc(sizeof(MemoryNode));
         MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
         if (countaux == NULL) {
@@ -323,7 +326,7 @@ void* LIST_at(const List* list, u16 position){
         return NULL;
     }
 
-
+    // ALopezESAT: Position is unsigned, it will never be less than 0
     if (position < 0){
         return NULL;
     }
@@ -508,7 +511,8 @@ void* LIST_extractFirst(List* list) {
         return NULL;
 
     }
-
+    
+    // ALopezESAT: Same as in LIST_reset, same for data
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
     void* data = MM->malloc(sizeof(void*) * 1);
 
@@ -582,7 +586,9 @@ void* LIST_extractAt(List* list, u16 position){
         MM->free(aux);
         return NULL;
     }
-
+    
+    // ALopezESAT: This part is a bit chaotic, you might want to rewrite this after giving it a think.
+    // It also has memory leaks.
     MemoryNode* countaux = list->head_;
     MemoryNode* deleteaux = list->head_;
     void* data = MM->malloc(sizeof(void*) * 1);
@@ -734,6 +740,7 @@ void LIST_print(List* list) {
         return;
     }
 
+    // ALopezESAT: There are some casts missing.
     printf("\t[List Info] Address: %p\n", list);
     printf("\t[List Info] Length: %d\n", list->length_);
     printf("\t[List Info] Capacity: %d\n", list->capacity_);
@@ -750,6 +757,7 @@ void LIST_print(List* list) {
 
     while (currentNode != NULL) {
         printf("\t  [List Info] Storage #%d\n", count);
+        // ALopezESAT: There are some casts missing.
         printf("\t      [Node info] Address: %p\n", currentNode);
         printf("\t      [Node info] Size: %d\n", currentNode->size_);
         printf("\t      [Node info] Data Address: %p\n", currentNode->data_);
