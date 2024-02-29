@@ -325,7 +325,7 @@ void* DLL_LIST_at(const List* list, u16 position){
     }
     else {
         MemoryNode* countaux = list->tail_;
-        int count = list->capacity_;
+        int count = list->length_;
 
         while (count < position) {
             countaux = countaux->previous_;
@@ -504,7 +504,7 @@ s16 DLL_LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
             }
             else {
                 MemoryNode* countaux = list->tail_;
-                int count = list->capacity_;
+                int count = list->length_;
 
                 while (count > position - 1) {
                     countaux = countaux->previous_;
@@ -549,6 +549,7 @@ void* DLL_LIST_extractFirst(List* list) {
     MM->free(list->head_);
     
     list->head_ = aux;
+    list->head_->previous_ = NULL;
     list->length_--;
 
     return data;
@@ -600,59 +601,81 @@ void* DLL_LIST_extractAt(List* list, u16 position){
 
         return NULL;
     }
-
-    MemoryNode* aux = list->head_->next_;
-    if (aux == NULL) {
-        MM->free(aux);
-        return NULL;
-    }
-    
-    // ALopezESAT: This part is a bit chaotic, you might want to rewrite this after giving it a think.
-    // It also has memory leaks.
-    MemoryNode* countaux = list->head_;
-    MemoryNode* deleteaux = list->head_;
     void* data = list->head_->data_;
-    int count = 0;
+    if (position == 0) {
+       
+        data=DLL_LIST_extractFirst(list);
 
-        if (position == 0) {
-            aux = list->head_->next_;
-            data = list->head_->data_;
-            MM->free(list->head_);
-            list->head_ = aux;
+    }
+    else {
+        if (position == list->length_) {
+            
+            data=DLL_LIST_extractLast(list);
 
         }
         else {
-            if(position+1<list->length_-1){
-                
+            
+            
+           
+
+            if (list->length_ < list->capacity_ / 2) {
+                MemoryNode* aux = list->head_->next_;
+                if (aux == NULL) {
+                    MM->free(aux);
+                    return NULL;
+                }
+
+               
+                MemoryNode* countaux = list->head_;
+                MemoryNode* deleteaux = list->head_;
+                int count = 0;
                 while (count < position - 1) {
                     countaux = countaux->next_;
                     count++;
                 }
                 aux = countaux;
-                
+
                 deleteaux = countaux->next_;
 
-               aux->next_ = deleteaux->next_;
-               data = deleteaux->data_;
-               MM->free(deleteaux);
-            
-            }
-            else {
-                while (count < position - 1) {
-                    countaux = countaux->next_;
-                    count++;
-                }
-                data = list->tail_->data_;
-                MM->free(list->tail_);
-                list->tail_ = countaux;
-                countaux->next_ = NULL;
-                
+                aux->next_ = deleteaux->next_;
+                data = deleteaux->data_;
+                MM->free(deleteaux);
 
             }
-        }   
+            else {
+                MemoryNode* aux = list->tail_;
+                if (aux == NULL) {
+                    MM->free(aux);
+                    return NULL;
+                }
+
+           
+                MemoryNode* p = NULL;
+                MemoryNode* n = NULL;
+                int count = list->length_;
+                while (count > position + 1 ) {
+                    aux = aux->previous_;
+                    count--;
+                }
+                p = aux->previous_;
+                n = aux->next_;
+                data = aux->data_;
+                MM->free(aux);
+                p->next_ = n;
+                n->previous_ = p;
+            }
+            
+                
+
+        }
+
+
+    }
     list->length_--;
 
     return data;
+
+    
 }
 
 s16 DLL_LIST_concat(List* list, const List* list_src) {
