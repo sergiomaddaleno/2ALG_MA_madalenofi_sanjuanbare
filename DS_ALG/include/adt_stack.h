@@ -22,7 +22,20 @@ struct stack_ops_s {
 	s16(*push)(Stack* stack, void* data, u16 size);
 	s16(*pop)(Stack* stack);
 	s16(*top)(Stack* stack);
-}
+
+	s16(*reset)(Stack* stack);
+	u16 (*capacity)(Stack* stack);
+	s16 (*resize)(Stack* stack, u16 new_size);
+	u16 (*length)(Stack* stack);
+
+	boolean (*isEmpty)(Stack* stack);
+	boolean (*isFull)(Stack* stack);
+
+	s16 (*concat)(Stack* stack, Stack* stack_src);
+	s16 (*destroy)(Stack* stack);
+
+	void (*print)(Stack* stack);
+};
 
 Stack* STACK_create(u16 capacity);
 
