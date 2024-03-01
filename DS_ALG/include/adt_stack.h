@@ -26,7 +26,7 @@ struct stack_ops_s {
 	s16(*reset)(Stack* stack);
 	u16 (*capacity)(Stack* stack);
 	s16 (*resize)(Stack* stack, u16 new_size);
-	u16 (*length)(Stack* stack);
+	s16 (*length)(Stack* stack);
 
 	boolean (*isEmpty)(Stack* stack);
 	boolean (*isFull)(Stack* stack);

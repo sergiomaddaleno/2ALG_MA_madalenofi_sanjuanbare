@@ -16,7 +16,7 @@ static s16 STACK_top(Stack* stack);
 static s16 STACK_reset(Stack* stack);
 static u16 STACK_capacity(Stack* stack);
 static s16 STACK_resize(Stack* stack, u16 new_size);
-static u16 STACK_length(Stack* stack);
+static s16 STACK_length(Stack* stack);
 
 static boolean STACK_isEmpty(Stack* stack);
 static boolean STACK_isFull(Stack* stack);
@@ -56,30 +56,32 @@ Stack* STACK_create(u16 capacity) {
         return NULL;
     }
 
-    s_temp->storage_ = MM->malloc(sizeof(Vector) * capacity);
-    if (NULL == s_temp->storage_) {
-        MM->free(s_temp);
-        return NULL;
-    }
-
-    for (s16 i = 0; i < capacity; i++) {
-        MEMNODE_createLite(&s_temp->storage_[i]);
-    }
-
-    s_temp->tail_ = 0;
-    s_temp->head_ = 0;
-    s_temp->capacity_ = capacity;
+    s_temp->storage_ = VECTOR_create(capacity);
     s_temp->ops_ = &stack_ops;
+
+    /*if (NULL == s_temp->storage_) {
+        return NULL;
+    } mIRAR */ 
 
     return s_temp;
 }
 
 s16 STACK_push(Stack* stack, void* data, u16 size) {
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
 
+    return stack->storage_->ops_->insertLast(stack->storage_, data, size);
 }
 
 s16 STACK_pop(Stack* stack) {
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
 
+    return stack->storage_->ops_->extractLast(stack->storage_);
 }
 
 s16 STACK_top(Stack* stack) {
@@ -87,27 +89,57 @@ s16 STACK_top(Stack* stack) {
 }
 
 s16 STACK_reset(Stack* stack) {
-
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
+    //assert(stack->storsge_);
+    return stack->storage_->ops_->reset(stack->storage_);
 }
 
 u16 STACK_capacity(Stack* stack) {
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
 
+    return stack->storage_->ops_->capacity(stack->storage_);
 }
 
 s16 STACK_resize(Stack* stack, u16 new_size) {
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
 
+    return stack->storage_->ops_->resize(stack->storage_, new_size);
 }
 
-u16 STACK_length(Stack* stack) {
+s16 STACK_length(Stack* stack) {
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
 
+    return stack->storage_->ops_->length(stack->storage_);
 }
 
 boolean STACK_isEmpty(Stack* stack) {
-
+    if (stack->storage_->ops_->isEmpty(stack->storage_)) {
+        return True;
+    }
+    else {
+        return False;
+    }
 }
 
 boolean STACK_isFull(Stack* stack) {
-
+    if (stack->storage_->ops_->isFull(stack->storage_)) {
+        return True;
+    }
+    else {
+        return False;
+    }
 }
 
 s16 STACK_concat(Stack* stack, Stack* stack_src) {
@@ -115,14 +147,21 @@ s16 STACK_concat(Stack* stack, Stack* stack_src) {
 }
 
 s16 STACK_destroy(Stack* stack) {
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
+    
+    stack->storage_->ops_->destroy(stack->storage_);
 
+    return kErrorCode_Ok;
 }
 
-void VECTOR_print(Vector* vector) {
-    if (NULL == vector) {
-        printf("\t[Vector Info] vector: NULL\n");
-        return;
+void STACK_print(Stack* stack) {
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
     }
 
-    
+    stack->storage_->ops_->print(stack->storage_);
 }
