@@ -162,14 +162,18 @@ project "PR05_List"
     path.join(PROJ_DIR, "tests/test_dll_list.c"),
   }
 
---project "PR09_Stack"
---  files {
---    path.join(PROJ_DIR, "include/adt_memory_node.h"),
---    path.join(PROJ_DIR, "src/adt_memory_node.c"),
---    path.join(PROJ_DIR, "include/adt_stack.h"),
---    path.join(PROJ_DIR, "src/adt_stack.c"),
---    path.join(PROJ_DIR, "tests/test_stack.c"),
---  }
+
+  
+project "PR09_Stack"
+  files {
+    path.join(PROJ_DIR, "include/adt_memory_node.h"),
+    path.join(PROJ_DIR, "src/adt_memory_node.c"),
+    path.join(PROJ_DIR, "include/adt_vector.h"),
+    path.join(PROJ_DIR, "src/adt_vector.c"),
+    path.join(PROJ_DIR, "include/adt_stack.h"),
+    path.join(PROJ_DIR, "src/adt_stack.c"),
+    path.join(PROJ_DIR, "tests/test_stack.c"),
+  }
 
 
 

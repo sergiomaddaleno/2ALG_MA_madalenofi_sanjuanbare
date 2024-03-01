@@ -332,4 +332,5 @@ struct vector_ops_s {
  *         or if the specified capacity is less than or equal to 0.
  */
 Vector* VECTOR_create(u16 capacity); // Creates a new vector
+
 #endif //__ADT_VECTOR_H__
