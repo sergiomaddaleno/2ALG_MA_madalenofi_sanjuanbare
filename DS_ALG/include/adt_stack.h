@@ -11,17 +11,14 @@
 #include "adt_vector.h"
 
 typedef struct adt_stack_s {
-	u16 head_;
-	u16 tail_;
-	u16 capacity_;
 	Vector* storage_;
 	struct stack_ops_s* ops_;
 } Stack;
 
 struct stack_ops_s {
 	s16(*push)(Stack* stack, void* data, u16 size);
-	s16(*pop)(Stack* stack);
-	s16(*top)(Stack* stack);
+	void* (*pop)(Stack* stack);
+	void* (*top)(Stack* stack);
 
 	s16(*reset)(Stack* stack);
 	u16 (*capacity)(Stack* stack);

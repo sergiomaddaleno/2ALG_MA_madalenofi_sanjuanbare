@@ -10,8 +10,8 @@
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
 static s16 STACK_push(Stack* stack, void* data, u16 size);
-static s16 STACK_pop(Stack* stack);
-static s16 STACK_top(Stack* stack);
+static void* STACK_pop(Stack* stack);
+static void* STACK_top(Stack* stack);
 
 static s16 STACK_reset(Stack* stack);
 static u16 STACK_capacity(Stack* stack);
@@ -53,6 +53,7 @@ Stack* STACK_create(u16 capacity) {
 
     Stack* s_temp = MM->malloc(sizeof(Stack));
     if (NULL == s_temp) {
+        MM->free(s_temp);
         return NULL;
     }
 
@@ -75,17 +76,24 @@ s16 STACK_push(Stack* stack, void* data, u16 size) {
     return stack->storage_->ops_->insertLast(stack->storage_, data, size);
 }
 
-s16 STACK_pop(Stack* stack) {
-    if (NULL == stack)
-    {
-        return kErrorCode_VectorNull;
+void* STACK_pop(Stack* stack) {
+    if (NULL == stack ) {
+        return NULL;
     }
 
+    
     return stack->storage_->ops_->extractLast(stack->storage_);
+
+
 }
 
-s16 STACK_top(Stack* stack) {
+void* STACK_top(Stack* stack) {
+    if (NULL == stack)
+    {
+        return NULL;
+    }
 
+    return stack->storage_->ops_->last(stack->storage_);
 }
 
 s16 STACK_reset(Stack* stack) {
@@ -93,7 +101,12 @@ s16 STACK_reset(Stack* stack) {
     {
         return kErrorCode_VectorNull;
     }
-    //assert(stack->storsge_);
+    if (NULL == stack->storage_)
+    {
+        return kErrorCode_VectorNull;
+    }
+
+
     return stack->storage_->ops_->reset(stack->storage_);
 }
 
@@ -143,7 +156,17 @@ boolean STACK_isFull(Stack* stack) {
 }
 
 s16 STACK_concat(Stack* stack, Stack* stack_src) {
-
+    if (NULL == stack)
+    {
+        return kErrorCode_VectorNull;
+    }
+    if (NULL == stack_src)
+    {
+        return kErrorCode_VectorNull;
+    }
+    
+        return stack->storage_->ops_->isEmpty(stack->storage_, stack_src->storage_);
+    
 }
 
 s16 STACK_destroy(Stack* stack) {

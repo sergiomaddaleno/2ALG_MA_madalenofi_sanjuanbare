@@ -440,7 +440,7 @@ void* VECTOR_extractLast(Vector* vector) {
 
     void* tmp = vector->storage_[vector->tail_-1].data_;
 
-    //vector->storage_[vector->tail_-1].ops_->softReset(&vector->storage_[vector->tail_-1]);
+    
     vector->tail_--;
 
     return tmp;
