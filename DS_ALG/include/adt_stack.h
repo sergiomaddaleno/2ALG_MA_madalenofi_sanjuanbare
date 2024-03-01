@@ -8,7 +8,22 @@
 #define __ADT_STACK_H__
 
 #include "adt_memory_node.h"
+#include "adt_vector.h"
 
+typedef struct adt_stack_s {
+	u16 head_;
+	u16 tail_;
+	u16 capacity_;
+	Vector* storage_;
+	struct stack_ops_s* ops_;
+} Stack;
 
+struct stack_ops_s {
+	s16(*push)(Stack* stack, void* data, u16 size);
+	s16(*pop)(Stack* stack);
+	s16(*top)(Stack* stack);
+}
+
+Stack* STACK_create(u16 capacity);
 
 #endif //__ADT_STACK_H__
