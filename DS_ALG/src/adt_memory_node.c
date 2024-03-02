@@ -309,7 +309,7 @@ void MEMNODE_print(MemoryNode* node) {
 static MemoryNode* MEMNODE_next(MemoryNode* node) {
 
     if (NULL == node) {
-        return kErrorCode_NodeNull;
+        return NULL;
     }
 
     return node->next_;
@@ -317,7 +317,7 @@ static MemoryNode* MEMNODE_next(MemoryNode* node) {
 
 static MemoryNode* MEMNODE_previous(MemoryNode* node) {
     if (NULL == node) {
-        return kErrorCode_NodeNull;
+        return NULL;
     }
 
     return node->previous_;
@@ -326,16 +326,15 @@ static MemoryNode* MEMNODE_previous(MemoryNode* node) {
 static void MEMNODE_setNext(MemoryNode* node, MemoryNode* next_node){
    
     if (NULL == node) {
-        return kErrorCode_NodeNull;
+        return;
     }
 
     node->next_ = next_node->next_;
-
 }
 
 static void MEMNODE_setPrevious(MemoryNode* node, MemoryNode* previous_node){
     if (NULL == node) {
-        return kErrorCode_NodeNull;
+        return;
     }
 
     node->previous_ = previous_node->previous_;

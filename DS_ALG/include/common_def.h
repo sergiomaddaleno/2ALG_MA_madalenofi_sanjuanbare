@@ -35,7 +35,11 @@ typedef enum {
 	kErrorCode_ListNull = -30,
 
 	//Stack
-	kErrorCode_StackNull = -40,
+	kErrorCode_StackNull = -35,
+
+	//Queue
+	kErrorCode_QueueNull = -40,
+
 
 } ErrorCode;
 

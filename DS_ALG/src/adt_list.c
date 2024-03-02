@@ -690,7 +690,7 @@ void LIST_print(List* list) {
         printf("\t      [Node info] Address: %p\n", currentNode);
         printf("\t      [Node info] Size: %d\n", currentNode->size_);
         printf("\t      [Node info] Data Address: %p\n", currentNode->data_);
-        printf("\t      [Node info] Data Content: %s\n", currentNode->data_);
+        printf("\t      [Node info] Data Content: %s\n", (char*)currentNode->data_);
 
         printf("\t      [Node info] Next address: %p\n", currentNode->next_);
 
