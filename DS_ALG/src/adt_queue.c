@@ -62,43 +62,60 @@ Queue* QUEUE_create(u16 capacity) {
 }
 
 s16 QUEUE_enqueue(Queue* queue, void* data, u16 bytes) {
-    /*if (NULL == queue)
+    if (NULL == queue)
     {
         return kErrorCode_QueueNull;
     }
 
-    queue->storage_->ops_->insertFirst(queue, data, bytes);
+    queue->storage_->ops_->insertLast(queue->storage_, data, bytes);
 
-    return kErrorCode_Ok;*/
-
+    return kErrorCode_Ok;
 }
 
 void* QUEUE_dequeue(Queue* queue) {
+    if (NULL == queue)
+    {
+        return NULL;
+    }
 
+    return queue->storage_->ops_->extractFirst(queue->storage_);
 }
 
 void* QUEUE_back(const Queue* queue) {
+    if (NULL == queue)
+    {
+        return NULL;
+    }
 
+    return queue->storage_->ops_->last(queue->storage_);
 }
 
 void* QUEUE_front(const Queue* queue) {
+    if (NULL == queue)
+    {
+        return NULL;
+    }
 
+    return queue->storage_->ops_->first(queue->storage_);
 }
 
 //---
 
 s16 QUEUE_destroy(Queue* queue) {
-
-    
-}
-
-s16 QUEUE_reset(Queue* queue) {
-
     if (NULL == queue)
     {
         return kErrorCode_QueueNull;
     }
-    if (NULL == queue->storage_)
+    
+    queue->storage_->ops_->destroy(queue->storage_);
+    MM->free(queue);
+
+    return kErrorCode_Ok;
+}
+
+s16 QUEUE_reset(Queue* queue) {
+
+    if (NULL == queue || NULL == queue->storage_)
     {
         return kErrorCode_QueueNull;
     }
@@ -107,29 +124,55 @@ s16 QUEUE_reset(Queue* queue) {
 }
 
 s16 QUEUE_resize(Queue* queue, u16 new_size) {
+    if (NULL == queue)
+    {
+        return kErrorCode_QueueNull;
+    }
 
+    return queue->storage_->ops_->resize(queue->storage_, new_size);
 }
 
 u16 QUEUE_capacity(const Queue* queue) {
-   
+    if (NULL == queue)
+    {
+        return 0;
+    }
+
+    return queue->storage_->ops_->capacity(queue->storage_);
 }
 
 u16 QUEUE_length(const Queue* queue) {
-    
+    if (NULL == queue)
+    {
+        return 0;
+    }
+
+    return queue->storage_->ops_->length(queue->storage_);
 }
 
 s16 QUEUE_isEmpty(const Queue* queue) {
-    
+    if (NULL == queue) {
+        return 0;
+    }
+
+    return queue->storage_->ops_->isEmpty(queue->storage_);
 }
 
 s16 QUEUE_isFull(const Queue* queue) {
-    
+    if (NULL == queue) {
+        return 0;
+    }
+
+    return queue->storage_->ops_->isFull(queue->storage_);
 }
 
 
 s16 QUEUE_concat(Queue* queue, const Queue* queue_src) {
-
+    if (NULL == queue || NULL == queue_src) {
+        return kErrorCode_QueueNull;
+    }
   
+    return queue->storage_->ops_->concat(queue->storage_, queue_src->storage_);
 }
 
 void QUEUE_print(Queue* queue) {
