@@ -387,7 +387,6 @@ s16 C_VECTOR_insertFirst(C_Vector* vector, void* data, u16 bytes) {
     if (C_VECTOR_isFull(vector)) {
         return kErrorCode_VectorFull;
     }
-
     
     s16 position = (vector->head_ - 1 + vector->capacity_) % vector->capacity_;
 
@@ -430,14 +429,11 @@ s16 C_VECTOR_insertLast(C_Vector* vector, void* data, u16 bytes) {
     if (C_VECTOR_isFull(vector)) {
         return kErrorCode_VectorFull;
     }
-
     
     s16 position = vector->tail_;
 
-    
     vector->storage_[position].data_ = data;
     vector->storage_[position].size_ = bytes;
-
     
     vector->tail_ = (vector->tail_ + 1) % vector->capacity_;
 
@@ -466,36 +462,35 @@ s16 C_VECTOR_insertAt(C_Vector* vector, void* data, u16 bytes,u16 position) {
         return kErrorCode_VectorFull;
     }
 
-    if (position > vector->tail_) {
+    /**/if (position + vector->head_ >= vector->capacity_) {
 
-        position = vector->tail_;
+        position = (vector->head_ + 1 + position) % vector->capacity_;
+
+        if (position >= vector->tail_) {
+            C_VECTOR_insertLast(vector, data, bytes);
+            
+        }
+        else {
+            for (s16 i = vector->tail_; i >= position; i--) {
+
+                vector->storage_[i + 1] = vector->storage_[i];
+            }
+            vector->storage_[position].data_ = data;
+            vector->storage_[position].size_ = bytes;
+            vector->tail_++;
+        }
     }
-    
-    if (position >= vector->head_) {
+    else {
+        position = (vector->head_ + position) % vector->capacity_;
 
         for (s16 i = vector->head_; i <= position; i++) {
-
-            vector->storage_[i - 1] = vector->storage_[i];
+            vector->storage_[(i - 1 + vector->capacity_) % vector->capacity_] = vector->storage_[i];
         }
         vector->storage_[position].data_ = data;
         vector->storage_[position].size_ = bytes;
-        vector->head_--;
-    }
-    else {
-      
-           for(s16 i = vector->tail_; i >= position; i--) {
-
-               vector->storage_[i + 1] = vector->storage_[i];
-           }
-           vector->storage_[position].data_ = data;
-           vector->storage_[position].size_ = bytes;
-           vector->tail_++;
-   
-        
-
+        vector->head_ = (vector->head_ - 1 + vector->capacity_) % vector->capacity_;
     }
    
-
     return kErrorCode_Ok;
 }
 
@@ -512,17 +507,14 @@ void* C_VECTOR_extractFirst(C_Vector* vector) {
     if (C_VECTOR_isEmpty(vector)) {
         return NULL;
     }
-
-    
+ 
     void* tmp = vector->storage_[vector->head_].data_;
 
-   
     for (u16 i = vector->head_ + 1; i < vector->tail_; i++) {
         s16 current_index = (i + vector->capacity_) % vector->capacity_;
         s16 previous_index = (current_index - 1 + vector->capacity_) % vector->capacity_;
         vector->storage_[previous_index] = vector->storage_[current_index];
     }
-
     
     vector->tail_ = (vector->tail_ - 1 + vector->capacity_) % vector->capacity_;
 
@@ -543,9 +535,7 @@ void* C_VECTOR_extractLast(C_Vector* vector) {
         return NULL;
     }
 
-    
     void* tmp = vector->storage_[(vector->tail_ - 1 + vector->capacity_) % vector->capacity_].data_;
-
    
     vector->tail_ = (vector->tail_ - 1 + vector->capacity_) % vector->capacity_;
 

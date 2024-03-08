@@ -239,6 +239,7 @@ int main() {
 	printf("\t insertLast vector_3\n");
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_C; ++i)
 	{
+
 		error_type = v->ops_->insertLast(vector_3, TestData.storage_ptr_test_C[i], (strlen(TestData.storage_ptr_test_C[i]) + 1));
 		TestData.storage_ptr_test_C[i] = NULL;
 		TESTBASE_printFunctionResult(vector_3, (u8 *)"insertLast vector_3", error_type);
