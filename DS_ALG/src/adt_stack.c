@@ -42,19 +42,25 @@ struct stack_ops_s stack_ops = {
 };
 
 Stack* STACK_create(u16 capacity) {
+    // ALopezESAT: This could be inline, also no need to have less than if it is unsigned
     if (capacity <= 0) {
         return NULL;
     }
 
     Stack* s_temp = MM->malloc(sizeof(Stack));
     if (NULL == s_temp) {
+        // ALopezESAT: If NULL, then free would fail, you don't need to free anything here
         MM->free(s_temp);
         return NULL;
     }
 
     s_temp->storage_ = VECTOR_create(capacity);
+    // ALopezESAT: Maybe it would be worth checking storage here, and calling free on s_temp if this one fails before
+    // returning null.
     s_temp->ops_ = &stack_ops;
 
+    // ALopezESAT: This! But before assigning ops and calling free on s_temp, as you already allocated it therefore
+    // to avoid memory leaks you should release it as well.
     /*if (NULL == s_temp->storage_) {
         return NULL;
     } mirar */ 
@@ -63,6 +69,7 @@ Stack* STACK_create(u16 capacity) {
 }
 
 s16 STACK_push(Stack* stack, void* data, u16 size) {
+    // ALopezESAT: Can be made inline
     if (NULL == stack)
     {
         return kErrorCode_StackNull;
@@ -72,6 +79,7 @@ s16 STACK_push(Stack* stack, void* data, u16 size) {
 }
 
 void* STACK_pop(Stack* stack) {
+    // ALopezESAT: Can be made inline
     if (NULL == stack ) {
         return NULL;
     }
@@ -80,6 +88,7 @@ void* STACK_pop(Stack* stack) {
 }
 
 void* STACK_top(Stack* stack) {
+    // ALopezESAT: Same here and after, just check them all
     if (NULL == stack)
     {
         return NULL;
@@ -93,6 +102,9 @@ s16 STACK_reset(Stack* stack) {
     {
         return kErrorCode_StackNull;
     }
+    // ALopezESAT: This might be not necessary if the stack is functioning as expected, as you either get both
+    // the stack and the storage set up or neither.
+    // The same goes for the ops, if you assume no one is messing with your structure, they do not need checking.
     if (NULL == stack->storage_)
     {
         return kErrorCode_StackNull;
@@ -120,6 +132,8 @@ s16 STACK_resize(Stack* stack, u16 new_size) {
     return stack->storage_->ops_->resize(stack->storage_, new_size);
 }
 
+// ALopezESAT: I am quite sure length returns u16 from vector, so you should do the same (and also change the .h)
+// Or modify vector to also return s16 and error codes, your call...
 s16 STACK_length(Stack* stack) {
     if (NULL == stack)
     {
@@ -130,6 +144,8 @@ s16 STACK_length(Stack* stack) {
 }
 
 boolean STACK_isEmpty(Stack* stack) {
+    // ALopezESAT: Check "NULL != stack" as you have done before
+    // Also this if else is redundant, you already get a boolean return, you can return that
     if (stack->storage_->ops_->isEmpty(stack->storage_)) {
         return True;
     }
@@ -139,6 +155,7 @@ boolean STACK_isEmpty(Stack* stack) {
 }
 
 boolean STACK_isFull(Stack* stack) {
+    // ALopezESAT: Same as above
     if (stack->storage_->ops_->isFull(stack->storage_)) {
         return True;
     }
@@ -156,7 +173,7 @@ s16 STACK_concat(Stack* stack, Stack* stack_src) {
     {
         return kErrorCode_StackNull;
     }
-    
+    // ALopezESAT: I am quite sure this is not what you do when you concat... right?
     return stack->storage_->ops_->isEmpty(stack->storage_);
 }
 
@@ -165,7 +182,8 @@ s16 STACK_destroy(Stack* stack) {
     {
         return kErrorCode_StackNull;
     }
-    
+
+    // ALopezESAT: Destroy returns an error code, you can check it just in case
     stack->storage_->ops_->destroy(stack->storage_);
     MM->free(stack);
 
@@ -178,6 +196,7 @@ void STACK_print(Stack* stack) {
         printf("\t[Stack Info] stack: NULL\n");
         return;
     }
-
+    // ALopezESAT: You might want to print some info about the stack itself (at least a memory address for the stack
+    // wrapping struct.
     stack->storage_->ops_->print(stack->storage_);
 }
