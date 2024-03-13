@@ -45,17 +45,21 @@ struct queue_ops_s queue_ops = {
 };
 
 Queue* QUEUE_create(u16 capacity) {
+    // ALopezESAT: This could be inline, also no need to have less than if it is unsigned
     if (capacity <= 0) {
         return NULL;
     }
 
     Queue* q_temp = MM->malloc(sizeof(Queue));
     if (NULL == q_temp) {
+        // ALopezESAT: Same as stack
         MM->free(q_temp);
         return NULL;
     }
 
     q_temp->storage_ = LIST_create(capacity);
+    // ALopezESAT: Same as stack
+    // Ok, from here after, all the comments are the same as in stack so... check stack first and apply them here.
     q_temp->ops_ = &queue_ops;
 
     return q_temp;
