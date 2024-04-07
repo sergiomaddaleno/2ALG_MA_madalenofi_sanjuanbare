@@ -86,16 +86,17 @@ s16 LIST_destroy(List* list) {
     if(NULL == list) {
         return kErrorCode_ListNull;
     }
-
+    
     MemoryNode* current = list->head_;
     MemoryNode* next;
-
-    while (current != NULL) {
+    int count = 0;
+    while (count != list->length_) {
         next = current->next_;
         
         MM->free(current->data_);
         MM->free(current);
         current = next;
+        count++;
     }
 
     MM->free(list);
@@ -108,16 +109,18 @@ s16 LIST_reset(List* list) {
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
-    
+    if(list->tail_!=NULL)
+    list->tail_->next_ = NULL;
     MemoryNode* aux = list->head_;
-
-    while (NULL != list->head_) {
+    int count = 0;
+    while (count != list->length_) {
        
         MM->free(list->head_->data_);
         
         aux = list->head_->next_;
         MM->free(list->head_);
         list->head_ = aux;
+        count++;
     }
 
     list->length_ = 0;
@@ -701,9 +704,8 @@ void LIST_print(List* list) {
     }
 
     MemoryNode* currentNode = list->head_;
-    int count = 0;
-
-    while (currentNode->next_ != list->head_) {
+    int count = 0; 
+    while (count!=list->length_) {
         printf("\t  [List Info] Storage #%d\n", count);
         // ALopezESAT: There are some casts missing.
         printf("\t      [Node info] Address: %p\n", currentNode);
@@ -717,14 +719,6 @@ void LIST_print(List* list) {
         count++;
     }
 
-    printf("\t  [List Info] Storage #%d\n", count);
-    // ALopezESAT: There are some casts missing.
-    printf("\t      [Node info] Address: %p\n", list->tail_);
-    printf("\t      [Node info] Size: %d\n", list->tail_->size_);
-    printf("\t      [Node info] Data Address: %p\n", list->tail_->data_);
-    printf("\t      [Node info] Data Content: %s\n", (char*)list->tail_->data_);
-
-    printf("\t      [Node info] Next address: %p\n", list->tail_->next_);
 }
 
 
