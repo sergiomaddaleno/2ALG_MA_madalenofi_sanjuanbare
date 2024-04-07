@@ -339,9 +339,10 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
         aux->data_ = data;
         aux->size_ = bytes;
 
-        aux->next_ = NULL;
+        
         list->head_ = aux;
         list->tail_ = aux;
+        //list->tail_->next_=aux;
 
         list->length_++;
     }
@@ -356,7 +357,7 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
 
         aux->next_ = list->head_;
         list->head_ = aux;
-
+        list->tail_->next_ = list->head_;
         list->length_++;
     }
     return kErrorCode_Ok;
@@ -397,7 +398,7 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
 
         list->tail_->next_ = aux;
         list->tail_ = aux;
-        list->tail_->next_ = NULL;
+        list->tail_->next_ = list->head_;
 
         aux->data_ = data;
         aux->size_ = bytes;
@@ -461,6 +462,7 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
 
         if (aux->next_ == NULL) {
             list->tail_ = aux;
+            list->tail_-> next_ = list->head_;
         }
     }
     list->length_++;
@@ -599,7 +601,7 @@ s16 LIST_concat(List* list, const List* list_src) {
 
     MemoryNode* current_src = list_src->head_;
 
-    while (current_src != NULL) {
+    while (current_src->next_ != list_src->head_) {
 
         MemoryNode* new_node = MM->malloc(sizeof(MemoryNode));
         if (new_node == NULL) {
@@ -629,10 +631,27 @@ s16 LIST_concat(List* list, const List* list_src) {
             
             list->tail_->next_ = new_node;
             list->tail_ = new_node;
+            list->tail_->next_ = list->head_;
         }
 
         current_src = current_src->next_;
     }
+    MemoryNode* new_node = MM->malloc(sizeof(MemoryNode));
+    u8 * tmp = MM->malloc(current_src->size_);
+    if (NULL == tmp) {
+        return kErrorCode_MallocNull;
+    }
+
+    u8* aux = (u8*)current_src->data_;
+    for (s32 i = 0; i < current_src->size_; i++) {
+        tmp[i] = aux[i];
+    }
+
+    new_node->data_ = tmp;
+    new_node->size_ = current_src->size_;
+    list->tail_->next_ = new_node;
+    list->tail_ = new_node;
+    list->tail_->next_ = list->head_;
 
     list->length_ += list_src->length_;
     list->capacity_ += list_src->capacity_;
@@ -684,7 +703,7 @@ void LIST_print(List* list) {
     MemoryNode* currentNode = list->head_;
     int count = 0;
 
-    while (currentNode != NULL) {
+    while (currentNode->next_ != list->head_) {
         printf("\t  [List Info] Storage #%d\n", count);
         // ALopezESAT: There are some casts missing.
         printf("\t      [Node info] Address: %p\n", currentNode);
@@ -697,6 +716,15 @@ void LIST_print(List* list) {
         currentNode = currentNode->next_;
         count++;
     }
+
+    printf("\t  [List Info] Storage #%d\n", count);
+    // ALopezESAT: There are some casts missing.
+    printf("\t      [Node info] Address: %p\n", list->tail_);
+    printf("\t      [Node info] Size: %d\n", list->tail_->size_);
+    printf("\t      [Node info] Data Address: %p\n", list->tail_->data_);
+    printf("\t      [Node info] Data Content: %s\n", (char*)list->tail_->data_);
+
+    printf("\t      [Node info] Next address: %p\n", list->tail_->next_);
 }
 
 
