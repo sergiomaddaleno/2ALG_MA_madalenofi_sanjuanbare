@@ -209,7 +209,7 @@ s16 LIST_resize(List* list, u16 new_size) {
             list->length_ = new_size;
             list->capacity_ = new_size;
             list->tail_ = aux;
-            aux->next_ = NULL;
+            aux->next_ = list->head_;
         }
         else {
             int count = 0;
@@ -229,7 +229,7 @@ s16 LIST_resize(List* list, u16 new_size) {
             list->capacity_ = new_size;
             list->tail_ = aux;
             list->head_ = aux;
-            aux->next_ = NULL;
+            aux->next_ = list->head_;
 
         }
     }
