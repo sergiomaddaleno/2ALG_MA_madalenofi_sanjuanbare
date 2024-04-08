@@ -19,7 +19,7 @@ PROJECT_NAMES = {
   "PR05_List",
   "PR06_DLList",
   "PR07_CircularList",
-  --"PR08_CircularDLList",
+  "PR08_CircularDLList",
   "PR09_Stack",
   "PR10_Queue",
   --"PR11_Logger",
@@ -179,6 +179,15 @@ project "PR07_CircularList"
     path.join(PROJ_DIR, "src/adt_CircularList.c"),
     path.join(PROJ_DIR, "tests/test_list.c"),
   }
+
+project "PR08_CircularDLList"
+files {
+  path.join(PROJ_DIR, "include/adt_memory_node.h"),
+  path.join(PROJ_DIR, "src/adt_memory_node.c"),
+  path.join(PROJ_DIR, "include/adt_circular_dll_list.h"),
+  path.join(PROJ_DIR, "src/adt_circular_dll_list.c"),
+  path.join(PROJ_DIR, "tests/test_dll_list.c"),
+}
   
 project "PR09_Stack"
   files {
