@@ -84,19 +84,20 @@ List* DLL_LIST_create(u16 capacity) {
 
 s16 DLL_LIST_destroy(List* list) {
 
-    if(NULL == list) {
+    if (NULL == list) {
         return kErrorCode_ListNull;
     }
 
     MemoryNode* current = list->head_;
     MemoryNode* next;
-
-    while (current != NULL) {
+    int count = 0;
+    while (count != list->length_) {
         next = current->next_;
-        
+
         MM->free(current->data_);
         MM->free(current);
         current = next;
+        count++;
     }
 
     MM->free(list);
@@ -112,15 +113,18 @@ s16 DLL_LIST_reset(List* list) {
     
     // ALopezESAT: Creating a memory node to then point aux to something else is a memory leak
     // LIST_reset should not have any malloc at all.
+    if (list->tail_ != NULL)
+        list->tail_->next_ = NULL;
     MemoryNode* aux = list->head_;
+    int count = 0;
+    while (count != list->length_) {
 
-    while (NULL != list->head_) {
-       
         MM->free(list->head_->data_);
-        
+
         aux = list->head_->next_;
         MM->free(list->head_);
         list->head_ = aux;
+        count++;
     }
 
     list->length_ = 0;
@@ -140,21 +144,20 @@ s16 DLL_LIST_softReset(List* list) {
         return kErrorCode_StorageNull;
     }
 
-    // ALopezESAT: Same as in LIST_reset
     MemoryNode* aux = list->head_;
 
     while (NULL != list->head_) {
 
         aux = list->head_->next_;
         MM->free(list->head_);
-       
+
         list->head_ = aux;
     }
 
     list->length_ = 0;
     list->head_ = NULL;
     list->tail_ = NULL;
-    //list->storage_ = NULL;
+
     return  kErrorCode_Ok;
 }
 
@@ -211,7 +214,8 @@ s16 DLL_LIST_resize(List* list, u16 new_size) {
             list->length_ = new_size;
             list->capacity_ = new_size;
             list->tail_ = aux;
-            aux->next_ = NULL;
+            aux->next_ = list->head_;
+            list->head_->previous_ = list->tail_;
         }
         else {
             int count = 0;
@@ -231,7 +235,8 @@ s16 DLL_LIST_resize(List* list, u16 new_size) {
             list->capacity_ = new_size;
             list->tail_ = aux;
             list->head_ = aux;
-            aux->next_ = NULL;
+            aux->next_ = list->head_;
+           
 
         }
     }
@@ -649,8 +654,9 @@ s16 DLL_LIST_concat(List* list, const List* list_src) {
 
     MemoryNode* current_src = list_src->head_;
 
-    while (current_src != NULL) {
-
+    int count = 0;
+    while (count != list_src->length_) {
+        count++;
         MemoryNode* new_node = MM->malloc(sizeof(MemoryNode));
         if (new_node == NULL) {
             MM->free(new_node);
@@ -669,16 +675,22 @@ s16 DLL_LIST_concat(List* list, const List* list_src) {
 
         new_node->data_ = tmp;
         new_node->size_ = current_src->size_;
-        new_node->next_ = NULL;
+        
 
         if (NULL == list->head_) {
             list->head_ = new_node;
             list->tail_ = new_node;
+            list->head_->previous_ = list->tail_;
+            list->tail_->next_ = list->tail_;
+            
         }
         else {
             
             list->tail_->next_ = new_node;
+            new_node->previous_ = list->tail_;
             list->tail_ = new_node;
+            list->tail_->next_ = list->head_;
+            list->head_->previous_ = new_node;
         }
 
         current_src = current_src->next_;
