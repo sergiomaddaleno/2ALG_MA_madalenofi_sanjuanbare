@@ -81,6 +81,7 @@ C_Vector* VECTOR_create(u16 capacity) {
 
     v_temp->tail_ = 0;
     v_temp->head_ = 0;
+    v_temp->length_ = 0;
     v_temp->capacity_ = capacity;
     v_temp->ops_ = &vector_ops;
 
@@ -121,6 +122,7 @@ s16 C_VECTOR_reset(C_Vector* vector) {
 
     vector->tail_ = 0;
     vector->head_ = 0;
+    vector->length_ = 0;
     return kErrorCode_Ok;
 }
 
@@ -162,6 +164,7 @@ s16 C_VECTOR_softReset(C_Vector* vector) {
 
     vector->tail_ =0;
     vector->head_ = 0;
+    vector->length_ = 0;
     return kErrorCode_Ok;
 }
                                       
@@ -277,22 +280,7 @@ u16 C_VECTOR_capacity(C_Vector* vector) {
 }
 
 u16 C_VECTOR_length(C_Vector* vector) {
-    if (NULL == vector) {
-        return 0;
-    }
-
-    if (C_VECTOR_isEmpty(vector)) {
-        return 0; 
-    }
-
-    if (vector->head_ <= vector->tail_) {
-        
-        return vector->tail_ - vector->head_;
-    }
-    else {
-       
-        return vector->capacity_ - vector->head_ + vector->tail_;
-    }
+    return vector->length_;
 }
 
 boolean C_VECTOR_isEmpty(C_Vector* vector) {
@@ -312,7 +300,7 @@ boolean C_VECTOR_isFull(C_Vector* vector) {
         return False; 
     }
 
-    if ((vector->tail_ + 1) % vector->capacity_ == vector->head_) {
+    if (vector->length_==vector->capacity_) {
         return True;
     }
 
@@ -388,7 +376,7 @@ s16 C_VECTOR_insertFirst(C_Vector* vector, void* data, u16 bytes) {
         return kErrorCode_VectorFull;
     }
     
-    s16 position = (vector->head_ - 1 + vector->capacity_) % vector->capacity_;
+    s16 position = (vector->head_ + vector->capacity_ -1) % vector->capacity_;
 
     /*
     for (s16 i = vector->tail_; i > position; i--) {
@@ -403,7 +391,7 @@ s16 C_VECTOR_insertFirst(C_Vector* vector, void* data, u16 bytes) {
 
     
     vector->head_ = position;
-    
+    vector->length_++;
 
     return kErrorCode_Ok;
 }
@@ -436,61 +424,42 @@ s16 C_VECTOR_insertLast(C_Vector* vector, void* data, u16 bytes) {
     vector->storage_[position].size_ = bytes;
     
     vector->tail_ = (vector->tail_ + 1) % vector->capacity_;
+    vector->length_++;
 
     return kErrorCode_Ok;
 }
 
 s16 C_VECTOR_insertAt(C_Vector* vector, void* data, u16 bytes, u16 position) {
 
-    if (NULL == vector) {
-        return kErrorCode_VectorNull;
+    if (NULL == vector) return kErrorCode_VectorNull;
+    if (NULL == vector->storage_) return kErrorCode_StorageNull;
+    if (NULL == data) return kErrorCode_DataNull;
+    if (bytes == 0) return kErrorCode_BytesZero;
+    if (C_VECTOR_isFull(vector)) return kErrorCode_VectorFull;
+
+    // Insert first/last plus wrapped position
+   
+    if (position >= vector->tail_) return C_VECTOR_insertLast(vector, data, bytes);
+    if (position == 0) return C_VECTOR_insertFirst(vector, data, bytes);
+
+
+    u16 wrapped_position = (vector->head_ + position) % vector->capacity_;
+    
+
+    // ALopezESAT You might also do it the other way around if there is less movement
+    u16 to = vector->tail_;
+    while (to != wrapped_position) {
+        u16 from = to != 0 ? to - 1 : vector->capacity_ - 1;
+
+        vector->storage_[to] = vector->storage_[from];
+
+        to = from;
     }
 
-    if (NULL == vector->storage_) {
-        return kErrorCode_StorageNull;
-    }
-
-    if (NULL == data) {
-        return kErrorCode_DataNull;
-    }
-
-    if (bytes <= 0) {
-        return kErrorCode_BytesZero;
-    }
-
-    if (C_VECTOR_isFull(vector)) {
-        return kErrorCode_VectorFull;
-    }
-
-    if (position + vector->head_ >= vector->capacity_) {
-
-        position = (vector->head_ + position) % vector->capacity_;
-
-        if (position >= vector->tail_) {
-            C_VECTOR_insertLast(vector, data, bytes);
-
-        }
-        else {
-            for (s16 i = vector->tail_; i >= position; i--) {
-
-                vector->storage_[i] = vector->storage_[i - 1];
-            }
-            vector->storage_[position].data_ = data;
-            vector->storage_[position].size_ = bytes;
-            vector->tail_ = (vector->tail_ + 1) % vector->capacity_;
-        }
-    }
-    else {
-        position = (position + vector->head_) % vector->capacity_;
-
-        for (s16 i = vector->head_; i <= position; i++) {
-            vector->storage_[(i - 1 + vector->capacity_) % vector->capacity_] = vector->storage_[i];
-        }
-        vector->storage_[position].data_ = data;
-        vector->storage_[position].size_ = bytes;
-        vector->head_ = (vector->head_ - 1 + vector->capacity_) % vector->capacity_;
-    }
-
+    vector->storage_[wrapped_position].data_ = data;
+    vector->storage_[wrapped_position].size_ = bytes;
+    vector->tail_ = (vector->tail_ + 1) % vector->capacity_;
+    vector->length_++;
     return kErrorCode_Ok;
 }
 

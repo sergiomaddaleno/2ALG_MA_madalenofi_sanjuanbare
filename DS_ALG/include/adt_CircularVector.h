@@ -13,6 +13,7 @@ typedef struct adt_c_vector_s {
 	u16 head_;
 	u16 tail_; // Corresponds to the first free place of the vector
 	u16 capacity_;
+	u16 length_;
 	MemoryNode *storage_;
 	struct vector_ops_s *ops_;
 } C_Vector;
