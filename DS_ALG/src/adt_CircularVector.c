@@ -104,21 +104,14 @@ s16 C_VECTOR_reset(C_Vector* vector) {
 
     
 
-    if (vector->head_ < vector->tail_) {
+    
        
-        for (u16 i = vector->head_; i < vector->tail_; i++) {
-            vector->storage_[i].ops_->reset(&vector->storage_[i]);
-        }
+    for (u16 i = vector->head_; i < vector->length_; i++) {
+        u16 index = (vector->head_ + i) % vector->capacity_;
+        vector->storage_[index].data_ = NULL;
+        vector->storage_[index].size_ = 0;
     }
-    else {
-       
-        for (u16 i = vector->head_; i < vector->capacity_; i++) {
-            vector->storage_[i].ops_->reset(&vector->storage_[i]);
-        }
-        for (u16 i = 0; i < vector->tail_; i++) {
-            vector->storage_[i].ops_->reset(&vector->storage_[i]);
-        }
-    }
+  
 
     vector->tail_ = 0;
     vector->head_ = 0;
@@ -217,7 +210,7 @@ s16 C_VECTOR_resize(C_Vector* vector, u16 new_size) {
     MM->free(vector->storage_);
 
    
-    vector->capacity_ = new_size;
+    vector->capacity_ =new_size;
     vector->head_ = 0;
     vector->tail_ = elements_to_copy;
     vector->length_ = elements_to_copy;
@@ -241,28 +234,9 @@ s16 C_VECTOR_destroy(C_Vector* vector)
         return kErrorCode_Ok;
     }
 
-    s16 start = vector->head_;
-    s16 end = vector->tail_;
-
-    if (start < end) {
-       
-        for (s16 i = start; i < end; i++) {
-            if (NULL != vector->storage_[i].data_) {
-                MM->free(vector->storage_[i].data_);
-            }
-        }
-    }
-    else {
-   
-        for (s16 i = start; i < vector->capacity_; i++) {
-            if (NULL != vector->storage_[i].data_) {
-                MM->free(vector->storage_[i].data_);
-            }
-        }
-        for (s16 i = 0; i < end; i++) {
-            if (NULL != vector->storage_[i].data_) {
-                MM->free(vector->storage_[i].data_);
-            }
+    for (u16 i = 0; i < vector->capacity_; i++) {
+        if (NULL != vector->storage_[i].data_) {
+            MM->free(vector->storage_[i].data_);
         }
     }
 
@@ -480,7 +454,6 @@ void* C_VECTOR_extractFirst(C_Vector* vector) {
  
     void* tmp = vector->storage_[vector->head_].data_;
 
-   
     
     vector->head_ = (vector->head_ + 1) % vector->capacity_;
     vector->length_--;
@@ -569,8 +542,13 @@ s16 C_VECTOR_traverse(C_Vector* vector, void (*callback)(MemoryNode*)){
 
 s16 C_VECTOR_concat(C_Vector* vector, C_Vector* vector_src)
 {
-    if (NULL == vector || NULL == vector_src) {
+    if (NULL == vector || NULL == vector_src)
+    {
         return kErrorCode_VectorNull;
+    }
+    if (NULL == vector->storage_ || NULL == vector_src->storage_)
+    {
+        return kErrorCode_NodeNull;
     }
 
     // Calcular la capacidad total requerida para el vector concatenado
@@ -602,7 +580,7 @@ s16 C_VECTOR_concat(C_Vector* vector, C_Vector* vector_src)
     // Liberar la memoria de vector y vector_src
     C_VECTOR_destroy(vector);
     vector_concat->head_ = 0;
-    vector_concat->tail_ = vector->tail_ + vector_src->tail_;
+    vector_concat->tail_ = vector->length_ + vector_src->length_;
     vector_concat->capacity_= vector->capacity_ + vector_src->capacity_;
     //C_VECTOR_destroy(vector_src);
     
