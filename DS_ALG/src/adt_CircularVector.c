@@ -101,18 +101,13 @@ s16 C_VECTOR_reset(C_Vector* vector) {
     if (C_VECTOR_isEmpty(vector)) {
         return kErrorCode_Ok;
     }
-
-    
-
-    
-       
+  
     for (u16 i = vector->head_; i < vector->length_; i++) {
         u16 index = (vector->head_ + i) % vector->capacity_;
         vector->storage_[index].data_ = NULL;
         vector->storage_[index].size_ = 0;
     }
-  
-
+ 
     vector->tail_ = 0;
     vector->head_ = 0;
     vector->length_ = 0;
@@ -166,10 +161,6 @@ s16 C_VECTOR_resize(C_Vector* vector, u16 new_size) {
         return kErrorCode_VectorNull;
     }
 
-    if (NULL == vector->storage_) {
-        return kErrorCode_NodeNull;
-    }
-
     if (0 == new_size) {
         return kErrorCode_SizeNull;
     }
@@ -179,7 +170,6 @@ s16 C_VECTOR_resize(C_Vector* vector, u16 new_size) {
     }
 
     MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * new_size);
-
     if (NULL == aux) {
         return kErrorCode_MallocNull;
     }
@@ -192,23 +182,14 @@ s16 C_VECTOR_resize(C_Vector* vector, u16 new_size) {
    else {
        elements_to_copy = vector->capacity_;
    }
-
     
-    for (u16 i = 0; i < elements_to_copy; i++) {
-        u16 index = (vector->head_ + i) % vector->capacity_; 
-        aux[i].data_ = vector->storage_[index].data_;
-        aux[i].size_ = vector->storage_[index].size_;
-    }
-
-    
-    for (u16 i = 0; i < vector->capacity_; i++) {
-        if (NULL != vector->storage_[i].data_) {
-            MM->free(vector->storage_[i].data_);
-        }
-    }
+   for (u16 i = 0; i < elements_to_copy; i++) {
+       u16 index = (vector->head_ + i) % vector->capacity_;
+       aux[i].data_ = vector->storage_[index].data_;
+       aux[i].size_ = vector->storage_[index].size_;
+   }
 
     MM->free(vector->storage_);
-
    
     vector->capacity_ =new_size;
     vector->head_ = 0;
@@ -232,12 +213,6 @@ s16 C_VECTOR_destroy(C_Vector* vector)
         MM->free(vector->storage_);
         MM->free(vector);
         return kErrorCode_Ok;
-    }
-
-    for (u16 i = 0; i < vector->capacity_; i++) {
-        if (NULL != vector->storage_[i].data_) {
-            MM->free(vector->storage_[i].data_);
-        }
     }
 
     MM->free(vector->storage_);
@@ -288,7 +263,7 @@ void* C_VECTOR_first(C_Vector* vector) {
         return NULL;
     }
 
-    if (NULL == vector->storage_) {
+    if (NULL == vector->storage_ || C_VECTOR_isEmpty(vector)) {
         return NULL;
     }
 
@@ -301,7 +276,7 @@ void* C_VECTOR_at(C_Vector* vector,u16 position) {
         return NULL;
     }
 
-    if (NULL == vector->storage_) {
+    if (NULL == vector->storage_ || C_VECTOR_isEmpty(vector)) {
         return NULL;
     }
 
@@ -317,7 +292,6 @@ void* C_VECTOR_last(C_Vector* vector) {
     if (NULL == vector || NULL == vector->storage_) {
         return NULL;
     }
-
     
     if (vector->tail_ == 0) {
        
@@ -353,17 +327,8 @@ s16 C_VECTOR_insertFirst(C_Vector* vector, void* data, u16 bytes) {
     
     s16 position = (vector->head_ + vector->capacity_ -1) % vector->capacity_;
 
-    /*
-    for (s16 i = vector->tail_; i > position; i--) {
-        s16 current_index = (i + vector->capacity_) % vector->capacity_;
-        s16 previous_index = (current_index - 1 + vector->capacity_) % vector->capacity_;
-        vector->storage_[current_index] = vector->storage_[previous_index];
-    }
-    */
-    
     vector->storage_[position].data_ = data;
     vector->storage_[position].size_ = bytes;
-
     
     vector->head_ = position;
     vector->length_++;
@@ -412,14 +377,10 @@ s16 C_VECTOR_insertAt(C_Vector* vector, void* data, u16 bytes, u16 position) {
     if (bytes == 0) return kErrorCode_BytesZero;
     if (C_VECTOR_isFull(vector)) return kErrorCode_VectorFull;
 
-    // Insert first/last plus wrapped position
-   
-    if (position >= vector->tail_) return C_VECTOR_insertLast(vector, data, bytes);
+    if (position > vector->tail_) return C_VECTOR_insertLast(vector, data, bytes);
     if (position == 0) return C_VECTOR_insertFirst(vector, data, bytes);
 
-
     u16 wrapped_position = (vector->head_ + position) % vector->capacity_;
-    
 
     // ALopezESAT You might also do it the other way around if there is less movement
     u16 to = vector->tail_;
@@ -453,7 +414,6 @@ void* C_VECTOR_extractFirst(C_Vector* vector) {
     }
  
     void* tmp = vector->storage_[vector->head_].data_;
-
     
     vector->head_ = (vector->head_ + 1) % vector->capacity_;
     vector->length_--;
@@ -500,16 +460,13 @@ void* C_VECTOR_extractAt(C_Vector* vector, u16 position) {
         return NULL; 
     }
 
-    
     void* tmp = vector->storage_[position].data_;
-
     
     for (u16 i = position; i < vector->tail_ - 1; i++) {
         s16 current_index = (i + vector->capacity_) % vector->capacity_;
         s16 next_index = (current_index + 1) % vector->capacity_;
         vector->storage_[current_index] = vector->storage_[next_index];
     }
-
    
     vector->tail_ = (vector->tail_ - 1 + vector->capacity_) % vector->capacity_;
     vector->length_--;
@@ -525,10 +482,8 @@ s16 C_VECTOR_traverse(C_Vector* vector, void (*callback)(MemoryNode*)){
     if (NULL == vector->storage_) {
         return kErrorCode_StorageNull;
     }
-
    
     u16 elements_to_traverse = C_VECTOR_length(vector);
-
     
     for (u16 i = 0; i < elements_to_traverse; i++) {
        
@@ -551,40 +506,20 @@ s16 C_VECTOR_concat(C_Vector* vector, C_Vector* vector_src)
         return kErrorCode_NodeNull;
     }
 
-    // Calcular la capacidad total requerida para el vector concatenado
-    u16 total_capacity = vector->capacity_ + vector_src->capacity_;
+    u16 total_capacity = vector->length_ + vector_src->length_;
 
-    // Crear un nuevo vector para almacenar la concatenación
-    C_Vector* vector_concat = MM->malloc(sizeof(C_Vector));
-    vector_concat->storage_ = MM->malloc(sizeof(MemoryNode) * total_capacity);
-
-    // Verificar si la creación del vector fue exitosa
-    if (NULL == vector_concat) {
-        return kErrorCode_MallocNull;
+    if (total_capacity > vector->capacity_) {
+        C_VECTOR_resize(vector, total_capacity);
     }
 
-    // Copiar los elementos de vector a vector_concat
-    for (u16 i = 0; i < vector->length_; i++) {
-        void* data = C_VECTOR_at(vector, i);
-        u16 bytes = vector->storage_[(vector->head_ + i) % vector->capacity_].size_;
-        C_VECTOR_insertLast(vector_concat, data, bytes);
-    }
-
-    // Copiar los elementos de vector_src a vector_concat
+    u16 index = vector->tail_;
     for (u16 i = 0; i < vector_src->length_; i++) {
-        void* data = C_VECTOR_at(vector_src, i);
+        void* data = C_VECTOR_at(vector_src, (vector_src->head_ + i) % vector_src->capacity_);
         u16 bytes = vector_src->storage_[(vector_src->head_ + i) % vector_src->capacity_].size_;
-        C_VECTOR_insertLast(vector_concat, data, bytes);
+        C_VECTOR_insertLast(vector, data, bytes);
     }
 
-    // Liberar la memoria de vector y vector_src
-    C_VECTOR_destroy(vector);
-    vector_concat->head_ = 0;
-    vector_concat->tail_ = vector->length_ + vector_src->length_;
-    vector_concat->capacity_= vector->capacity_ + vector_src->capacity_;
-    //C_VECTOR_destroy(vector_src);
-    
-    return vector_concat;
+    return kErrorCode_Ok;
 }
 
 void C_VECTOR_print(C_Vector* vector) {
@@ -604,10 +539,8 @@ void C_VECTOR_print(C_Vector* vector) {
         printf("\t[Storage Info] vector storage: NULL\n");
         return;
     }
-
     
     u16 elements_to_print = C_VECTOR_length(vector);
-
     
     for (u16 i = 0; i < elements_to_print; i++) {
        
