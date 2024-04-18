@@ -4,8 +4,8 @@
 // ESAT 2020-2021
 //
 
-#ifndef __ADT_LIST_H__
-#define __ADT_LIST_H__
+#ifndef __ADT_DLL_LIST_H__
+#define __ADT_DLL_LIST_H__
 
 #include "adt_memory_node.h"
 
@@ -398,4 +398,4 @@ struct dll_list_ops_s {
 
 List* DLL_LIST_create(u16 capacity);
 
-#endif //__ADT_LIST_H__
+#endif //__ADT_DLL_LIST_H__

@@ -23,7 +23,7 @@ PROJECT_NAMES = {
   "PR09_Stack",
   "PR10_Queue",
   --"PR11_Logger",
-  --"PR12_Comparative",
+  "PR12_Comparative",
   --"PR13_SortingAlgorithms",
 }
 
@@ -212,4 +212,15 @@ project "PR10_Queue"
   }
 
 
+project "PR12_Comparative"
+  files {
+    path.join(PROJ_DIR, "include/adt_memory_node.h"),
+    path.join(PROJ_DIR, "src/adt_memory_node.c"),
+    path.join(PROJ_DIR, "src/adt_vector.c"),
+    path.join(PROJ_DIR, "include/adt_vector.h"),
+    path.join(PROJ_DIR, "include/adt_list.h"),
+    path.join(PROJ_DIR, "src/adt_list.c"),
+  
+    path.join(PROJ_DIR, "tests/comparative.c"),
+  }
 
