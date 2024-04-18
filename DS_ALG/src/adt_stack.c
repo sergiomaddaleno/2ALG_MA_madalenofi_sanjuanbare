@@ -9,6 +9,8 @@
 
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
+//Static prototipes
+
 static s16 STACK_push(Stack* stack, void* data, u16 size);
 static void* STACK_pop(Stack* stack);
 static void* STACK_top(Stack* stack);
@@ -25,6 +27,7 @@ static s16 STACK_concat(Stack* stack, Stack* stack_src);
 static s16 STACK_destroy(Stack* stack);
 
 static void STACK_print(Stack* stack);
+// Memory Node's API Definitions
 
 struct stack_ops_s stack_ops = {
 	.push = STACK_push,
@@ -40,6 +43,9 @@ struct stack_ops_s stack_ops = {
     .destroy = STACK_destroy,
     .print = STACK_print
 };
+
+
+//Function definitions:
 
 Stack* STACK_create(u16 capacity) {
     // ALopezESAT: This could be inline, also no need to have less than if it is unsigned
