@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "adt_queue.h"
+#include "adt_logger.h"
 #include "EDK_MemoryManager\edk_memory_manager.h"
 
 #include ".\..\tests\test_base.c"

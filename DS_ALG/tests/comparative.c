@@ -14,20 +14,23 @@
 #include "common_def.h"
 #include "adt_vector.h"
 #include "adt_list.h"
+
+#include "./../tests/test_base.c"
 //#include "adt_dll_list.h"
 
 void* data[10000];
 
 void TESTBASE_generateDataForComparative() {
 	//TODO some stuff
-
+	
 	Vector* vector_1 = NULL;
-	vector_1 = VECTOR_create(10);
+	vector_1 = VECTOR_create(10000);
 
 	List* list_1 = NULL;
-	list_1 = VECTOR_create(10);
+	list_1 = VECTOR_create(10000);
 
-
+	//error_type = vector_1->ops_->reset(vector_1);
+	
 
 }
 

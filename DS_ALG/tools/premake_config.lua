@@ -22,7 +22,7 @@ PROJECT_NAMES = {
   "PR08_CircularDLList",
   "PR09_Stack",
   "PR10_Queue",
-  --"PR11_Logger",
+  "PR11_Logger",
   "PR12_Comparative",
   --"PR13_SortingAlgorithms",
 }
@@ -211,6 +211,19 @@ project "PR10_Queue"
     path.join(PROJ_DIR, "tests/test_queue.c"),
   }
 
+ project "PR11_Logger"
+  files {
+    path.join(PROJ_DIR, "include/adt_memory_node.h"),
+    path.join(PROJ_DIR, "src/adt_memory_node.c"),
+    path.join(PROJ_DIR, "include/adt_logger.h"),
+    path.join(PROJ_DIR, "src/adt_logger.c"),
+    path.join(PROJ_DIR, "include/adt_list.h"),
+    path.join(PROJ_DIR, "src/adt_list.c"),
+    path.join(PROJ_DIR, "include/adt_queue.h"),
+    path.join(PROJ_DIR, "src/adt_queue.c"),
+  
+    path.join(PROJ_DIR, "tests/test_logger.c"),
+  }
 
 project "PR12_Comparative"
   files {
@@ -219,7 +232,7 @@ project "PR12_Comparative"
     path.join(PROJ_DIR, "src/adt_vector.c"),
     path.join(PROJ_DIR, "include/adt_vector.h"),
     path.join(PROJ_DIR, "include/adt_list.h"),
-    path.join(PROJ_DIR, "src/adt_list.c"),
+    path.join(PROJ_DIR, "src/adt_list.c"),  
   
     path.join(PROJ_DIR, "tests/comparative.c"),
   }

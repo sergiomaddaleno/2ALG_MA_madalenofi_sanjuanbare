@@ -104,7 +104,7 @@ s16 C_VECTOR_reset(C_Vector* vector) {
   
     for (u16 i = vector->head_; i < vector->length_; i++) {
         u16 index = (vector->head_ + i) % vector->capacity_;
-        vector->storage_[index].data_ = NULL;
+        MM->free(vector->storage_[index].data_);
         vector->storage_[index].size_ = 0;
     }
  
@@ -128,26 +128,10 @@ s16 C_VECTOR_softReset(C_Vector* vector) {
         return kErrorCode_Ok; 
     }
 
-    s16 start = vector->head_;
-    s16 end = vector->tail_;
-
-    if (start < end) {
-       
-        for (s16 i = start; i < end; i++) {
-            vector->storage_[i].data_ = NULL;
-            vector->storage_[i].size_ = 0;
-        }
-    }
-    else {
-       
-        for (s16 i = start; i < vector->capacity_; i++) {
-            vector->storage_[i].data_ = NULL;
-            vector->storage_[i].size_ = 0;
-        }
-        for (s16 i = 0; i < end; i++) {
-            vector->storage_[i].data_ = NULL;
-            vector->storage_[i].size_ = 0;
-        }
+    for (u16 i = vector->head_; i < vector->length_; i++) {
+        u16 index = (vector->head_ + i) % vector->capacity_;
+        vector->storage_[index].data_=NULL;
+        vector->storage_[index].size_ = 0;
     }
 
     vector->tail_ =0;
@@ -189,6 +173,12 @@ s16 C_VECTOR_resize(C_Vector* vector, u16 new_size) {
        aux[i].size_ = vector->storage_[index].size_;
    }
 
+   for (u16 i = vector->head_; i < vector->length_; i++) {
+       u16 index = (vector->head_ + i) % vector->capacity_;
+       MM->free(vector->storage_[index].data_);
+       vector->storage_[index].size_ = 0;
+   }
+
     MM->free(vector->storage_);
    
     vector->capacity_ =new_size;
@@ -206,6 +196,7 @@ s16 C_VECTOR_destroy(C_Vector* vector)
         return kErrorCode_VectorNull;
     }
     if (NULL == vector->storage_) {
+        MM->free(vector->storage_);
         MM->free(vector);
         return kErrorCode_NodeNull;
     }
@@ -213,6 +204,12 @@ s16 C_VECTOR_destroy(C_Vector* vector)
         MM->free(vector->storage_);
         MM->free(vector);
         return kErrorCode_Ok;
+    }
+
+    for (u16 i = vector->head_; i < vector->length_; i++) {
+        u16 index = (vector->head_ + i) % vector->capacity_;
+        MM->free(vector->storage_[index].data_);
+        vector->storage_[index].size_ = 0;
     }
 
     MM->free(vector->storage_);
