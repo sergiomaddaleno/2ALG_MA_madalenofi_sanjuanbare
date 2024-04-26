@@ -16,21 +16,30 @@
 #include "adt_list.h"
 
 #include "./../tests/test_base.c"
-//#include "adt_dll_list.h"
+#include "adt_dll_list.h"
 
 void* data[10000];
+Vector* vector_1 = NULL;
+List* list_1 = NULL;
+DLL_List* list_dll_1 = NULL;
 
 void TESTBASE_generateDataForComparative() {
 	//TODO some stuff
 	
-	Vector* vector_1 = NULL;
-	vector_1 = VECTOR_create(10000);
-
-	List* list_1 = NULL;
-	list_1 = VECTOR_create(10000);
-
-	//error_type = vector_1->ops_->reset(vector_1);
 	
+	//vector_1 = VECTOR_create(10000);
+	//list_1 = LIST_create(10000);
+	list_dll_1 = DLL_LIST_create(10000);
+
+	
+	for (s16 i = 0; i < 10000; i++) {
+
+		data[i] = MM->malloc(sizeof(u8) * 1);
+		//data[i][0] = 's';
+		
+		//data[i] = 'hola' + i;
+
+	}
 
 }
 
@@ -52,9 +61,12 @@ void calculateTimeForFunction() {
 	// execute function to meassure 'repetitions' times
 	for (u32 rep = 0; rep < repetitions; ++rep) {
 		//TODO execute function
-		TESTBASE_generateDataForComparative();
+		
+		list_dll_1->ops_->insertAt(list_dll_1, data[rep], (strlen(data[rep]) + 1), rep);
 
 	}
+	list_dll_1->ops_->reset(list_dll_1);
+	list_dll_1->ops_->destroy(list_dll_1);
 	// stop timer
 	QueryPerformanceCounter(&time_end);
 	///////////////////////////////////////////////////////////////////////

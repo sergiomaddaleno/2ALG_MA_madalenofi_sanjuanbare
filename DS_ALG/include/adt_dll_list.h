@@ -16,7 +16,7 @@ typedef struct adt_dll_list_s {
 	u16 capacity_;
 	//MemoryNode* storage_;
 	struct dll_list_ops_s* ops_;
-} List;
+} DLL_List;
 
 struct dll_list_ops_s {
     /**
@@ -35,7 +35,7 @@ struct dll_list_ops_s {
 *         - kErrorCode_ListNull: The provided pointer to the List is NULL.
 */
 
-    s16(*destroy)(List* list);
+    s16(*destroy)(DLL_List* list);
 
     /**
  * @brief Resets a List by removing all elements and freeing associated memory.
@@ -53,7 +53,7 @@ struct dll_list_ops_s {
  *         - kErrorCode_ListNull: The provided pointer to the List is NULL.
  */
 
-    s16(*reset)(List* list);
+    s16(*reset)(DLL_List* list);
 
     /**
 * @brief Soft resets a List by removing all elements without freeing associated memory.
@@ -73,7 +73,7 @@ struct dll_list_ops_s {
 *         - kErrorCode_StorageNull: The storage pointer of the List is NULL.
 */
 
-    s16(*softReset)(List* list);
+    s16(*softReset)(DLL_List* list);
 
     /**
 * @brief Resizes a List to the specified new size.
@@ -97,7 +97,7 @@ struct dll_list_ops_s {
 *         - kErrorCode_EqualCapacity: The new size is equal to the current capacity of the list.
 *         - kErrorCode_MallocNull: Memory allocation failed while resizing the list.
 */
-    s16(*resize)(List* list, u16 new_size);
+    s16(*resize)(DLL_List* list, u16 new_size);
 
     /**
  * @brief Retrieves the capacity of a List.
@@ -112,7 +112,7 @@ struct dll_list_ops_s {
  *         - Otherwise, returns the capacity of the List.
  */
 
-    u16(*capacity)(const List* list);
+    u16(*capacity)(const DLL_List* list);
 
     /**
 * @brief Retrieves the length of a List.
@@ -127,7 +127,7 @@ struct dll_list_ops_s {
 *         - Otherwise, returns the length of the List.
 */
 
-    u16(*length)(const List* list);
+    u16(*length)(const DLL_List* list);
 
     /**
  * @brief Checks if a List is empty.
@@ -143,7 +143,7 @@ struct dll_list_ops_s {
  *         - Otherwise, returns 0 (false).
  */
 
-    s16(*isEmpty)(const List* list);
+    s16(*isEmpty)(const DLL_List* list);
 
     /**
 * @brief Checks if a List is full.
@@ -159,7 +159,7 @@ struct dll_list_ops_s {
 *         - Otherwise, returns 0 (false).
 */
 
-    s16(*isFull)(const List* list);
+    s16(*isFull)(const DLL_List* list);
 
     /**
 * @brief Retrieves the data of the first element in a List.
@@ -175,7 +175,7 @@ struct dll_list_ops_s {
 *         - Otherwise, returns a pointer to the data of the first element in the List.
 */
 
-    void* (*first)(const List* list);
+    void* (*first)(const DLL_List* list);
 
     /**
 * @brief Retrieves the data of the last element in a List.
@@ -193,7 +193,7 @@ struct dll_list_ops_s {
 *         - Otherwise, returns a pointer to the data of the last element in the List.
 */
 
-    void* (*last)(const List* list);
+    void* (*last)(const DLL_List* list);
 
     /**
  * @brief Retrieves the data of the element at a specified position in a List.
@@ -213,7 +213,7 @@ struct dll_list_ops_s {
  *         - Otherwise, returns a pointer to the data of the element at the specified position in the List.
  */
 
-    void* (*at)(const List* list, u16 position);
+    void* (*at)(const DLL_List* list, u16 position);
 
     /**
 * @brief Inserts a new element at the beginning of a List.
@@ -238,7 +238,7 @@ struct dll_list_ops_s {
 *         - Returns `kErrorCode_Ok` if the insertion operation is successful.
 */
 
-    s16(*insertFirst)(List* list, void* data, u16 bytes);
+    s16(*insertFirst)(DLL_List* list, void* data, u16 bytes);
 
     /**
  * @brief Inserts an element with specified data and size at the end of a List.
@@ -262,7 +262,7 @@ struct dll_list_ops_s {
  *         - kErrorCode_Ok: If the element is successfully inserted.
  */
 
-    s16(*insertLast)(List* list, void* data, u16 bytes);
+    s16(*insertLast)(DLL_List* list, void* data, u16 bytes);
 
     /**
  * @brief Inserts an element with specified data and size at a specified position in a List.
@@ -288,7 +288,7 @@ struct dll_list_ops_s {
  *         - kErrorCode_Ok: If the element is successfully inserted.
  */
 
-    s16(*insertAt)(List* list, void* data, u16 bytes, u16 position);
+    s16(*insertAt)(DLL_List* list, void* data, u16 bytes, u16 position);
 
     /**
  * @brief Extracts and returns the data of the first element in a List.
@@ -303,7 +303,7 @@ struct dll_list_ops_s {
  * @return A pointer to the data of the first element if extraction is successful, otherwise NULL.
  */
 
-    void* (*extractFirst)(List* list);
+    void* (*extractFirst)(DLL_List* list);
 
     /**
  * @brief Extracts and returns the data of the last element in a List.
@@ -318,7 +318,7 @@ struct dll_list_ops_s {
  * @return A pointer to the data of the last element if extraction is successful, otherwise NULL.
  */
 
-    void* (*extractLast)(List* list);
+    void* (*extractLast)(DLL_List* list);
 
     /**
 * @brief Extracts and returns the data of the element at the specified position in a List.
@@ -335,7 +335,7 @@ struct dll_list_ops_s {
 * @return A pointer to the data of the extracted element if extraction is successful, otherwise NULL.
 */
 
-    void* (*extractAt)(List* list, u16 position);
+    void* (*extractAt)(DLL_List* list, u16 position);
 
     /**
 * @brief Concatenates two Lists.
@@ -351,7 +351,7 @@ struct dll_list_ops_s {
 * @return An error code indicating the status of the concatenation operation.
 */
 
-    s16(*concat)(List* list, const List* list_src);
+    s16(*concat)(DLL_List* list, const DLL_List* list_src);
 
     /**
  * @brief Traverses the elements of a List and applies a callback function to each element.
@@ -368,7 +368,7 @@ struct dll_list_ops_s {
  * @return An error code indicating the status of the traversal operation.
  */
 
-    s16(*traverse)(const List* list, void (*callback)(MemoryNode*));
+    s16(*traverse)(const DLL_List* list, void (*callback)(MemoryNode*));
 
     /**
  * @brief Prints information about a List and its elements.
@@ -381,7 +381,7 @@ struct dll_list_ops_s {
  * @param list A pointer to the List to be printed.
  */
 
-    void (*print)(List* list);
+    void (*print)(DLL_List* list);
 };
 
 /**
@@ -396,6 +396,6 @@ struct dll_list_ops_s {
  * @return A pointer to the newly created List, or NULL if the capacity is invalid or memory allocation fails.
  */
 
-List* DLL_LIST_create(u16 capacity);
+DLL_List* DLL_LIST_create(u16 capacity);
 
 #endif //__ADT_DLL_LIST_H__

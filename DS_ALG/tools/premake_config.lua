@@ -233,6 +233,8 @@ project "PR12_Comparative"
     path.join(PROJ_DIR, "include/adt_vector.h"),
     path.join(PROJ_DIR, "include/adt_list.h"),
     path.join(PROJ_DIR, "src/adt_list.c"),  
+    path.join(PROJ_DIR, "include/adt_dll_list.h"),
+    path.join(PROJ_DIR, "src/adt_dll_list.c"),
   
     path.join(PROJ_DIR, "tests/comparative.c"),
   }

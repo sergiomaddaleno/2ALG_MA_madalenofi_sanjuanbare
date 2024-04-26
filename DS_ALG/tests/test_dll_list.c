@@ -24,16 +24,16 @@ int main() {
 	TESTBASE_generateDataForTest();
 
 	// list created just to have a reference to the operations
-	List *ls = NULL;
+	DLL_List *ls = NULL;
 	ls = DLL_LIST_create(1);
 	if (NULL == ls) {
 		printf("\n create returned a null node in list for ops");
 		return -1;
 	}
 	// vectors to work with
-	List *list_1 = NULL;
-	List *list_2 = NULL;
-	List *list_3 = NULL;
+	DLL_List *list_1 = NULL;
+	DLL_List *list_2 = NULL;
+	DLL_List *list_3 = NULL;
 	list_1 = DLL_LIST_create(kCapacityList1);
 	if (NULL == list_1) {
 		printf("\n create returned a null node in list_1\n");
@@ -426,7 +426,7 @@ int main() {
 	error_type = ls->ops_->destroy(list_1);
 	TESTBASE_printFunctionResult(list_1, (u8 *)"destroy list_1", error_type);
 	error_type = ls->ops_->destroy(ls);
-	TESTBASE_printFunctionResult(ls, (u8 *)"destroy List Operations", error_type);
+	TESTBASE_printFunctionResult(ls, (u8 *)"destroy DLL_List Operations", error_type);
 
 	printf("\nAt this point, it must be only one block of %d bytes waiting to be freed\n\n", kSingleSizeBigData);
 	MM->status();
