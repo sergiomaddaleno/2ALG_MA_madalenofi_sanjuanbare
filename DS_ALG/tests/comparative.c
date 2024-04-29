@@ -18,21 +18,25 @@
 #include "./../tests/test_base.c"
 #include "adt_dll_list.h"
 
-void* data[10000];
+void* data[1000];
 Vector* vector_1 = NULL;
+Vector* vector_2 = NULL;
 List* list_1 = NULL;
+List* list_2 = NULL;
 DLL_List* list_dll_1 = NULL;
-
+DLL_List* list_dll_2 = NULL;
 void TESTBASE_generateDataForComparative() {
 	//TODO some stuff
 	
 	
-	//vector_1 = VECTOR_create(10000);
-	//list_1 = LIST_create(10000);
-	list_dll_1 = DLL_LIST_create(10000);
-
+	//vector_1 = VECTOR_create(500);
+	//vector_1 = VECTOR_create(500);
+	list_1 = LIST_create(1000);
+	//list_2 = LIST_create(1000);
+	//list_dll_1 = DLL_LIST_create(500);
+	//list_dll_2 = DLL_LIST_create(500);
 	
-	for (s16 i = 0; i < 10000; i++) {
+	for (s16 i = 0; i < 1000; i++) {
 
 		data[i] = MM->malloc(sizeof(u8) * 1);
 		//data[i][0] = 's';
@@ -47,7 +51,7 @@ void calculateTimeForFunction() {
 	LARGE_INTEGER frequency;				// ticks per second
 	LARGE_INTEGER  time_start, time_end;    // ticks in interval
 	double elapsed_time = 0.0f;
-	u32 repetitions = 10000;
+	u32 repetitions = 1000;
 
 	///////////////////////////////////////////////////////////////////////
 	// Frequency: ticks per second
@@ -62,11 +66,11 @@ void calculateTimeForFunction() {
 	for (u32 rep = 0; rep < repetitions; ++rep) {
 		//TODO execute function
 		
-		list_dll_1->ops_->insertAt(list_dll_1, data[rep], (strlen(data[rep]) + 1), rep);
-
+		list_1->ops_->insertFirst(list_1,data[rep],strlen(data[rep])+1);
+		//MM->free(data[rep]) for extracts;
 	}
-	list_dll_1->ops_->reset(list_dll_1);
-	list_dll_1->ops_->destroy(list_dll_1);
+	list_1->ops_->reset(list_1);
+	list_1->ops_->destroy(list_1);
 	// stop timer
 	QueryPerformanceCounter(&time_end);
 	///////////////////////////////////////////////////////////////////////
