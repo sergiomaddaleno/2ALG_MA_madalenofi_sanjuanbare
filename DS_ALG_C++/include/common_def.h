@@ -1,0 +1,46 @@
+// common_def.h
+// Escuela Superior de Arte y Tecnologia
+// Algoritmos & Inteligencia Artificial
+// ESAT 2020-2021
+//
+#ifndef __COMMON_DEF_H__
+#define __COMMON_DEF_H__ 1
+
+#define VERBOSE_
+
+typedef enum {
+	kErrorCode_Ok = 0,
+	kErrorCode_Null = -1,
+	kErrorCode_Memory = -2,
+
+	//Memory node
+	kErrorCode_NodeNull = -10,
+	kErrorCode_SrcNull = -11,
+	kErrorCode_BytesZero = -12,
+	kErrorCode_DataNull = -13,
+	kErrorCode_SizeNull = -14,
+	kErrorCode_MallocNull = -15,
+	kErrorCode_EqualCapacity = -16,
+
+	//Vecotr
+	kErrorCode_VectorNull = -20,
+	kErrorCode_CapacityZero = -21,
+	kErrorCode_StorageNull = -22,
+	kErrorCode_Data_StorageNull = -23,
+	kErrorCode_VectorFull = -24,
+	kErrorCode_VectorEmpty = -25,
+	kErrorCode_TailZero = -26,
+
+	//List
+	kErrorCode_ListNull = -30,
+
+	//Stack
+	kErrorCode_StackNull = -35,
+
+	//Queue
+	kErrorCode_QueueNull = -40,
+
+
+} ErrorCode;
+
+#endif // __COMMON_DEF_H__
