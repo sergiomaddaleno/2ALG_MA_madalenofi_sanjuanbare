@@ -12,53 +12,19 @@
 
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
-
-// Memory Node Declarations
 static s16 MEMNODE_initWithoutCheck(memory_node_s *node);	// inits a MN with no checks
-static void* MEMNODE_data(memory_node_s *node);	// returns a reference to data_
-static u16 MEMNODE_size(memory_node_s *node);		// returns data size
 
-static s16 MEMNODE_SetData(memory_node_s *node, void* src, u16 bytes);
-static s16 MEMNODE_reset(memory_node_s* node);     // reset content of memory node
-static s16 MEMNODE_softReset(memory_node_s* node); // reset content of memory node without freeing the data
-static s16 MEMNODE_free(memory_node_s* node);		// free memory, both data and node
-static s16 MEMNODE_softFree(memory_node_s* node);	// free only the node (its mmory, not its data)
-
-static s16 MEMNODE_memSet(memory_node_s* node, u8 value);
-static s16 MEMNODE_memCopy(memory_node_s* node, void* src, u16 bytes);
-static s16 MEMNODE_memConcat(memory_node_s* node, void* src, u16 bytes);
-static s16 MEMNODE_memMask(memory_node_s* node, u8 mask);
-
-static memory_node_s* MEMNODE_next(memory_node_s* node);
-static memory_node_s* MEMNODE_previous(memory_node_s* node);
-static void MEMNODE_setNext(memory_node_s* node, memory_node_s* next_node);
-static void MEMNODE_setPrevious(memory_node_s* node, memory_node_s* previous_node);
-
-static void MEMNODE_print(memory_node_s* node);
-
-
-struct memory_node_ops_s memory_node_ops = { data = MEMNODE_data,
-                                             size = MEMNODE_size,
-                                             setData = MEMNODE_SetData,
-                                             reset = MEMNODE_reset,
-                                             softReset = MEMNODE_softReset,
-                                             free = MEMNODE_free,
-                                             softFree = MEMNODE_softFree,
-                                             memSet = MEMNODE_memSet,
-                                             memCopy = MEMNODE_memCopy,
-                                             memConcat = MEMNODE_memConcat,
-                                             memMask = MEMNODE_memMask,
-                                             print = MEMNODE_print,
-                                             next = MEMNODE_next,
-                                             previous = MEMNODE_previous,
-                                             setNext = MEMNODE_setNext,
-                                             setPrevious = MEMNODE_setPrevious,
-};
-
+memory_node_s::memory_node_s() {
+    data_ = nullptr;
+    size_ = 0;
+    next_ = nullptr;
+    previous_ = nullptr;
+}
+memory_node_s::~memory_node_s() {}
 
 // Memory Node Definitions
 memory_node_s* MEMNODE_create() {
-  memory_node_s *node = MM->malloc(sizeof(memory_node_s));
+  memory_node_s *node = (memory_node_s*)MM->malloc(sizeof(memory_node_s));
   if (NULL == node) {
 #ifdef VERBOSE_
     printf("Error: [%s] not enough memory available\n", __FUNCTION__);
@@ -90,10 +56,8 @@ s16 MEMNODE_createLite(memory_node_s* node) {
     }
     node->data_ = NULL;
     node->size_ = 0;
-    node->ops_ = &memory_node_ops;
     node->next_ = NULL;
     node->previous_ = NULL;
-
 
     return kErrorCode_Ok;
 }
@@ -101,25 +65,27 @@ s16 MEMNODE_createLite(memory_node_s* node) {
 s16 MEMNODE_initWithoutCheck(memory_node_s *node) {
   node->data_ = NULL;
   node->size_ = 0;
-  node->ops_ = &memory_node_ops;
   return kErrorCode_Ok;
 }
 
-void* MEMNODE_data(memory_node_s *node) { // returns a reference to data_
-  if (NULL == node) {
-      return NULL;
-  }
-  return node->data_;
+
+void* memory_node_s::data(memory_node_s* node)
+{
+    if (NULL == node) {
+          return NULL;
+    }
+
+    return node->data_;
 }
 
-u16	MEMNODE_size(memory_node_s *node) { // returns data size
+u16	memory_node_s::size(memory_node_s *node) { // returns data size
   if (NULL == node) {
       return 0;
   }
   return node->size_;
 }
 
-s16 MEMNODE_SetData(memory_node_s* node, void* src, u16 bytes) {
+s16 memory_node_s::setData(memory_node_s* node, void* src, u16 bytes) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -135,7 +101,7 @@ s16 MEMNODE_SetData(memory_node_s* node, void* src, u16 bytes) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_reset(memory_node_s* node) {
+s16 memory_node_s::reset(memory_node_s* node) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -148,7 +114,7 @@ s16 MEMNODE_reset(memory_node_s* node) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_softReset(memory_node_s* node) {
+s16 memory_node_s::softReset(memory_node_s* node) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -161,7 +127,7 @@ s16 MEMNODE_softReset(memory_node_s* node) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_free(memory_node_s* node) {
+s16 memory_node_s::free(memory_node_s* node) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -172,7 +138,7 @@ s16 MEMNODE_free(memory_node_s* node) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_softFree(memory_node_s* node) {
+s16 memory_node_s::softFree(memory_node_s* node) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -181,7 +147,7 @@ s16 MEMNODE_softFree(memory_node_s* node) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_memSet(memory_node_s* node, u8 value) {
+s16 memory_node_s::memSet(memory_node_s* node, u8 value) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -198,7 +164,7 @@ s16 MEMNODE_memSet(memory_node_s* node, u8 value) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_memCopy(memory_node_s* node, void* src, u16 bytes) {
+s16 memory_node_s::memCopy(memory_node_s* node, void* src, u16 bytes) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -210,7 +176,7 @@ s16 MEMNODE_memCopy(memory_node_s* node, void* src, u16 bytes) {
         return kErrorCode_BytesZero;
     }
 
-    u8* tmp = MM->malloc(bytes);
+    u8* tmp = (u8*)MM->malloc(bytes);
     if (NULL == tmp) {
         return kErrorCode_MallocNull;
     }
@@ -228,7 +194,7 @@ s16 MEMNODE_memCopy(memory_node_s* node, void* src, u16 bytes) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_memConcat(memory_node_s* node, void* src, u16 bytes) {
+s16 memory_node_s::memConcat(memory_node_s* node, void* src, u16 bytes) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -241,7 +207,7 @@ s16 MEMNODE_memConcat(memory_node_s* node, void* src, u16 bytes) {
 
     u16 new_size = node->size_ + bytes;
 
-    u8* tmp = MM->malloc(new_size);
+    u8* tmp = (u8*)MM->malloc(new_size);
     if (NULL == tmp) {
         return kErrorCode_MallocNull;
     }
@@ -265,7 +231,7 @@ s16 MEMNODE_memConcat(memory_node_s* node, void* src, u16 bytes) {
     return kErrorCode_Ok;
 }
 
-s16 MEMNODE_memMask(memory_node_s* node, u8 mask) {
+s16 memory_node_s::memMask(memory_node_s* node, u8 mask) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
@@ -285,7 +251,7 @@ s16 MEMNODE_memMask(memory_node_s* node, u8 mask) {
     return kErrorCode_Ok;
 }
 
-void MEMNODE_print(memory_node_s* node) {
+void memory_node_s::print(memory_node_s* node) {
     if (NULL == node) {
         printf("\t[Node Info] Address: NULL\n");
         return;
@@ -306,7 +272,7 @@ void MEMNODE_print(memory_node_s* node) {
 }
 
                                 
-static memory_node_s* MEMNODE_next(memory_node_s* node) {
+memory_node_s* memory_node_s::next(memory_node_s* node) {
 
     if (NULL == node) {
         return NULL;
@@ -315,7 +281,7 @@ static memory_node_s* MEMNODE_next(memory_node_s* node) {
     return node->next_;
 }
 
-static memory_node_s* MEMNODE_previous(memory_node_s* node) {
+memory_node_s* memory_node_s::previous(memory_node_s* node) {
     if (NULL == node) {
         return NULL;
     }
@@ -323,7 +289,7 @@ static memory_node_s* MEMNODE_previous(memory_node_s* node) {
     return node->previous_;
 }
 
-static void MEMNODE_setNext(memory_node_s* node, memory_node_s* next_node){
+void memory_node_s::setNext(memory_node_s* node, memory_node_s* next_node){
    
     if (NULL == node) {
         return;
@@ -332,7 +298,7 @@ static void MEMNODE_setNext(memory_node_s* node, memory_node_s* next_node){
     node->next_ = next_node->next_;
 }
 
-static void MEMNODE_setPrevious(memory_node_s* node, memory_node_s* previous_node){
+void memory_node_s::setPrevious(memory_node_s* node, memory_node_s* previous_node){
     if (NULL == node) {
         return;
     }

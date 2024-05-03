@@ -24,7 +24,7 @@ PROJECT_NAMES = {
   "PR10_Queue",
   "PR11_Logger",
   "PR12_Comparative",
-  --"PR13_SortingAlgorithms",
+  "PR13_SortingAlgorithms",
 }
 
 -- Solution workspace declaration:
@@ -237,5 +237,14 @@ project "PR12_Comparative"
     path.join(PROJ_DIR, "src/adt_dll_list.cc"),
   
     path.join(PROJ_DIR, "tests/comparative.c"),
+  }
+
+  project "PR13_SortingAlgorithms"
+  files {
+    path.join(PROJ_DIR, "include/adt_sorting_algorithm.h"),
+    path.join(PROJ_DIR, "src/adt_sorting_algorithm.c"),
+    path.join(PROJ_DIR, "include/adt_memory_node.h"),
+    path.join(PROJ_DIR, "include/adt_vector.h"),
+    path.join(PROJ_DIR, "tests/sorting_algorithm_test.c"),
   }
 
