@@ -123,7 +123,7 @@ project "PR01_MemoryNode"
 	files {
 	  path.join(PROJ_DIR, "include/adt_memory_node.h"),
 	  path.join(PROJ_DIR, "src/adt_memory_node.cc"),
-	  path.join(PROJ_DIR, "tests/test_memory_node.c"),
+	  path.join(PROJ_DIR, "tests/test_memory_node.cc"),
   }
 
 project "PR02_Vector"
@@ -132,7 +132,7 @@ project "PR02_Vector"
     path.join(PROJ_DIR, "src/adt_memory_node.cc"),
     path.join(PROJ_DIR, "include/adt_vector.h"),
     path.join(PROJ_DIR, "src/adt_vector.cc"),
-    path.join(PROJ_DIR, "tests/test_vector.c"),
+    path.join(PROJ_DIR, "tests/test_vector.cc"),
   }
 
 project "PR03_CircularVector"
@@ -159,7 +159,7 @@ project "PR05_List"
     path.join(PROJ_DIR, "src/adt_memory_node.cc"),
     path.join(PROJ_DIR, "include/adt_list.h"),
     path.join(PROJ_DIR, "src/adt_list.cc"),
-    path.join(PROJ_DIR, "tests/test_list.c"),
+    path.join(PROJ_DIR, "tests/test_list.cc"),
   }
 
 project "PR06_DLList"
@@ -168,7 +168,7 @@ files {
   path.join(PROJ_DIR, "src/adt_memory_node.cc"),
   path.join(PROJ_DIR, "include/adt_dll_list.h"),
   path.join(PROJ_DIR, "src/adt_dll_list.cc"),
-  path.join(PROJ_DIR, "tests/test_dll_list.c"),
+  path.join(PROJ_DIR, "tests/test_dll_list.cc"),
 }
 
 project "PR07_CircularList"
@@ -197,7 +197,7 @@ project "PR09_Stack"
     path.join(PROJ_DIR, "src/adt_vector.cc"),
     path.join(PROJ_DIR, "include/adt_stack.h"),
     path.join(PROJ_DIR, "src/adt_stack.cc"),
-    path.join(PROJ_DIR, "tests/test_stack.c"),
+    path.join(PROJ_DIR, "tests/test_stack.cc"),
 }
 
 project "PR10_Queue"
@@ -208,7 +208,7 @@ project "PR10_Queue"
     path.join(PROJ_DIR, "src/adt_list.cc"),
     path.join(PROJ_DIR, "include/adt_queue.h"),
     path.join(PROJ_DIR, "src/adt_queue.cc"),
-    path.join(PROJ_DIR, "tests/test_queue.c"),
+    path.join(PROJ_DIR, "tests/test_queue.cc"),
   }
 
  project "PR11_Logger"
