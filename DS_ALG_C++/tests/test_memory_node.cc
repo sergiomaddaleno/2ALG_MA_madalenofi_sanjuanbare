@@ -14,7 +14,7 @@
 
 
 void printFunctionResult(memory_node_s *mn, u8 *msg, s16 error_type) {
-	u8 *error_msg = (u8 *)MM->malloc (sizeof(u8) * 100);
+	u8* error_msg = new u8[100];
 	if (NULL == error_msg)
 	{
 		printf(" [TEST] Error allocating error mesage\n");
@@ -52,7 +52,7 @@ void printFunctionResult(memory_node_s *mn, u8 *msg, s16 error_type) {
 
 	printf(" in address = %p", mn);
 	printf("\n");
-	MM->free(error_msg);
+	delete[] error_msg;
 }
 s16 printMemoryNodeInfo(memory_node_s *node) {
 	printf("\n [TEST] Node Info:\n");
@@ -126,27 +126,28 @@ int main()
 {
 	//printf("big_data_msg size = %d", strlen((char *)big_data_msg));
 	s16 error_type;
-	u8 *ptr_data_1 = (u8*)MM->malloc(sizeof(u8) * kSizeData1); // abcde
+	u8* ptr_data_1 = new u8[kSizeData1]; // abcde
 	if (NULL == ptr_data_1) {
 		printf("\n create returned a null node in ptr_data_1");
 		return -1;
 	}
-	u8 *ptr_data_2 = (u8*)MM->malloc(sizeof(u8) * kSizeData2); // fghijklmnopqrst
+	u8* ptr_data_2 = new u8[kSizeData2]; // fghijklmnopqrst
 	if (NULL == ptr_data_2) {
 		printf("\n create returned a null node in ptr_data_2");
 		return -1;
 	}
-	u8 *ptr_data_3 = (u8*)MM->malloc(sizeof(u8) * kSizeData3); // 0123456789
+	u8* ptr_data_3 = new u8[kSizeData3]; // 0123456789
 	if (NULL == ptr_data_3) {
 		printf("\n create returned a null node in ptr_data_3");
 		return -1;
 	}
-	u8 *ptr_data_4 = (u8*)MM->malloc(sizeof(u8) * kSizeData4); // ABGS
+	u8* ptr_data_4 = new u8[kSizeData4]; // ABGS
 	if (NULL == ptr_data_4) {
 		printf("\n create returned a null node in ptr_data_4");
 		return -1;
 	}
-	u8 *ptr_big_data = (u8*)MM->malloc(sizeof(u8) * kSizeBigData);
+	u8* ptr_big_data = new u8[kSizeBigData];
+	
 	if (NULL == ptr_big_data) {
 		printf("\n create returned a null node in ptr_big_data");
 		return -1;
@@ -201,12 +202,12 @@ int main()
 	memory_node_s *node_2 = NULL;
 	memory_node_s *node_3 = NULL;
 
-	node_1 = MEMNODE_create();
+	node_1 = new  memory_node_s();
 	if (NULL == node_1) {
 		printf("\n create returned a null node in node_1");
 		return -1;
 	}
-	node_2 = MEMNODE_create();
+	node_2 = new  memory_node_s();
 	if (NULL == node_2) {
 		printf("\n create returned a null node in node_2");
 		return -1;
@@ -215,7 +216,7 @@ int main()
 	printFunctionResult(node_3, (u8 *)"createFromRef Node 3", error_type);
 
 	// node created just to have a reference to the operations
-	mn = MEMNODE_create();
+	mn = new  memory_node_s();
 	if (NULL == mn) {
 		printf("\n create returned a null node in node for ops");
 		return -1;
@@ -326,7 +327,7 @@ int main()
 
 	// NULL COMPROBATION
 	printf("\n\n---------------- NULL BATTERY ----------------\n\n");
-	node_1 = MEMNODE_create();
+	node_1 = new  memory_node_s();
 	if (NULL == node_1) {
 		printf("\n create returned a null node in node_1");
 		return -1;
@@ -365,12 +366,12 @@ int main()
 	printf("\n\n---------------- Big Data BATTERY ----------------\n\n");
 	error_type = mn->reset(node_1);
 	printFunctionResult(node_1, (u8 *)"reset node 1", error_type);
-	node_2 = MEMNODE_create();
+	node_2 = new  memory_node_s();
 	if (NULL == node_2) {
 		printf("\n create returned a null node in node_2");
 		return -1;
 	}
-	node_3 = MEMNODE_create();
+	node_3 = new  memory_node_s();
 	if (NULL == node_3) {
 		printf("\n create returned a null node in node_3");
 		return -1;
@@ -410,9 +411,9 @@ int main()
 	error_type = mn->free(node_3);
 	printFunctionResult(node_3, (u8 *)"free Node 3", error_type);
 	error_type = mn->free(mn);
-  MM->free(ptr_big_data);
+  delete[] ptr_big_data;
 
-  MM->status();
+  MM-> status();
   MM->destroy();
 
 	printf("Press ENTER to continue\n");

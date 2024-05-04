@@ -15,31 +15,21 @@
 static s16 MEMNODE_initWithoutCheck(memory_node_s *node);	// inits a MN with no checks
 
 memory_node_s::memory_node_s() {
-    data_ = nullptr;
+    data_ = NULL;
     size_ = 0;
-    next_ = nullptr;
-    previous_ = nullptr;
+    next_ = NULL;
+    previous_ = NULL;
 }
 memory_node_s::~memory_node_s() {}
 
 // Memory Node Definitions
-memory_node_s* MEMNODE_create() {
-  memory_node_s *node = (memory_node_s*)MM->malloc(sizeof(memory_node_s));
-  if (NULL == node) {
-#ifdef VERBOSE_
-    printf("Error: [%s] not enough memory available\n", __FUNCTION__);
-#endif
-    return NULL;
-  }
-  MEMNODE_initWithoutCheck(node);
-  return node;
-}
+
 
 s16 MEMNODE_createFromRef(memory_node_s **node) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
-  *node = MEMNODE_create();
+  *node = new  memory_node_s();
   
   if (NULL == *node) {
 #ifdef VERBOSE_
@@ -108,7 +98,7 @@ s16 memory_node_s::reset(memory_node_s* node) {
     if (NULL == node->data_) {
       return kErrorCode_DataNull;
     }
-    MM->free(node->data_);
+    delete node->data_;
     node->data_ = NULL;
     node->size_ = 0;
     return kErrorCode_Ok;
@@ -132,9 +122,9 @@ s16 memory_node_s::free(memory_node_s* node) {
         return kErrorCode_NodeNull;
     }
     if (NULL != node->data_) {
-        MM->free(node->data_);
+        delete node->data_;
     }
-    MM->free(node);
+    delete node;
     return kErrorCode_Ok;
 }
 
@@ -142,7 +132,7 @@ s16 memory_node_s::softFree(memory_node_s* node) {
     if (NULL == node) {
         return kErrorCode_NodeNull;
     }
-    MM->free(node);
+    delete node;
 
     return kErrorCode_Ok;
 }
@@ -176,7 +166,7 @@ s16 memory_node_s::memCopy(memory_node_s* node, void* src, u16 bytes) {
         return kErrorCode_BytesZero;
     }
 
-    u8* tmp = (u8*)MM->malloc(bytes);
+    u8* tmp = new u8[bytes];
     if (NULL == tmp) {
         return kErrorCode_MallocNull;
     }
@@ -186,7 +176,7 @@ s16 memory_node_s::memCopy(memory_node_s* node, void* src, u16 bytes) {
         tmp[i] = aux[i];
     }
     if (NULL != node->data_) {
-        MM->free(node->data_);
+        delete node->data_;
     }
     node->data_ = tmp;
     node->size_ = bytes;
@@ -207,7 +197,7 @@ s16 memory_node_s::memConcat(memory_node_s* node, void* src, u16 bytes) {
 
     u16 new_size = node->size_ + bytes;
 
-    u8* tmp = (u8*)MM->malloc(new_size);
+    u8* tmp = new u8[new_size];
     if (NULL == tmp) {
         return kErrorCode_MallocNull;
     }
@@ -224,7 +214,7 @@ s16 memory_node_s::memConcat(memory_node_s* node, void* src, u16 bytes) {
         }
     }
 
-    MM->free(node->data_);
+    delete node->data_;
     node->data_ = tmp;
     node->size_ = new_size;
 
@@ -305,3 +295,5 @@ void memory_node_s::setPrevious(memory_node_s* node, memory_node_s* previous_nod
 
     node->previous_ = previous_node->previous_;
 }
+
+

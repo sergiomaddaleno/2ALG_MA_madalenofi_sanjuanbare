@@ -51,9 +51,11 @@ public:
 	void setNext(memory_node_s* node, memory_node_s* next_node);
 
 	void setPrevious(memory_node_s* node, memory_node_s* previous_node);
+
+	//static memory_node_s* MEMNODE_create();
 };
 
-memory_node_s* MEMNODE_create();
+
 
 s16 MEMNODE_createFromRef(memory_node_s** node);
 
