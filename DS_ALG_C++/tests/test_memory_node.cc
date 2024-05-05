@@ -413,8 +413,8 @@ int main()
 	error_type = mn->free(mn);
   delete[] ptr_big_data;
 
-  MM-> status();
-  MM->destroy();
+  //MM->status();
+  //MM->destroy();
 
 	printf("Press ENTER to continue\n");
 	getchar();
