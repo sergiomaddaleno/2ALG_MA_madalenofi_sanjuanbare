@@ -9,16 +9,17 @@
 
 #include "adt_memory_node.h"
 
-typedef struct adt_list_s {
-	MemoryNode* head_;
-	MemoryNode* tail_; 
+class adt_list_s {
+
+public:
+    memory_node_s* head_;
+    memory_node_s* tail_;
 	u16 length_;
 	u16 capacity_;
 	struct list_ops_s* ops_;
-} List;
 
-struct list_ops_s {
-
+    adt_list_s(u16 capacity);
+    ~adt_list_s();
     /**
  * @brief Destroys a List and frees memory associated with its elements.
  *
@@ -34,7 +35,7 @@ struct list_ops_s {
  *         - kErrorCode_Ok: The destruction operation was successful.
  *         - kErrorCode_ListNull: The provided pointer to the List is NULL.
  */
-    s16(*destroy)(List* list);
+    s16 destroy (adt_list_s* list);
 
     /**
  * @brief Resets a List by removing all elements and freeing associated memory.
@@ -51,7 +52,7 @@ struct list_ops_s {
  *         - kErrorCode_Ok: The reset operation was successful.
  *         - kErrorCode_ListNull: The provided pointer to the List is NULL.
  */
-    s16(*reset)(List* list);
+    s16 reset (adt_list_s* list);
 
     /**
  * @brief Soft resets a List by removing all elements without freeing associated memory.
@@ -70,7 +71,7 @@ struct list_ops_s {
  *         - kErrorCode_ListNull: The provided pointer to the List is NULL.
  *         - kErrorCode_StorageNull: The storage pointer of the List is NULL.
  */
-    s16(*softReset)(List* list);
+    s16 softReset(adt_list_s* list);
 
     /**
  * @brief Resizes a List to the specified new size.
@@ -94,7 +95,7 @@ struct list_ops_s {
  *         - kErrorCode_EqualCapacity: The new size is equal to the current capacity of the list.
  *         - kErrorCode_MallocNull: Memory allocation failed while resizing the list.
  */
-    s16(*resize)(List* list, u16 new_size);
+    s16 resize(adt_list_s* list, u16 new_size);
 
     /**
  * @brief Retrieves the capacity of a List.
@@ -108,7 +109,7 @@ struct list_ops_s {
  *         - If the provided pointer to the List is NULL, returns 0.
  *         - Otherwise, returns the capacity of the List.
  */
-    u16(*capacity)(const List* list);
+    u16 capacity (const adt_list_s* list);
 
     /**
  * @brief Retrieves the length of a List.
@@ -122,7 +123,7 @@ struct list_ops_s {
  *         - If the provided pointer to the List is NULL, returns 0.
  *         - Otherwise, returns the length of the List.
  */
-    u16(*length)(const List* list);
+    u16 length (const adt_list_s* list);
 
     /**
  * @brief Checks if a List is empty.
@@ -137,7 +138,7 @@ struct list_ops_s {
  *         - If the List is empty, returns 1 (true).
  *         - Otherwise, returns 0 (false).
  */
-    s16(*isEmpty)(const List* list);
+    s16 isEmpty (const adt_list_s* list);
 
     /**
  * @brief Checks if a List is full.
@@ -152,7 +153,7 @@ struct list_ops_s {
  *         - If the List is full, returns 1 (true).
  *         - Otherwise, returns 0 (false).
  */
-    s16(*isFull)(const List* list);
+    s16 isFull (const adt_list_s* list);
 
     /**
  * @brief Retrieves the data of the first element in a List.
@@ -167,7 +168,7 @@ struct list_ops_s {
  *         - If the List is empty, returns NULL.
  *         - Otherwise, returns a pointer to the data of the first element in the List.
  */
-    void* (*first)(const List* list);
+    void* first(const adt_list_s* list);
 
     /**
  * @brief Retrieves the data of the last element in a List.
@@ -184,7 +185,7 @@ struct list_ops_s {
  *         - If the List has no elements, returns NULL.
  *         - Otherwise, returns a pointer to the data of the last element in the List.
  */
-    void* (*last)(const List* list);
+    void* last (const adt_list_s* list);
 
     /**
  * @brief Retrieves the data of the element at a specified position in a List.
@@ -203,7 +204,7 @@ struct list_ops_s {
  *         - If the specified position is out of bounds, returns NULL.
  *         - Otherwise, returns a pointer to the data of the element at the specified position in the List.
  */
-    void* (*at)(const List* list, u16 position);
+    void* at (const adt_list_s* list, u16 position);
 
     /**
  * @brief Inserts a new element at the beginning of a List.
@@ -227,7 +228,7 @@ struct list_ops_s {
  *         - Returns `kErrorCode_MallocNull` if memory allocation for the new element fails.
  *         - Returns `kErrorCode_Ok` if the insertion operation is successful.
  */
-    s16(*insertFirst)(List* list, void* data, u16 bytes);
+    s16 insertFirst (adt_list_s* list, void* data, u16 bytes);
 
     /**
  * @brief Inserts an element with specified data and size at the end of a List.
@@ -250,7 +251,7 @@ struct list_ops_s {
  *         - kErrorCode_BytesZero: If the size of the data is less than or equal to 0.
  *         - kErrorCode_Ok: If the element is successfully inserted.
  */
-    s16(*insertLast)(List* list, void* data, u16 bytes);
+    s16 insertLast (adt_list_s* list, void* data, u16 bytes);
 
     /**
  * @brief Inserts an element with specified data and size at a specified position in a List.
@@ -275,7 +276,7 @@ struct list_ops_s {
  *         - kErrorCode_MallocNull: If memory allocation fails during node creation.
  *         - kErrorCode_Ok: If the element is successfully inserted.
  */
-    s16(*insertAt)(List* list, void* data, u16 bytes, u16 position);
+    s16 insertAt (adt_list_s* list, void* data, u16 bytes, u16 position);
 
     /**
  * @brief Extracts and returns the data of the first element in a List.
@@ -289,7 +290,7 @@ struct list_ops_s {
  * @param list A pointer to the List from which the first element's data will be extracted.
  * @return A pointer to the data of the first element if extraction is successful, otherwise NULL.
  */
-    void* (*extractFirst)(List* list);
+    void* extractFirst (adt_list_s* list);
 
     /**
  * @brief Extracts and returns the data of the last element in a List.
@@ -303,7 +304,7 @@ struct list_ops_s {
  * @param list A pointer to the List from which the last element's data will be extracted.
  * @return A pointer to the data of the last element if extraction is successful, otherwise NULL.
  */
-    void* (*extractLast)(List* list);
+    void* extractLast (adt_list_s* list);
 
     /**
  * @brief Extracts and returns the data of the element at the specified position in a List.
@@ -319,7 +320,7 @@ struct list_ops_s {
  * @param position The position of the element to be extracted (0-indexed).
  * @return A pointer to the data of the extracted element if extraction is successful, otherwise NULL.
  */
-    void* (*extractAt)(List* list, u16 position);
+    void* extractAt (adt_list_s* list, u16 position);
 
     /**
  * @brief Concatenates two Lists.
@@ -334,7 +335,7 @@ struct list_ops_s {
  * @param list_src A pointer to the source List containing the elements to be concatenated.
  * @return An error code indicating the status of the concatenation operation.
  */
-    s16(*concat)(List* list, const List* list_src);
+    s16 concat (adt_list_s* list, const adt_list_s* list_src);
 
     /**
  * @brief Traverses the elements of a List and applies a callback function to each element.
@@ -350,7 +351,7 @@ struct list_ops_s {
  * @param callback A function pointer to the callback function to be applied to each element of the List.
  * @return An error code indicating the status of the traversal operation.
  */
-    s16 (*traverse)(const List* list, void (*callback)(MemoryNode*));
+    s16  traverse (const adt_list_s* list, void (*callback)(memory_node_s*));
 
     /**
  * @brief Prints information about a List and its elements.
@@ -362,7 +363,7 @@ struct list_ops_s {
  *
  * @param list A pointer to the List to be printed.
  */
-    void (*print)(List* list);
+    void  print (adt_list_s* list);
 };
 
 /**
@@ -376,6 +377,6 @@ struct list_ops_s {
  * @param capacity The capacity of the List to be created.
  * @return A pointer to the newly created List, or NULL if the capacity is invalid or memory allocation fails.
  */
-List* LIST_create(u16 capacity);
+
 
 #endif //__ADT_LIST_H__

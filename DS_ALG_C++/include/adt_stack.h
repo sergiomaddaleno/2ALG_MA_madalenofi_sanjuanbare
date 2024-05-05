@@ -13,10 +13,10 @@
 class adt_stack_s {
 public:
 
-	adt_stack_s();
+	adt_stack_s(u16 capacity);
 	~adt_stack_s();
 
-	Vector* storage_;
+	adt_vector_s* storage_;
 
 	s16 push(adt_stack_s* stack, void* data, u16 size);
 

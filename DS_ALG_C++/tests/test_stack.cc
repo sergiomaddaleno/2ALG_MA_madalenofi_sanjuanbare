@@ -12,8 +12,8 @@
 #include "adt_stack.h"
 #include "EDK_MemoryManager\edk_memory_manager.h"
 
-#include ".\..\tests\test_base.c"
-//#include ".\..\tests\test_base.cc"
+//#include ".\..\tests\test_base.c"
+#include ".\..\tests\test_base.cc"
 
 const u16 kCapacityStack1 = 30;
 const u16 kCapacityStack2 = 5;
@@ -26,7 +26,7 @@ int main()
 
 	// stack created just to have a reference to the operations
 	adt_stack_s* s = NULL;
-	s = new adt_stack_s[1];
+	s = new adt_stack_s(1);
 	if (NULL == s) {
 		printf("\n create returned a null node in stack for ops");
 		return -1;
@@ -36,18 +36,18 @@ int main()
 	adt_stack_s* stack_2 = NULL;
 	adt_stack_s* stack_3 = NULL;
 	
-	stack_1 = new adt_stack_s[kCapacityStack1];
+	stack_1 = new adt_stack_s(kCapacityStack1);
 
 	if (NULL == stack_1) {
 		printf("\n create returned a null node in stack_1\n");
 		return -1;
 	}
-	stack_2 = new adt_stack_s[kCapacityStack2];
+	stack_2 = new adt_stack_s(kCapacityStack2);
 	if (NULL == stack_2) {
 		printf("\n create returned a null node in stack_2\n");
 		return -1;
 	}
-	stack_3 = new adt_stack_s[kCapacityStack3];
+	stack_3 = new adt_stack_s(kCapacityStack3);
 	if (NULL == stack_3) {
 		printf("\n create returned a null node in stack_3\n");
 		return -1;
@@ -86,7 +86,7 @@ int main()
 	printf("\t push stack_1\n");
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_A; ++i)
 	{
-		error_type = s->push(stack_1, TestData.storage_ptr_test_A[i], (strlen(TestData.storage_ptr_test_A[i]) + 1));
+		error_type = s->push(stack_1, TestData.storage_ptr_test_A[i], (strlen((const char*)TestData.storage_ptr_test_A[i]) + 1));
 		TestData.storage_ptr_test_A[i] = NULL;
 		TESTBASE_printFunctionResult(stack_1, (u8*)"push stack_1", error_type);
 	}
@@ -96,7 +96,7 @@ int main()
 	printf("\t push stack_1\n");
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_B; ++i)
 	{
-		error_type = s->push(stack_1, TestData.storage_ptr_test_B[i], (strlen(TestData.storage_ptr_test_B[i]) + 1));
+		error_type = s->push(stack_1, TestData.storage_ptr_test_B[i], (strlen((const char*)TestData.storage_ptr_test_B[i]) + 1));
 		TestData.storage_ptr_test_B[i] = NULL;
 		TESTBASE_printFunctionResult(stack_1, (u8*)"push stack_1", error_type);
 	}
@@ -128,7 +128,7 @@ int main()
 	{
 		if (False == s->isFull(stack_3))
 		{
-			error_type = s->push(stack_3, TestData.storage_ptr_test_C[i], (strlen(TestData.storage_ptr_test_C[i]) + 1));
+			error_type = s->push(stack_3, TestData.storage_ptr_test_C[i], (strlen((const char*)TestData.storage_ptr_test_C[i]) + 1));
 			TestData.storage_ptr_test_C[i] = NULL;
 			TESTBASE_printFunctionResult(stack_3, (u8*)"push stack_3", error_type);
 		}
@@ -154,7 +154,7 @@ int main()
 
 	for (u16 i = 2; i < kNumberOfStoragePtrTest_C; ++i)
 	{
-		error_type = s->push(stack_3, TestData.storage_ptr_test_C[i], (strlen(TestData.storage_ptr_test_C[i]) + 1));
+		error_type = s->push(stack_3, TestData.storage_ptr_test_C[i], (strlen((const char*)TestData.storage_ptr_test_C[i]) + 1));
 		TestData.storage_ptr_test_C[i] = NULL;
 		TESTBASE_printFunctionResult(stack_3, (u8*)"push stack_3", error_type);
 	}
@@ -164,7 +164,7 @@ int main()
 	printf("\n\n# Test Pop\n");
 	printf("\t pop stack_3\n");
 	u16 position = 2;
-	TestData.storage_ptr_test_C[position] = s->pop(stack_3, NULL);
+	TestData.storage_ptr_test_C[position] = s->pop(stack_3);
 	if (NULL == TestData.storage_ptr_test_C[position])
 		printf("ERROR: NULL pointer extracted at top stack_3\n");
 	else
@@ -188,7 +188,7 @@ int main()
 	printf("\t pop stack_3\n");
 	for (u16 i = 0; i < 2; ++i)
 	{
-		TestData.storage_ptr_test_C[i] = s->pop(stack_3, NULL);
+		TestData.storage_ptr_test_C[i] = s->pop(stack_3);
 		if (NULL == TestData.storage_ptr_test_C[i])
 			printf("ERROR: NULL pointer extracted at top position\n");
 		else
@@ -199,7 +199,7 @@ int main()
 	printf("\t pop stack_3\n");
 	for (u16 i = 6; i > 4; --i)
 	{
-		TestData.storage_ptr_test_C[i] = s->pop(stack_3, NULL);
+		TestData.storage_ptr_test_C[i] = s->pop(stack_3);
 		if (NULL == TestData.storage_ptr_test_C[i])
 			printf("ERROR: NULL pointer extracted at top position\n");
 		else
@@ -214,9 +214,9 @@ int main()
 	{
 		if (False == s->isEmpty(stack_3))
 		{
-			data = s->pop(stack_3, NULL);
-			MM->free(data);
-			printf("ERROR: Trying to extract an element in an empty stack (stack_3 length = %d)\n", s->ops_->length(stack_3));
+			data = s->pop(stack_3);
+			delete data;
+			printf("ERROR: Trying to extract an element in an empty stack (stack_3 length = %d)\n", s->length(stack_3));
 			extract_errors++;
 		}
 	}
@@ -229,7 +229,7 @@ int main()
 	printf("\t push stack_3\n");
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_C; ++i)
 	{
-		error_type = s->push(stack_3, TestData.storage_ptr_test_C[i], (strlen(TestData.storage_ptr_test_C[i]) + 1));
+		error_type = s->push(stack_3, TestData.storage_ptr_test_C[i], (strlen((const char*) TestData.storage_ptr_test_C[i]) + 1));
 		TestData.storage_ptr_test_C[i] = NULL;
 		TESTBASE_printFunctionResult(stack_3, (u8*)"push stack_3", error_type);
 	}
@@ -309,12 +309,12 @@ int main()
 	printf("stack_1:\n");
 	s->print(stack_1);
 
-	MM->status();
+//	MM->status();
 
 	printf("\n\n---------------- NULL BATTERY ----------------\n\n");
 	printf("\n\n# Test Create\n");
-	stack_2 = new adt_stack_s[0];
-	if (NULL != stack_2) {
+	stack_2 = new adt_stack_s(0);
+	if (NULL != stack_2->storage_) {
 		printf("ERROR: trying to create stack_2 with 0 capacity\n");
 		return -1;
 	}
@@ -331,7 +331,7 @@ int main()
 		printf("ERROR: Top in stack_2 is not NULL\n");
 
 	printf("\n\n# Test Extract\n");
-	data = s->pop(stack_2, NULL);
+	data = s->pop(stack_2);
 	if (NULL != data)
 	{
 		printf("ERROR: trying to pop from an empty stack\n");
@@ -365,11 +365,11 @@ int main()
 	TESTBASE_printFunctionResult(s, (u8*)"destroy Stack Operations", error_type);
 
 	printf("\nAt this point, it must be only one block of %d bytes waiting to be freed\n\n", kSingleSizeBigData);
-	MM->status();
+	//MM->status();
 	TESTBASE_freeDataForTest();
-	MM->status();
+	//MM->status();
 	printf("Press ENTER to continue\n");
 	getchar();
-	MM->destroy();
+	//MM->destroy();
 	return 0;
 }

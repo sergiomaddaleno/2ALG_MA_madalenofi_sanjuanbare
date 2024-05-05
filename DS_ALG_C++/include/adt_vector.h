@@ -18,7 +18,7 @@ public:
 	u16 capacity_;
 	memory_node_s *storage_;
 
-	adt_vector_s();
+	adt_vector_s(u16 capacity);
 	~adt_vector_s();
 	
 	s16 destroy(adt_vector_s *vector);	// Destroys the vector and its data

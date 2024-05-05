@@ -98,9 +98,11 @@ s16 memory_node_s::reset(memory_node_s* node) {
     if (NULL == node->data_) {
       return kErrorCode_DataNull;
     }
-    delete node->data_;
+   
     node->data_ = NULL;
     node->size_ = 0;
+    delete[] node->data_;
+    //delete node->data_;
     return kErrorCode_Ok;
 }
 
@@ -176,7 +178,7 @@ s16 memory_node_s::memCopy(memory_node_s* node, void* src, u16 bytes) {
         tmp[i] = aux[i];
     }
     if (NULL != node->data_) {
-        delete node->data_;
+        delete[] node->data_;
     }
     node->data_ = tmp;
     node->size_ = bytes;
@@ -214,7 +216,7 @@ s16 memory_node_s::memConcat(memory_node_s* node, void* src, u16 bytes) {
         }
     }
 
-    delete node->data_;
+    delete[] node->data_;
     node->data_ = tmp;
     node->size_ = new_size;
 

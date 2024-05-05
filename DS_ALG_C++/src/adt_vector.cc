@@ -8,11 +8,17 @@
 
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
-adt_vector_s::adt_vector_s(){
+adt_vector_s::adt_vector_s(u16 capacity){
     head_ = 0;
     tail_ = 0;
-    capacity_ = 0;
-    storage_ = NULL;
+    if (capacity > 0) {
+        storage_ = new memory_node_s[capacity];
+    }
+    else {
+
+        storage_ = NULL;
+    }
+    capacity_ = capacity;
 }
 
 adt_vector_s::~adt_vector_s() {}
@@ -126,7 +132,7 @@ s16 adt_vector_s::resize(adt_vector_s* vector, u16 new_size) {
         }
     }
 
-    delete vector->storage_;
+    delete[] vector->storage_;
     vector->capacity_ = new_size;
     vector->storage_ = aux;
 
@@ -150,7 +156,7 @@ s16 adt_vector_s::destroy(adt_vector_s* vector)
             delete vector->storage_[i].data_;
         }
     }
-    delete vector->storage_;
+    delete[] vector->storage_;
     delete vector;
 
     return kErrorCode_Ok;

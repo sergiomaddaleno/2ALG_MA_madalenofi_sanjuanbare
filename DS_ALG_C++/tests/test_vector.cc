@@ -26,7 +26,7 @@ int main() {
 
 	// vector created just to have a reference to the operations
 	adt_vector_s *v = NULL;
-	v = new adt_vector_s[1];
+	v = new adt_vector_s(1);
 	//v = VECTOR_create(1);
 	if (NULL == v) {
 		printf("\n create returned a null node in vector for ops");
@@ -36,19 +36,19 @@ int main() {
 	adt_vector_s *vector_1 = NULL;
 	adt_vector_s *vector_2 = NULL;
 	adt_vector_s *vector_3 = NULL;
-	vector_1= new adt_vector_s[kCapacityVector1];
+	vector_1= new adt_vector_s(kCapacityVector1);
 	//vector_1 = VECTOR_create(kCapacityVector1);
 	if (NULL == vector_1) {
 		printf("\n create returned a null node in vector_1\n");
 		return -1;
 	}
-	vector_2 = new adt_vector_s[kCapacityVector2];
+	vector_2 = new adt_vector_s(kCapacityVector2);
 	//vector_2 = VECTOR_create(kCapacityVector2);
 	if (NULL == vector_2) {
 		printf("\n create returned a null node in vector_2\n");
 		return -1;
 	}
-	vector_3 = new adt_vector_s[kCapacityVector3];
+	vector_3 = new adt_vector_s(kCapacityVector3);
 	//vector_3 = VECTOR_create(kCapacityVector3);
 	if (NULL == vector_3) {
 		printf("\n create returned a null node in vector_3\n");
@@ -365,9 +365,9 @@ int main() {
 
 	printf("\n\n---------------- NULL BATTERY ----------------\n\n");
 	printf("\n\n# Test Create\n");
-	vector_2 = new adt_vector_s[0];
+	vector_2 = new adt_vector_s(0);
 	//vector_2 = VECTOR_create(0);
-	if (NULL != vector_2) {
+	if (NULL != vector_2->storage_) {
 		printf("ERROR: trying to create vector_2 with 0 capacity\n");
 		return -1;
 	}

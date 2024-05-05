@@ -10,6 +10,19 @@
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
 
+adt_stack_s::adt_stack_s(u16 capacity)
+{
+    if (capacity > 0) {
+        storage_= new adt_vector_s(capacity);
+    }
+    else {
+        storage_ = NULL;
+    }
+
+}
+
+adt_stack_s::~adt_stack_s(){}
+
 s16 adt_stack_s::push(adt_stack_s* stack, void* data, u16 size) {
     // ALopezESAT: Can be made inline
     if (NULL == stack)
