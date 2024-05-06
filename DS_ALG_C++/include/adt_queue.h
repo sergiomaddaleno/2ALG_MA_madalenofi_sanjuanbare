@@ -10,12 +10,15 @@
 #include "adt_memory_node.h"
 #include "adt_list.h"
 
-typedef struct adt_queue_s {
-    List* storage_;
-	struct queue_ops_s* ops_;
-} Queue;
+class adt_queue_s {
 
-struct queue_ops_s {
+public:
+
+    adt_list_s* storage_;
+
+    adt_queue_s(u16 capacity);
+    ~adt_queue_s();
+    
 
     /**
 * @brief Inserts an element with specified data and size at the end of a Queue.
@@ -39,7 +42,7 @@ struct queue_ops_s {
 *         - kErrorCode_Ok: If the element is successfully inserted.
 */
 
-    s16(*enqueue)(Queue* queue, void* data, u16 bytes);
+    s16 enqueue (adt_queue_s* queue, void* data, u16 bytes);
 
     /**
 * @brief Extracts and returns the data of the first element in a Queue.
@@ -54,7 +57,7 @@ struct queue_ops_s {
 * @return A pointer to the data of the first element if extraction is successful, otherwise NULL.
 */
 
-    void* (*dequeue)(Queue* queue);
+    void* dequeue (adt_queue_s* queue);
 
     /**
 * @brief Retrieves the data of the last element in a Queue.
@@ -72,7 +75,7 @@ struct queue_ops_s {
 *         - Otherwise, returns a pointer to the data of the last element in the Queue.
 */
 
-    void* (*back)(const Queue* queue);
+    void* back (const adt_queue_s* queue);
 
 
     /**
@@ -89,7 +92,7 @@ struct queue_ops_s {
  *         - Otherwise, returns a pointer to the data of the first element in the Queue.
  */
 
-    void* (*front)(const Queue* queue);
+    void* front (const adt_queue_s* queue);
 
     /**
 * @brief Destroys a Queue and frees its allocated memory, including internal storage and elements.
@@ -104,7 +107,7 @@ struct queue_ops_s {
 *         - kErrorCode_Ok if the destruction operation is successful.
 */
 
-    s16(*destroy)(Queue* queue);
+    s16 destroy (adt_queue_s* queue);
 
     /**
 * @brief Resets a Queue by removing all elements and freeing associated memory.
@@ -122,7 +125,7 @@ struct queue_ops_s {
 *         - kErrorCode_ListNull: The provided pointer to the Queue is NULL.
 */
 
-    s16(*reset)(Queue* queue);
+    s16 reset (adt_queue_s* queue);
 
     /**
 * @brief Resizes a Queue to the specified new size.
@@ -147,7 +150,7 @@ struct queue_ops_s {
 *         - kErrorCode_MallocNull: Memory allocation failed while resizing the Queue.
 */
 
-    s16(*resize)(Queue* queue, u16 new_size);
+    s16 resize (adt_queue_s* queue, u16 new_size);
 
     /**
 * @brief Retrieves the capacity of a Queue.
@@ -162,7 +165,7 @@ struct queue_ops_s {
 *         - Otherwise, returns the capacity of the Queue.
 */
 
-    u16(*capacity)(const Queue* queue);
+    u16 capacity (const adt_queue_s* queue);
 
     /**
 * @brief Retrieves the length of a Queue.
@@ -177,7 +180,7 @@ struct queue_ops_s {
 *         - Otherwise, returns the length of the Queue.
 */
 
-    u16(*length)(const Queue* queue);
+    u16 length(const adt_queue_s* queue);
 
     /**
  * @brief Checks if a Queue is empty.
@@ -193,7 +196,7 @@ struct queue_ops_s {
  *         - Otherwise, returns 0 (false).
  */
 
-    s16(*isEmpty)(const Queue* queue);
+    s16 isEmpty(const adt_queue_s* queue);
 
     /**
 * @brief Checks if a Queue is full.
@@ -209,7 +212,7 @@ struct queue_ops_s {
 *         - Otherwise, returns 0 (false).
 */
 
-    s16(*isFull)(const Queue* queue);
+    s16 isFull (const adt_queue_s* queue);
    
     /**
  * @brief Concatenates the elements of two Queues.
@@ -224,7 +227,7 @@ struct queue_ops_s {
  *         - kErrorCode_NodeNull if either the destination queue's internal storage or the source Vector's internal storage pointer is NULL.
  *         - kErrorCode_Ok if the concatenation is successful and the destination Vector is updated accordingly.
  */
-    s16(*concat)(Queue* queue, const Queue* queue_src);
+    s16 concat (adt_queue_s* queue, const adt_queue_s* queue_src);
    
     /**
 * @brief Prints information about a Queue and its elements.
@@ -237,7 +240,7 @@ struct queue_ops_s {
 * @param queue A pointer to the Queue to be printed.
 */
 
-    void (*print)(Queue* queue);
+    void print (adt_queue_s* queue);
 };
 
 /**
@@ -252,6 +255,4 @@ struct queue_ops_s {
  * @return A pointer to the newly created Queue, or NULL if the capacity is invalid or memory allocation fails.
  */
 
-Queue* QUEUE_create(u16 capacity);
-
-#endif //__ADT_QUEUE_H__
+#endif

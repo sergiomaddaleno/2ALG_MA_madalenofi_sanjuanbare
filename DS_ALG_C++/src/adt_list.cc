@@ -4,120 +4,67 @@
 
 #include "common_def.h"
 #include "adt_list.h"
-
+#include "adt_memory_node.h"
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
-// Static prototypes
-static s16 LIST_destroy(List* list);
-static s16 LIST_reset(List* list);
-static s16 LIST_softReset(List* list);
-static s16 LIST_resize(List* list, u16 new_size);   
 
-static u16 LIST_capacity(const List* list);
-static u16 LIST_length(const List* list);
-static s16 LIST_isEmpty(const List* list);
-static s16 LIST_isFull(const List* list);
 
-static void* LIST_first(const List* list);
-static void* LIST_last(const List* list);
-static void* LIST_at(const List* list, u16 position);
+adt_list_s::adt_list_s(u16 capacity)
+{
+   
+     head_=NULL;
+     tail_=NULL;
+     length_=0;
+     capacity_=capacity;
 
-static s16 LIST_insertFirst(List* list, void* data, u16 bytes);
-static s16 LIST_insertLast(List* list, void* data, u16 bytes);
-static s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position);
-
-static void* LIST_extractFirst(List* list); 
-static void* LIST_extractLast(List* list); 
-static void* LIST_extractAt(List* list, u16 position); 
-
-static s16 LIST_concat(List* list, const List* list_src); 
-static s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*));
-
-static void LIST_print(List* list);
-
-// Memory Node's API Definitions
-struct list_ops_s list_ops = {
-    .destroy = LIST_destroy,
-    .reset = LIST_reset,
-    .softReset = LIST_softReset,
-    .resize = LIST_resize,
-    .capacity = LIST_capacity,
-    .length = LIST_length,
-    .isEmpty = LIST_isEmpty,
-    .isFull = LIST_isFull,
-    .first = LIST_first,
-    .last = LIST_last,
-    .at = LIST_at,
-    .insertFirst = LIST_insertFirst,
-    .insertLast = LIST_insertLast,
-    .insertAt = LIST_insertAt,
-    .extractFirst = LIST_extractFirst,
-    .extractLast = LIST_extractLast,
-    .extractAt = LIST_extractAt,
-    .concat = LIST_concat,
-    .traverse = LIST_traverse,
-    .print = LIST_print
-
-};
-
-List* LIST_create(u16 capacity) {
-    
-    if (capacity <= 0) {
-        return NULL;
-    }
-
-    List* l_temp = MM->malloc(sizeof(List));
-    if (NULL == l_temp) {
-        MM->free(l_temp);
-        return NULL;
-    }
-
-    l_temp->length_ = 0;
-    l_temp->capacity_ = capacity;
-    l_temp->head_ = NULL;
-    l_temp->tail_ = NULL;
-    l_temp->ops_ = &list_ops;
-    
-    return l_temp;
 }
 
-s16 LIST_destroy(List* list) {
+adt_list_s::~adt_list_s()
+{
+}
 
-    if(NULL == list) {
+s16 adt_list_s::destroy(adt_list_s* list)
+{
+    if (NULL == list) {
         return kErrorCode_ListNull;
     }
 
-    MemoryNode* current = list->head_;
-    MemoryNode* next;
+    memory_node_s* current = list->head_;
+    memory_node_s* next;
 
     while (current != NULL) {
         next = current->next_;
-        
-        MM->free(current->data_);
-        MM->free(current);
+
+        delete[] current->data_;
+        delete[] current;
         current = next;
     }
 
-    MM->free(list);
+    //delete[] list;
 
     return kErrorCode_Ok;
 }
 
-s16 LIST_reset(List* list) {
-
+s16 adt_list_s::reset(adt_list_s* list)
+{
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
-    
-    MemoryNode* aux = list->head_;
 
+    memory_node_s* aux = list->head_;
+    int i = 0;
     while (NULL != list->head_) {
-       
-        MM->free(list->head_->data_);
-        
+        if (NULL != list->head_->data_) {
+            list->head_[i].reset(&list->head_[i]);
+         
+        }
+
         aux = list->head_->next_;
-        MM->free(list->head_);
+        if (list->head_ != NULL) {
+           // delete[] list->head_;
+        }
         list->head_ = aux;
+        i++;
     }
 
     list->length_ = 0;
@@ -127,8 +74,8 @@ s16 LIST_reset(List* list) {
     return  kErrorCode_Ok;
 }
 
-s16 LIST_softReset(List* list) {
-
+s16 adt_list_s::softReset(adt_list_s* list)
+{
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -137,13 +84,13 @@ s16 LIST_softReset(List* list) {
         return kErrorCode_StorageNull;
     }
 
-    MemoryNode* aux = list->head_;
+    memory_node_s* aux = list->head_;
 
     while (NULL != list->head_) {
 
         aux = list->head_->next_;
-        MM->free(list->head_);
-       
+        delete list->head_;
+
         list->head_ = aux;
     }
 
@@ -154,8 +101,8 @@ s16 LIST_softReset(List* list) {
     return  kErrorCode_Ok;
 }
 
-s16 LIST_resize(List* list, u16 new_size) {
-
+s16 adt_list_s::resize(adt_list_s* list, u16 new_size)
+{
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -173,11 +120,11 @@ s16 LIST_resize(List* list, u16 new_size) {
     }
 
     if (list->length_ > new_size) {
-        
+
         list->capacity_ = new_size;
-        
-        MemoryNode* countaux = list->head_;
-        MemoryNode* aux = list->head_;
+
+        memory_node_s* countaux = list->head_;
+        memory_node_s* aux = list->head_;
 
         if (countaux == NULL) {
             return kErrorCode_MallocNull;
@@ -198,8 +145,11 @@ s16 LIST_resize(List* list, u16 new_size) {
 
             while (count < list->length_ - 1) {
                 countaux = countaux->next_;
-                MM->free(countaux->data_);
-                MM->free(countaux);
+
+             
+
+               delete[] countaux->data_;
+                //delete[] countaux;
                 count++;
             }
 
@@ -210,18 +160,18 @@ s16 LIST_resize(List* list, u16 new_size) {
         }
         else {
             int count = 0;
-            
+
             aux = list->head_;
             countaux = list->head_;
-            
+
             while (count < list->length_ - 1) {
                 countaux = countaux->next_;
-                MM->free(countaux->data_);
-                MM->free(countaux);
-               
+                delete[] countaux->data_;
+                delete[] countaux;
+
                 count++;
             }
-            
+
             list->length_ = new_size;
             list->capacity_ = new_size;
             list->tail_ = aux;
@@ -237,36 +187,40 @@ s16 LIST_resize(List* list, u16 new_size) {
     return kErrorCode_Ok;
 }
 
-u16 LIST_capacity(const List* list) {
+u16 adt_list_s::capacity(const adt_list_s* list)
+{
     if (NULL == list) {
         return 0;
     }
     return list->capacity_;
 }
 
-u16 LIST_length(const List* list) {
+u16 adt_list_s::length(const adt_list_s* list)
+{
     if (NULL == list) {
         return 0;
     }
     return list->length_;
 }
 
-s16 LIST_isEmpty(const List* list) {
+s16 adt_list_s::isEmpty(const adt_list_s* list)
+{
     if (NULL == list) {
         return 0;
     }
     return list->length_ == 0;
 }
 
-s16 LIST_isFull(const List* list) {
+s16 adt_list_s::isFull(const adt_list_s* list)
+{
     if (NULL == list) {
         return 0;
     }
     return list->length_ == list->capacity_;
 }
 
-void* LIST_first(const List* list){
-
+void* adt_list_s::first(const adt_list_s* list)
+{
     if (NULL == list) {
         return NULL;
     }
@@ -278,7 +232,8 @@ void* LIST_first(const List* list){
     return list->head_->data_;
 }
 
-void* LIST_last(const List* list){
+void* adt_list_s::last(const adt_list_s* list)
+{
     if (NULL == list) {
         return NULL;
     }
@@ -293,8 +248,8 @@ void* LIST_last(const List* list){
     return list->tail_->data_;
 }
 
-void* LIST_at(const List* list, u16 position){
-
+void* adt_list_s::at(const adt_list_s* list, u16 position)
+{
     if (NULL == list) {
         return NULL;
     }
@@ -303,10 +258,10 @@ void* LIST_at(const List* list, u16 position){
         return NULL;
     }
 
-    MemoryNode* countaux = list->head_;
+    memory_node_s* countaux = list->head_;
     int count = 0;
 
-    while (count < position ) {
+    while (count < position) {
         countaux = countaux->next_;
         count++;
     }
@@ -314,7 +269,8 @@ void* LIST_at(const List* list, u16 position){
     return countaux->data_;
 }
 
-s16 LIST_insertFirst(List* list, void* data, u16 bytes){
+s16 adt_list_s::insertFirst(adt_list_s* list, void* data, u16 bytes)
+{
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -331,8 +287,8 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
         return kErrorCode_BytesZero;
     }
 
-    if(NULL==list->head_){
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+    if (NULL == list->head_) {
+        memory_node_s* aux = new memory_node_s[1];
         if (NULL == aux) {
             return 0;
         }
@@ -347,7 +303,7 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
     }
     else {
 
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+        memory_node_s* aux = new memory_node_s[1];
         if (NULL == aux) {
             return 0;
         }
@@ -362,8 +318,8 @@ s16 LIST_insertFirst(List* list, void* data, u16 bytes){
     return kErrorCode_Ok;
 }
 
-s16 LIST_insertLast(List* list, void* data, u16 bytes){
-
+s16 adt_list_s::insertLast(adt_list_s* list, void* data, u16 bytes)
+{
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -381,7 +337,7 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
     }
 
     if (NULL == list->head_) {
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+        memory_node_s* aux = new memory_node_s[1];
 
         aux->next_ = NULL;
         list->head_ = aux;
@@ -393,7 +349,7 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
         list->length_++;
     }
     else {
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+        memory_node_s* aux = new memory_node_s[1];
 
         list->tail_->next_ = aux;
         list->tail_ = aux;
@@ -407,7 +363,8 @@ s16 LIST_insertLast(List* list, void* data, u16 bytes){
     return kErrorCode_Ok;
 }
 
-s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
+s16 adt_list_s::insertAt(adt_list_s* list, void* data, u16 bytes, u16 position)
+{
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -428,7 +385,7 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
         position = list->length_;
     }
 
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
+    memory_node_s* aux = new memory_node_s[1];
     if (aux == NULL) {
         return kErrorCode_MallocNull;
     }
@@ -447,7 +404,7 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
             list->head_ = aux;
         }
         else {
-            MemoryNode* countaux = list->head_;
+            memory_node_s* countaux = list->head_;
             int count = 0;
 
             while (count < position - 1) {
@@ -468,12 +425,13 @@ s16 LIST_insertAt(List* list, void* data, u16 bytes, u16 position) {
     return kErrorCode_Ok;
 }
 
-void* LIST_extractFirst(List* list) {
+void* adt_list_s::extractFirst(adt_list_s* list)
+{
     if (NULL == list) {
         return NULL;
     }
 
-    if (LIST_isEmpty(list)) {
+    if (isEmpty(list)) {
         return NULL;
     }
 
@@ -482,10 +440,10 @@ void* LIST_extractFirst(List* list) {
         return NULL;
     }
 
-    MemoryNode* aux = list->head_->next_;
+    memory_node_s* aux = list->head_->next_;
     void* data = list->head_->data_;
 
-    MM->free(list->head_);
+    delete[] list->head_;
     
     list->head_ = aux;
     list->length_--;
@@ -493,42 +451,43 @@ void* LIST_extractFirst(List* list) {
     return data;
 }
 
-void* LIST_extractLast(List* list) {
-    if (list == NULL || LIST_isEmpty(list) || list->head_ == NULL) {
+void* adt_list_s::extractLast(adt_list_s* list)
+{
+    if (list == NULL || isEmpty(list) || list->head_ == NULL) {
         return NULL;
     }
 
     void* data = list->tail_->data_;
 
     if (list->length_ == 1) {
-        MM->free(list->tail_);
+        delete[] list->tail_;
         list->tail_ = NULL;
         list->head_ = NULL;
     }
     else {
-        MemoryNode* secondToLast = list->head_;
+        memory_node_s* secondToLast = list->head_;
 
         while (secondToLast->next_ != list->tail_) {
             secondToLast = secondToLast->next_;
         }
 
-        MM->free(list->tail_);
+        delete[] list->tail_;
         list->tail_ = secondToLast;
         list->tail_->next_ = NULL;
     }
 
     list->length_--;
-    
+
     return data;
 }
 
-void* LIST_extractAt(List* list, u16 position){
-
+void* adt_list_s::extractAt(adt_list_s* list, u16 position)
+{
     if (NULL == list) {
         return NULL;
     }
 
-    if (LIST_isEmpty(list)) {
+    if (isEmpty(list)) {
         return NULL;
     }
 
@@ -541,9 +500,9 @@ void* LIST_extractAt(List* list, u16 position){
         return NULL;
     }
 
-    MemoryNode* aux = list->head_->next_;
-    MemoryNode* countaux = list->head_;
-    MemoryNode* deleteaux = list->head_;
+    memory_node_s* aux = list->head_->next_;
+    memory_node_s* countaux = list->head_;
+    memory_node_s* deleteaux = list->head_;
     void* data = list->head_->data_;
 
     int count = 0;
@@ -552,23 +511,23 @@ void* LIST_extractAt(List* list, u16 position){
         aux = list->head_->next_;
         data = list->head_->data_;
 
-        MM->free(list->head_);
+        delete[] list->head_;
         list->head_ = aux;
     }
     else {
-        if(position+1<list->length_-1){
-            
-           while (count < position - 1) {
-               countaux = countaux->next_;
-               count++;
-           }
-           aux = countaux;
-            
-           deleteaux = countaux->next_;
-           aux->next_ = deleteaux->next_;
+        if (position + 1 < list->length_ - 1) {
 
-           data = deleteaux->data_;
-           MM->free(deleteaux);
+            while (count < position - 1) {
+                countaux = countaux->next_;
+                count++;
+            }
+            aux = countaux;
+
+            deleteaux = countaux->next_;
+            aux->next_ = deleteaux->next_;
+
+            data = deleteaux->data_;
+            delete[] deleteaux;
         }
         else {
 
@@ -578,36 +537,36 @@ void* LIST_extractAt(List* list, u16 position){
             }
 
             data = list->tail_->data_;
-            MM->free(list->tail_);
+            delete[] list->tail_;
 
             list->tail_ = countaux;
             countaux->next_ = NULL;
         }
-    }   
+    }
     list->length_--;
 
     return data;
 }
 
-s16 LIST_concat(List* list, const List* list_src) {
+s16 adt_list_s::concat(adt_list_s* list, const adt_list_s* list_src)
+{
+    if (list_src == NULL || list == NULL)
+    {
 
-    if(list_src==NULL|| list == NULL)
-        {
-    
         return kErrorCode_StorageNull;
     }
 
-    MemoryNode* current_src = list_src->head_;
+    memory_node_s* current_src = list_src->head_;
 
     while (current_src != NULL) {
+        memory_node_s* new_node = new memory_node_s[sizeof(memory_node_s)];
 
-        MemoryNode* new_node = MM->malloc(sizeof(MemoryNode));
         if (new_node == NULL) {
-            MM->free(new_node);
+            delete[] new_node;
             return kErrorCode_StorageNull;
         }
 
-        u8* tmp = MM->malloc(current_src->size_);
+        u8* tmp = new u8[current_src->size_];
         if (NULL == tmp) {
             return kErrorCode_MallocNull;
         }
@@ -626,7 +585,7 @@ s16 LIST_concat(List* list, const List* list_src) {
             list->tail_ = new_node;
         }
         else {
-            
+
             list->tail_->next_ = new_node;
             list->tail_ = new_node;
         }
@@ -640,8 +599,8 @@ s16 LIST_concat(List* list, const List* list_src) {
     return kErrorCode_Ok;
 }
 
-s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
-    
+s16 adt_list_s::traverse(const adt_list_s* list, void(*callback)(memory_node_s*))
+{
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -649,11 +608,11 @@ s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
     if (NULL == list->head_) {
         return kErrorCode_StorageNull;
     }
-    
-    MemoryNode* countaux = list->head_;
 
-    for (s16 i = 0; i < list->length_-1; i++) {
-        
+    memory_node_s* countaux = list->head_;
+
+    for (s16 i = 0; i < list->length_ - 1; i++) {
+
         callback(countaux);
         countaux = countaux->next_;
     }
@@ -661,9 +620,8 @@ s16 LIST_traverse(const List* list, void (*callback)(MemoryNode*)) {
     return kErrorCode_Ok;
 }
 
-
-void LIST_print(List* list) {
-
+void adt_list_s::print(adt_list_s* list)
+{
     if (NULL == list) {
         printf("\t[List Info] list: NULL\n");
         return;
@@ -681,7 +639,7 @@ void LIST_print(List* list) {
         return;
     }
 
-    MemoryNode* currentNode = list->head_;
+    memory_node_s* currentNode = list->head_;
     int count = 0;
 
     while (currentNode != NULL) {
@@ -698,9 +656,3 @@ void LIST_print(List* list) {
         count++;
     }
 }
-
-
-
-
-
-

@@ -12,7 +12,7 @@
 #include "adt_logger.h"
 #include "EDK_MemoryManager\edk_memory_manager.h"
 
-#include ".\..\tests\test_base.c"
+#include ".\..\tests\test_base.cc"
 
 const u16 kCapacityQueue1 = 30;
 const u16 kCapacityQueue2 = 5;
@@ -24,34 +24,34 @@ int main()
 	TESTBASE_generateDataForTest();
 
 	// vector created just to have a reference to the operations
-	Queue *q = NULL;
-	q = QUEUE_create(1);
+	adt_queue_s *q = NULL;
+	q = new adt_queue_s(1);
 	if (NULL == q) {
 		printf("\n create returned a null node in vector for ops");
 		return -1;
 	}
 	// vectors to work with
-	Queue *queue_1 = NULL;
-	Queue *queue_2 = NULL;
-	Queue *queue_3 = NULL;
-	queue_1 = QUEUE_create(kCapacityQueue1);
+	adt_queue_s*queue_1 = NULL;
+	adt_queue_s*queue_2 = NULL;
+	adt_queue_s*queue_3 = NULL;
+	queue_1 = new adt_queue_s(kCapacityQueue1);
 	if (NULL == queue_1) {
 		printf("\n create returned a null node in queue_1\n");
 		return -1;
 	}
-	queue_2 = QUEUE_create(kCapacityQueue2);
+	queue_2 = new adt_queue_s(kCapacityQueue2);
 	if (NULL == queue_2) {
 		printf("\n create returned a null node in queue_2\n");
 		return -1;
 	}
-	queue_3 = QUEUE_create(kCapacityQueue3);
+	queue_3 = new adt_queue_s(kCapacityQueue3);
 	if (NULL == queue_3) {
 		printf("\n create returned a null node in queue_3\n");
 		return -1;
 	}
 
 	printf("Size of:\n");
-	printf("  + Mem Node: %zu\n", sizeof(MemoryNode));
+	printf("  + Mem Node: %zu\n", sizeof(memory_node_s));
 	printf("  + queue_1: %zu\n", sizeof(*queue_1));
 	printf("  + queue_2: %zu\n", sizeof(*queue_2));
 	printf("  + queue_3: %zu\n", sizeof(*queue_3));
@@ -61,17 +61,17 @@ int main()
 	printf("---------------- FIRST BATTERY ----------------\n\n");
 	// reset
 	printf("\n\n# Test Reset\n");
-	error_type = q->ops_->reset(queue_1);
+	error_type = q->reset(queue_1);
 	TESTBASE_printFunctionResult(queue_1, (u8 *)"reset queue_1", error_type);
 
-	error_type = q->ops_->enqueue(queue_1, TestData.single_ptr_data_4, kSingleSizeData4);
+	error_type = q->enqueue(queue_1, TestData.single_ptr_data_4, kSingleSizeData4);
 	TestData.single_ptr_data_4 = NULL;
 	TESTBASE_printFunctionResult(queue_1, (u8 *)"enqueue queue_1", error_type);
 
-	error_type = q->ops_->reset(queue_1);
+	error_type = q->reset(queue_1);
 	TESTBASE_printFunctionResult(queue_1, (u8 *)"reset queue_1", error_type);
 
-	if (False == q->ops_->isEmpty(queue_1))
+	if (False == q->isEmpty(queue_1))
 	{
 		printf("ERROR: isEmpty doesn't work correctly (queue_1)\n");
 	}
@@ -80,55 +80,55 @@ int main()
 	printf("\t enqueue queue_1\n");
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_A; ++i)
 	{
-		error_type = q->ops_->enqueue(queue_1, TestData.storage_ptr_test_A[i], (strlen(TestData.storage_ptr_test_A[i]) + 1));
+		error_type = q->enqueue(queue_1, TestData.storage_ptr_test_A[i], (strlen((const char*)TestData.storage_ptr_test_A[i]) + 1));
 		TestData.storage_ptr_test_A[i] = NULL;
 		TESTBASE_printFunctionResult(queue_1, (u8 *)"enqueue queue_1", error_type);
 	}
 	printf("queue_1:\n");
-	q->ops_->print(queue_1);
+	q->print(queue_1);
 
 	printf("\t enqueue queue_1\n");
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_B; ++i)
 	{
-		error_type = q->ops_->enqueue(queue_1, TestData.storage_ptr_test_B[i], (strlen(TestData.storage_ptr_test_B[i]) + 1));
+		error_type = q->enqueue(queue_1, TestData.storage_ptr_test_B[i], (strlen((const char*)TestData.storage_ptr_test_B[i]) + 1));
 		TestData.storage_ptr_test_B[i] = NULL;
 		TESTBASE_printFunctionResult(queue_1, (u8 *)"enqueue queue_1", error_type);
 	}
 	printf("queue_1:\n");
-	q->ops_->print(queue_1);
+	q->print(queue_1);
 
 	printf("\t queue_2 enqueue\n");
-	error_type = q->ops_->enqueue(queue_2, TestData.single_ptr_data_1, kSingleSizeData1);
+	error_type = q->enqueue(queue_2, TestData.single_ptr_data_1, kSingleSizeData1);
 	TestData.single_ptr_data_1 = NULL;
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"enqueue queue_2", error_type);
 
-	error_type = q->ops_->enqueue(queue_2, TestData.single_ptr_data_1, kSingleSizeData1);
+	error_type = q->enqueue(queue_2, TestData.single_ptr_data_1, kSingleSizeData1);
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"enqueue queue_2 with NULL data", error_type);
 
-	error_type = q->ops_->enqueue(queue_2, TestData.single_ptr_data_2, kSingleSizeData2);
+	error_type = q->enqueue(queue_2, TestData.single_ptr_data_2, kSingleSizeData2);
 	TestData.single_ptr_data_2 = NULL;
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"enqueue queue_2", error_type);
 
-	error_type = q->ops_->enqueue(queue_2, TestData.single_ptr_data_3, kSingleSizeData3);
+	error_type = q->enqueue(queue_2, TestData.single_ptr_data_3, kSingleSizeData3);
 	TestData.single_ptr_data_3 = NULL;
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"enqueue queue_2", error_type);
 
 	printf("queue_2:\n");
-	q->ops_->print(queue_2);
+	q->print(queue_2);
 
 	printf("\t enqueue queue_3\n");
 	u16 insert_errors = 0;
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_C; ++i)
 	{
-		if (False == q->ops_->isFull(queue_3))
+		if (False == q->isFull(queue_3))
 		{
-			error_type = q->ops_->enqueue(queue_3, TestData.storage_ptr_test_C[i], (strlen(TestData.storage_ptr_test_C[i]) + 1));
+			error_type = q->enqueue(queue_3, TestData.storage_ptr_test_C[i], (strlen((const char*) TestData.storage_ptr_test_C[i]) + 1));
 			TestData.storage_ptr_test_C[i] = NULL;
 			TESTBASE_printFunctionResult(queue_3, (u8 *)"enqueue queue_3", error_type);
 		}
 		else
 		{
-			printf("ERROR: Trying to insert an element in a full vector (queue_3 capacity = %d)\n",q->ops_->capacity(queue_3));
+			printf("ERROR: Trying to insert an element in a full vector (queue_3 capacity = %d)\n",q->capacity(queue_3));
 			insert_errors++;
 		}
 	}
@@ -137,80 +137,80 @@ int main()
 		printf("  ==> ERROR: isFull doesn't work correctly (queue_3)\n");
 	}
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	printf("\n\n# Test Resize\n");
 	printf("\t resize queue_3\n");
-	error_type = q->ops_->resize(queue_3, 10);
+	error_type = q->resize(queue_3, 10);
 	TESTBASE_printFunctionResult(queue_3, (u8 *)"resize queue_3", error_type);
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	for (u16 i = 2; i < kNumberOfStoragePtrTest_C; ++i)
 	{
-		error_type = q->ops_->enqueue(queue_3, TestData.storage_ptr_test_C[i], (strlen(TestData.storage_ptr_test_C[i]) + 1));
+		error_type = q->enqueue(queue_3, TestData.storage_ptr_test_C[i], (strlen((const char*) TestData.storage_ptr_test_C[i]) + 1));
 		TestData.storage_ptr_test_C[i] = NULL;
 		TESTBASE_printFunctionResult(queue_3, (u8 *)"enqueue queue_3", error_type);
 	}
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	printf("\n\n# Test Pop\n");
 	printf("\t dequeue queue_3\n");
 	u16 position = 2;
-	TestData.storage_ptr_test_C[position] = q->ops_->dequeue(queue_3);
+	TestData.storage_ptr_test_C[position] = q->dequeue(queue_3);
 	if (NULL == TestData.storage_ptr_test_C[position])
 		printf("ERROR: NULL pointer extracted at front queue_3\n");
 	else
 		printf("extracted \"%s\" at front in queue_3\n", TestData.storage_ptr_test_C[position]);
 	position++;
-	TestData.storage_ptr_test_C[position] = q->ops_->dequeue(queue_3);
+	TestData.storage_ptr_test_C[position] = q->dequeue(queue_3);
 	if (NULL == TestData.storage_ptr_test_C[position])
 		printf("ERROR: NULL pointer extracted at front queue_3\n");
 	else
 		printf("extracted \"%s\" at front in queue_3\n", TestData.storage_ptr_test_C[position]);
 	position++;
-	TestData.storage_ptr_test_C[position] = q->ops_->dequeue(queue_3);
+	TestData.storage_ptr_test_C[position] = q->dequeue(queue_3);
 	if (NULL == TestData.storage_ptr_test_C[position])
 		printf("ERROR: NULL pointer extracted at front queue_3\n");
 	else
 		printf("extracted \"%s\" at front in queue_3\n", TestData.storage_ptr_test_C[position]);
 
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	printf("\t dequeue queue_3\n");
 	for (u16 i = 0; i < 2; ++i)
 	{
-		TestData.storage_ptr_test_C[i] = q->ops_->dequeue(queue_3);
+		TestData.storage_ptr_test_C[i] = q->dequeue(queue_3);
 		if (NULL == TestData.storage_ptr_test_C[i])
 			printf("ERROR: NULL pointer extracted at front position\n");
 		else
 			printf("extracted \"%s\" at front position in queue_3\n", TestData.storage_ptr_test_C[i]);
 	}
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 	printf("\t dequeue queue_3\n");
 	for (u16 i = 6; i > 4; --i)
 	{
-		TestData.storage_ptr_test_C[i] = q->ops_->dequeue(queue_3);
+		TestData.storage_ptr_test_C[i] = q->dequeue(queue_3);
 		if (NULL == TestData.storage_ptr_test_C[i])
 			printf("ERROR: NULL pointer extracted at front position\n");
 		else
 			printf("extracted \"%s\" at front position in queue_3\n", TestData.storage_ptr_test_C[i]);
 	}
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	void *data = NULL;
 	u16 extract_errors = 0;
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_C; ++i)
 	{
-		if (False == q->ops_->isEmpty(queue_3))
+		if (False == q->isEmpty(queue_3))
 		{
-			data = q->ops_->dequeue(queue_3);
-			MM->free(data);
-			printf("ERROR: Trying to extract an element in an empty stack (queue_3 length = %d)\n",q->ops_->length(queue_3));
+			data = q->dequeue(queue_3);
+			delete data;
+			printf("ERROR: Trying to extract an element in an empty stack (queue_3 length = %d)\n",q->length(queue_3));
 			extract_errors++;
 		}
 	}
@@ -223,16 +223,16 @@ int main()
 	printf("\t enqueue queue_3\n");
 	for (u16 i = 0; i < kNumberOfStoragePtrTest_C; ++i)
 	{
-		error_type = q->ops_->enqueue(queue_3, TestData.storage_ptr_test_C[i], (strlen(TestData.storage_ptr_test_C[i]) + 1));
+		error_type = q->enqueue(queue_3, TestData.storage_ptr_test_C[i], (strlen((const char*) TestData.storage_ptr_test_C[i]) + 1));
 		TestData.storage_ptr_test_C[i] = NULL;
 		TESTBASE_printFunctionResult(queue_3, (u8 *)"enqueue queue_3", error_type);
 	}
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	printf("\n\n# Test Front\n");
 	printf("\t front queue_1\n");
-	data = q->ops_->front(queue_1);
+	data = q->front(queue_1);
 	if (NULL == data)
 		printf("Front in queue_1: NULL\n");
 	else
@@ -240,43 +240,43 @@ int main()
 
 	printf("\n\n# Test Back\n");
 	printf("\t back queue_1\n");
-	data = q->ops_->back(queue_1);
+	data = q->back(queue_1);
 	if (NULL == data)
 		printf("Back in queue_1: NULL\n");
 	else
 		printf("Back in queue_1: \"%s\"\n", data);
 
 	printf("\n\n# Test Length\n");
-	printf("\t queue_1: [Capacity = %d] - [Length  = %d]\n",q->ops_->capacity(queue_1),q->ops_->length(queue_1));
-	printf("\t queue_2: [Capacity = %d] - [Length  = %d]\n",q->ops_->capacity(queue_2),q->ops_->length(queue_2));
-	printf("\t queue_3: [Capacity = %d] - [Length  = %d]\n",q->ops_->capacity(queue_3),q->ops_->length(queue_3));
+	printf("\t queue_1: [Capacity = %d] - [Length  = %d]\n",q->capacity(queue_1),q->length(queue_1));
+	printf("\t queue_2: [Capacity = %d] - [Length  = %d]\n",q->capacity(queue_2),q->length(queue_2));
+	printf("\t queue_3: [Capacity = %d] - [Length  = %d]\n",q->capacity(queue_3),q->length(queue_3));
 
 	printf("\n\n# Test Concat\n");
 	printf("\t concat queue_1 + queue_3\n");
-	error_type = q->ops_->concat(queue_1, queue_3);
+	error_type = q->concat(queue_1, queue_3);
 	TESTBASE_printFunctionResult(queue_1, (u8 *)"concat queue_1 + queue_3", error_type);
 	printf("queue_1:\n");
-	q->ops_->print(queue_1);
+	q->print(queue_1);
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	printf("\n\n# Test Length\n");
-	printf("\t Length queue_1 = %d \n",q->ops_->length(queue_1));
-	printf("\t Length queue_2 = %d \n",q->ops_->length(queue_2));
-	printf("\t Length queue_3 = %d \n",q->ops_->length(queue_3));
+	printf("\t Length queue_1 = %d \n",q->length(queue_1));
+	printf("\t Length queue_2 = %d \n",q->length(queue_2));
+	printf("\t Length queue_3 = %d \n",q->length(queue_3));
 
 	printf("\n\n# Test Reset\n");
-	error_type = q->ops_->reset(queue_3);
+	error_type = q->reset(queue_3);
 	TESTBASE_printFunctionResult(queue_3, (u8 *)"reset queue_3", error_type);
 
 	printf("\n\n# Test Length\n");
-	printf("\t Length queue_1 = %d \n",q->ops_->length(queue_1));
-	printf("\t Length queue_2 = %d \n",q->ops_->length(queue_2));
-	printf("\t Length queue_3 = %d \n",q->ops_->length(queue_3));
+	printf("\t Length queue_1 = %d \n",q->length(queue_1));
+	printf("\t Length queue_2 = %d \n",q->length(queue_2));
+	printf("\t Length queue_3 = %d \n",q->length(queue_3));
 
 	printf("\n\n# Test Front\n");
 	printf("\t front queue_3\n");
-	data = q->ops_->front(queue_3);
+	data = q->front(queue_3);
 	if (NULL == data)
 		printf("Front in queue_3: NULL\n");
 	else
@@ -284,7 +284,7 @@ int main()
 
 	printf("\n\n# Test Back\n");
 	printf("\t back queue_3\n");
-	data = q->ops_->back(queue_3);
+	data = q->back(queue_3);
 	if (NULL == data)
 		printf("Back in queue_3: NULL\n");
 	else
@@ -292,57 +292,57 @@ int main()
 
 	printf("\n\n# Test Concat\n");
 	printf("\t concat queue_3 + queue_2\n");
-	error_type = q->ops_->concat(queue_3, queue_2);
+	error_type = q->concat(queue_3, queue_2);
 	TESTBASE_printFunctionResult(queue_3, (u8 *)"concat queue_3 + queue_2", error_type);
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	printf("\n\n# Test Destroy\n");
 	printf("\t queue_2 Destroy\n");
-	error_type = q->ops_->destroy(queue_2);
+	error_type = q->destroy(queue_2);
 	queue_2 = NULL;
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"destroy queue_2", error_type);
 	printf("queue_2:\n");
-	q->ops_->print(queue_2);
+	q->print(queue_2);
 
 	printf("\t queue_3 Destroy\n");
-	error_type = q->ops_->destroy(queue_3);
+	error_type = q->destroy(queue_3);
 	queue_3 = NULL;
 	TESTBASE_printFunctionResult(queue_3, (u8 *)"destroy queue_3", error_type);
 	printf("queue_3:\n");
-	q->ops_->print(queue_3);
+	q->print(queue_3);
 
 	printf("\n\n# Test Resize\n");
 	printf("\t queue_1 resize\n");
-	error_type = q->ops_->resize(queue_1, 3);
+	error_type = q->resize(queue_1, 3);
 	TESTBASE_printFunctionResult(queue_1, (u8 *)"resize queue_1", error_type);
 	printf("queue_1:\n");
-	q->ops_->print(queue_1);
+	q->print(queue_1);
 
-	MM->status();
+	//MM->status();
 
 	printf("\n\n---------------- NULL BATTERY ----------------\n\n");
 	printf("\n\n# Test Insert\n");
 	data = TestData.single_ptr_big_data;
-	error_type = q->ops_->enqueue(queue_2, data, kSingleSizeBigData);
+	error_type = q->enqueue(queue_2, data, kSingleSizeBigData);
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"enqueue queue_2 (NOT VALID)", error_type);
 
 	printf("\n\n# Test Front\n");
 	printf("\t front queue_2\n");
-	data = q->ops_->front(queue_2);
+	data = q->front(queue_2);
 	if (NULL != data)
 		printf("ERROR: Front in queue_2 is not NULL\n");
 
 	printf("\n\n# Test Back\n");
 	printf("\t back queue_2\n");
-	data = q->ops_->back(queue_2);
+	data = q->back(queue_2);
 	if (NULL == data)
 		printf("Back in queue_2: NULL\n");
 	else
 		printf("Back in queue_2: \"%s\"\n", data);
 
 	printf("\n\n# Test Extract\n");
-	data = q->ops_->dequeue(queue_2);
+	data = q->dequeue(queue_2);
 	if (NULL != data)
 	{
 		printf("ERROR: trying to dequeue from an empty stack\n");
@@ -350,37 +350,37 @@ int main()
 
 	printf("\n\n# Test Concat\n");
 	printf("\t concat queue_1 + queue_2\n");
-	error_type = q->ops_->concat(queue_1, queue_2);
+	error_type = q->concat(queue_1, queue_2);
 	TESTBASE_printFunctionResult(queue_1, (u8 *)"concat queue_1 + queue_2 (NOT VALID)", error_type);
 
 	printf("\n\n# Test Resize\n");
-	error_type = q->ops_->resize(queue_2, 5);
+	error_type = q->resize(queue_2, 5);
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"resize queue_2 (NOT VALID)", error_type);
 
 	printf("\n\n# Test Reset\n");
-	error_type = q->ops_->reset(&queue_2);
+	error_type = q->reset(queue_2);
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"reset queue_2 (NOT VALID)", error_type);
 
 
 	printf("\n\n# Test Destroy\n");
-	error_type = q->ops_->destroy(queue_2);
+	error_type = q->destroy(queue_2);
 	TESTBASE_printFunctionResult(queue_2, (u8 *)"destroy queue_2 (NOT VALID)", error_type);
-	error_type = q->ops_->destroy(queue_3);
+	error_type = q->destroy(queue_3);
 	TESTBASE_printFunctionResult(queue_3, (u8 *)"destroy queue_3 (NOT VALID)", error_type);
 
 
 	// Work is done, clean the system
-	error_type = q->ops_->destroy(queue_1);
+	error_type = q->destroy(queue_1);
 	TESTBASE_printFunctionResult(queue_1, (u8 *)"destroy queue_1", error_type);
-	error_type = q->ops_->destroy(q);
+	error_type = q->destroy(q);
 	TESTBASE_printFunctionResult(q, (u8 *)"destroy Queue Operations", error_type);
 
 	printf("\nAt this point, it must be only one block of %d bytes waiting to be freed\n\n", kSingleSizeBigData);
-	MM->status();
+	//MM->status();
 	TESTBASE_freeDataForTest();
-	MM->status();
+	//MM->status();
 	printf("Press ENTER to continue\n");
 	getchar();
-	MM->destroy();
+	//MM->destroy();
 	return 0;
 }

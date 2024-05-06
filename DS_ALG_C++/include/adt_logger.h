@@ -12,7 +12,7 @@
 
 
 typedef struct adt_logger_s {
-    Queue* storage_;
+    adt_queue_s* storage_;
 	struct logger_ops_s* ops_;
 } Logger;
 

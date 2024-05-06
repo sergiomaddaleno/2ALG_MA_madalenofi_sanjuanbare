@@ -12,11 +12,12 @@
 class adt_list_s {
 
 public:
+
     memory_node_s* head_;
     memory_node_s* tail_;
 	u16 length_;
 	u16 capacity_;
-	struct list_ops_s* ops_;
+
 
     adt_list_s(u16 capacity);
     ~adt_list_s();
