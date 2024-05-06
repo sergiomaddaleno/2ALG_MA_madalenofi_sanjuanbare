@@ -18,7 +18,6 @@ public:
 	u16 length_;
 	u16 capacity_;
 
-
     adt_list_s(u16 capacity);
     ~adt_list_s();
     /**

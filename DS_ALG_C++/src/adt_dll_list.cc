@@ -7,104 +7,38 @@
 
 #include "EDK_MemoryManager/edk_memory_manager.h"
 
-// Static prototypes
-static s16 DLL_LIST_destroy(DLL_List* list);
-static s16 DLL_LIST_reset(DLL_List* list);
-static s16 DLL_LIST_softReset(DLL_List* list);
-static s16 DLL_LIST_resize(DLL_List* list, u16 new_size);   
 
-static u16 DLL_LIST_capacity(const DLL_List* list);
-static u16 DLL_LIST_length(const DLL_List* list);
-static s16 DLL_LIST_isEmpty(const DLL_List* list);
-static s16 DLL_LIST_isFull(const DLL_List* list);
-
-static void* DLL_LIST_first(const DLL_List* list);
-static void* DLL_LIST_last(const DLL_List* list);
-static void* DLL_LIST_at(const DLL_List* list, u16 position);
-
-static s16 DLL_LIST_insertFirst(DLL_List* list, void* data, u16 bytes);
-static s16 DLL_LIST_insertLast(DLL_List* list, void* data, u16 bytes);
-static s16 DLL_LIST_insertAt(DLL_List* list, void* data, u16 bytes, u16 position);
-
-static void* DLL_LIST_extractFirst(DLL_List* list); 
-static void* DLL_LIST_extractLast(DLL_List* list); 
-static void* DLL_LIST_extractAt(DLL_List* list, u16 position); 
-
-static s16 DLL_LIST_concat(DLL_List* list, const DLL_List* list_src); 
-static s16 DLL_LIST_traverse(const DLL_List* list, void (*callback)(MemoryNode*));
-
-static void DLL_LIST_print(DLL_List* list);
-
-// Memory Node's API Definitions
-struct dll_list_ops_s dll_list_ops = {
-    .destroy = DLL_LIST_destroy,
-    .reset = DLL_LIST_reset,
-    .softReset = DLL_LIST_softReset,
-    .resize = DLL_LIST_resize,
-    .capacity = DLL_LIST_capacity,
-    .length = DLL_LIST_length,
-    .isEmpty = DLL_LIST_isEmpty,
-    .isFull = DLL_LIST_isFull,
-    .first = DLL_LIST_first,
-    .last = DLL_LIST_last,
-    .at = DLL_LIST_at,
-    .insertFirst = DLL_LIST_insertFirst,
-    .insertLast = DLL_LIST_insertLast,
-    .insertAt = DLL_LIST_insertAt,
-    .extractFirst = DLL_LIST_extractFirst,
-    .extractLast = DLL_LIST_extractLast,
-    .extractAt = DLL_LIST_extractAt,
-    .concat = DLL_LIST_concat,
-    .traverse = DLL_LIST_traverse,
-    .print = DLL_LIST_print
-
-};
-
-DLL_List* DLL_LIST_create(u16 capacity) {
-    
-    if (capacity <= 0) {
-        return NULL;
-    }
-
-    DLL_List* l_temp = MM->malloc(sizeof(DLL_List));
-    if (NULL == l_temp) {
-        MM->free(l_temp);
-        return NULL;
-    }
-
-    l_temp->length_ = 0;
-    l_temp->capacity_ = capacity;
-    l_temp->head_ = NULL;
-    l_temp->tail_ = NULL;
-    //l_temp->storage_ = NULL;
-    l_temp->ops_ = &dll_list_ops;
-    
-    return l_temp;
+adt_dll_list_s::adt_dll_list_s(u16 capacity){
+    head_ = NULL;
+    tail_ = NULL;
+    length_ = 0;
+    capacity_ = capacity;
 }
 
-s16 DLL_LIST_destroy(DLL_List* list) {
+adt_dll_list_s::~adt_dll_list_s(){}
+
+s16 adt_dll_list_s::destroy(adt_dll_list_s* list) {
 
     if(NULL == list) {
         return kErrorCode_ListNull;
     }
 
-    MemoryNode* current = list->head_;
-    MemoryNode* next;
+    memory_node_s* current = list->head_;
+    memory_node_s* next;
 
     while (current != NULL) {
         next = current->next_;
-        
-        MM->free(current->data_);
-        MM->free(current);
+
+        delete[] current->data_;
+        delete current;
         current = next;
     }
-
-    MM->free(list);
+    delete list;
 
     return kErrorCode_Ok;
 }
 
-s16 DLL_LIST_reset(DLL_List* list) {
+s16 adt_dll_list_s::reset(adt_dll_list_s* list) {
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -112,14 +46,14 @@ s16 DLL_LIST_reset(DLL_List* list) {
     
     // ALopezESAT: Creating a memory node to then point aux to something else is a memory leak
     // LIST_reset should not have any malloc at all.
-    MemoryNode* aux = list->head_;
+    memory_node_s* aux = list->head_;
 
     while (NULL != list->head_) {
        
-        MM->free(list->head_->data_);
+        delete list->head_->data_;
         
         aux = list->head_->next_;
-        MM->free(list->head_);
+        delete list->head_;
         list->head_ = aux;
     }
 
@@ -130,7 +64,7 @@ s16 DLL_LIST_reset(DLL_List* list) {
     return  kErrorCode_Ok;
 }
 
-s16 DLL_LIST_softReset(DLL_List* list) {
+s16 adt_dll_list_s::softReset(adt_dll_list_s* list) {
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -141,12 +75,12 @@ s16 DLL_LIST_softReset(DLL_List* list) {
     }
 
     // ALopezESAT: Same as in LIST_reset
-    MemoryNode* aux = list->head_;
+    memory_node_s* aux = list->head_;
 
     while (NULL != list->head_) {
 
         aux = list->head_->next_;
-        MM->free(list->head_);
+        delete[] list->head_;
        
         list->head_ = aux;
     }
@@ -158,7 +92,7 @@ s16 DLL_LIST_softReset(DLL_List* list) {
     return  kErrorCode_Ok;
 }
 
-s16 DLL_LIST_resize(DLL_List* list, u16 new_size) {
+s16 adt_dll_list_s::resize(adt_dll_list_s* list, u16 new_size) {
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -182,8 +116,8 @@ s16 DLL_LIST_resize(DLL_List* list, u16 new_size) {
         list->capacity_ = new_size;
         
         // ALopezESAT: Same as in LIST_reset
-        MemoryNode* countaux = list->head_;
-        MemoryNode* aux = list->head_;
+        memory_node_s* countaux = list->head_;
+        memory_node_s* aux = list->head_;
         if (countaux == NULL) {
             return kErrorCode_MallocNull;
         }
@@ -203,8 +137,8 @@ s16 DLL_LIST_resize(DLL_List* list, u16 new_size) {
 
             while (count < list->length_ - 1) {
                 countaux = countaux->next_;
-                MM->free(countaux->data_);
-                MM->free(countaux);
+                delete[] countaux->data_;
+                delete countaux;
                 count++;
             }
 
@@ -221,8 +155,8 @@ s16 DLL_LIST_resize(DLL_List* list, u16 new_size) {
             
             while (count < list->length_ - 1) {
                 countaux = countaux->next_;
-                MM->free(countaux->data_);
-                MM->free(countaux);
+                delete[] countaux->data_;
+                delete countaux;
                
                 count++;
             }
@@ -242,35 +176,35 @@ s16 DLL_LIST_resize(DLL_List* list, u16 new_size) {
     return kErrorCode_Ok;
 }
 
-u16 DLL_LIST_capacity(const DLL_List* list) {
+u16 adt_dll_list_s::capacity(const adt_dll_list_s* list) {
     if (NULL == list) {
         return 0;
     }
     return list->capacity_;
 }
 
-u16 DLL_LIST_length(const DLL_List* list) {
+u16 adt_dll_list_s::length(const adt_dll_list_s* list) {
     if (NULL == list) {
         return 0;
     }
     return list->length_;
 }
 
-s16 DLL_LIST_isEmpty(const DLL_List* list) {
+s16 adt_dll_list_s::isEmpty(const adt_dll_list_s* list) {
     if (NULL == list) {
         return 0;
     }
     return list->length_ == 0;
 }
 
-s16 DLL_LIST_isFull(const DLL_List* list) {
+s16 adt_dll_list_s::isFull(const adt_dll_list_s* list) {
     if (NULL == list) {
         return 0;
     }
     return list->length_ == list->capacity_;
 }
 
-void* DLL_LIST_first(const DLL_List* list){
+void* adt_dll_list_s::first(const adt_dll_list_s* list){
 
     if (NULL == list) {
         return NULL;
@@ -283,7 +217,7 @@ void* DLL_LIST_first(const DLL_List* list){
     return list->head_->data_;
 }
 
-void* DLL_LIST_last(const DLL_List* list){
+void* adt_dll_list_s::last(const adt_dll_list_s* list){
     if (NULL == list) {
         return NULL;
     }
@@ -298,7 +232,7 @@ void* DLL_LIST_last(const DLL_List* list){
     return list->tail_->data_;
 }
 
-void* DLL_LIST_at(const DLL_List* list, u16 position){
+void* adt_dll_list_s::at(const adt_dll_list_s* list, u16 position){
 
     if (NULL == list) {
         return NULL;
@@ -313,7 +247,7 @@ void* DLL_LIST_at(const DLL_List* list, u16 position){
         return NULL;
     }*/
     if (list->length_ < list->capacity_ / 2) {
-        MemoryNode* countaux = list->head_;
+        memory_node_s* countaux = list->head_;
         int count = 0;
 
         while (count < position) {
@@ -324,7 +258,7 @@ void* DLL_LIST_at(const DLL_List* list, u16 position){
         return countaux->data_;
     }
     else {
-        MemoryNode* countaux = list->tail_;
+        memory_node_s* countaux = list->tail_;
         int count = list->length_;
 
         while (count < position) {
@@ -337,7 +271,7 @@ void* DLL_LIST_at(const DLL_List* list, u16 position){
     
 }
 
-s16 DLL_LIST_insertFirst(DLL_List* list, void* data, u16 bytes){
+s16 adt_dll_list_s::insertFirst(adt_dll_list_s* list, void* data, u16 bytes){
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -356,7 +290,7 @@ s16 DLL_LIST_insertFirst(DLL_List* list, void* data, u16 bytes){
 
     if(NULL==list->head_){
        
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+        memory_node_s* aux = new memory_node_s;
         if (NULL == aux) {
             return 0;
         }
@@ -372,7 +306,8 @@ s16 DLL_LIST_insertFirst(DLL_List* list, void* data, u16 bytes){
     }
     else {
        
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+        memory_node_s* aux = new memory_node_s;
+
         if (NULL == aux) {
             return 0;
         }
@@ -389,7 +324,7 @@ s16 DLL_LIST_insertFirst(DLL_List* list, void* data, u16 bytes){
     return kErrorCode_Ok;
 }
 
-s16 DLL_LIST_insertLast(DLL_List* list, void* data, u16 bytes){
+s16 adt_dll_list_s::insertLast(adt_dll_list_s* list, void* data, u16 bytes){
 
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -408,7 +343,8 @@ s16 DLL_LIST_insertLast(DLL_List* list, void* data, u16 bytes){
     }
 
     if (NULL == list->head_) {
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+
+        memory_node_s* aux = new memory_node_s;
 
         aux->next_ = NULL;
         list->head_ = aux;
@@ -420,7 +356,8 @@ s16 DLL_LIST_insertLast(DLL_List* list, void* data, u16 bytes){
         list->length_++;
     }
     else {
-        MemoryNode* aux = MM->malloc(sizeof(MemoryNode) * 1);
+
+        memory_node_s* aux = new memory_node_s;
 
         list->tail_->next_ = aux;
         aux->previous_ = list->tail_;
@@ -435,7 +372,7 @@ s16 DLL_LIST_insertLast(DLL_List* list, void* data, u16 bytes){
     return kErrorCode_Ok;
 }
 
-s16 DLL_LIST_insertAt(DLL_List* list, void* data, u16 bytes, u16 position) {
+s16 adt_dll_list_s::insertAt(adt_dll_list_s* list, void* data, u16 bytes, u16 position) {
     if (NULL == list) {
         return kErrorCode_ListNull;
     }
@@ -456,7 +393,8 @@ s16 DLL_LIST_insertAt(DLL_List* list, void* data, u16 bytes, u16 position) {
         position = list->length_;
     }
 
-    MemoryNode* aux = MM->malloc(sizeof(MemoryNode));
+    memory_node_s* aux = new memory_node_s;
+
     if (aux == NULL) {
         return kErrorCode_MallocNull;
     }
@@ -482,7 +420,7 @@ s16 DLL_LIST_insertAt(DLL_List* list, void* data, u16 bytes, u16 position) {
 
             }
             else {
-                MemoryNode* countaux = list->head_;
+                memory_node_s* countaux = list->head_;
                 int count = 0;
 
                 while (count < position - 1) {
@@ -505,7 +443,7 @@ s16 DLL_LIST_insertAt(DLL_List* list, void* data, u16 bytes, u16 position) {
                 list->tail_ = aux;
             }
             else {
-                MemoryNode* countaux = list->tail_;
+                memory_node_s* countaux = list->tail_;
                 int count = list->length_;
 
                 while (count > position - 1) {
@@ -528,12 +466,12 @@ s16 DLL_LIST_insertAt(DLL_List* list, void* data, u16 bytes, u16 position) {
     return kErrorCode_Ok;
 }
 
-void* DLL_LIST_extractFirst(DLL_List* list) {
+void* adt_dll_list_s::extractFirst(adt_dll_list_s* list) {
     if (NULL == list) {
         return NULL;
     }
 
-    if (DLL_LIST_isEmpty(list)) {
+    if (isEmpty(list)) {
         return NULL;
     }
 
@@ -543,12 +481,12 @@ void* DLL_LIST_extractFirst(DLL_List* list) {
     }
     
     // ALopezESAT: Same as in LIST_reset, same for data
-    MemoryNode* aux = list->head_->next_;
+    memory_node_s* aux = list->head_->next_;
     void* data = list->head_->data_;
 
     aux = list->head_->next_;
     data = list->head_->data_;
-    MM->free(list->head_);
+    delete[] list->head_;
     
     list->head_ = aux;
     list->head_->previous_ = NULL;
@@ -557,23 +495,23 @@ void* DLL_LIST_extractFirst(DLL_List* list) {
     return data;
 }
 
-void* DLL_LIST_extractLast(DLL_List* list) {
-    if (list == NULL || DLL_LIST_isEmpty(list) || list->head_ == NULL) {
+void* adt_dll_list_s::extractLast(adt_dll_list_s* list) {
+    if (list == NULL || isEmpty(list) || list->head_ == NULL) {
         return NULL;
     }
 
     void* data = list->tail_->data_;
 
     if (list->length_ == 1) {
-        MM->free(list->tail_);
+        delete[] list->tail_;
+
         list->tail_ = NULL;
         list->head_ = NULL;
     }
     else {
-        MemoryNode* secondToLast = list->tail_->previous_;
+        memory_node_s* secondToLast = list->tail_->previous_;
         
-
-        MM->free(list->tail_);
+        delete[] list->tail_;
         list->tail_ = secondToLast;
         list->tail_->next_ = NULL;
     }
@@ -583,7 +521,7 @@ void* DLL_LIST_extractLast(DLL_List* list) {
     return data;
 }
 
-void* DLL_LIST_extractAt(DLL_List* list, u16 position){
+void* adt_dll_list_s::extractAt(adt_dll_list_s* list, u16 position){
     if (list == NULL ) {
         return NULL;
     }
@@ -591,29 +529,27 @@ void* DLL_LIST_extractAt(DLL_List* list, u16 position){
     void* data = list->head_->data_;
     if (position == 0) {
 
-        data = DLL_LIST_extractFirst(list);
+        data = extractFirst(list);
 
     }
     else {
         if (position == list->length_) {
 
-            data = DLL_LIST_extractLast(list);
+            data = extractLast(list);
 
         }
         else {
 
-
-
             if (list->length_ < list->capacity_ / 2) {
-                MemoryNode* aux = list->head_->next_;
+                memory_node_s* aux = list->head_->next_;
                 if (aux == NULL) {
-                    MM->free(aux);
+                    delete aux;
                     return NULL;
                 }
 
 
-                MemoryNode* countaux = list->head_;
-                MemoryNode* deleteaux = list->head_;
+                memory_node_s* countaux = list->head_;
+                memory_node_s* deleteaux = list->head_;
                 int count = 0;
                 while (count < position - 1) {
                     countaux = countaux->next_;
@@ -625,19 +561,20 @@ void* DLL_LIST_extractAt(DLL_List* list, u16 position){
 
                 aux->next_ = deleteaux->next_;
                 data = deleteaux->data_;
-                MM->free(deleteaux);
+  
+                delete deleteaux;
 
             }
             else {
-                MemoryNode* aux = list->tail_;
+                memory_node_s* aux = list->tail_;
                 if (aux == NULL) {
-                    MM->free(aux);
+                    delete aux;
                     return NULL;
                 }
 
 
-                MemoryNode* p = NULL;
-                MemoryNode* n = NULL;
+                memory_node_s* p = NULL;
+                memory_node_s* n = NULL;
                 int count = list->length_;
                 while (count > position + 1) {
                     aux = aux->previous_;
@@ -646,42 +583,36 @@ void* DLL_LIST_extractAt(DLL_List* list, u16 position){
                 p = aux->previous_;
                 n = aux->next_;
                 data = aux->data_;
-                MM->free(aux);
+                delete aux;
                 p->next_ = n;
                 n->previous_ = p;
             }
-
-
-
         }
-
-
     }
     list->length_--;
 
     return data;
-
 }
 
-s16 DLL_LIST_concat(DLL_List* list, const DLL_List* list_src) {
+s16 adt_dll_list_s::concat(adt_dll_list_s* list, const adt_dll_list_s* list_src) {
 
-    if(list_src==NULL|| list == NULL)
-        {
+    if(list_src==NULL|| list == NULL){
     
         return kErrorCode_StorageNull;
     }
 
-    MemoryNode* current_src = list_src->head_;
+    memory_node_s* current_src = list_src->head_;
 
     while (current_src != NULL) {
 
-        MemoryNode* new_node = MM->malloc(sizeof(MemoryNode));
+        memory_node_s* new_node = new memory_node_s;
         if (new_node == NULL) {
-            MM->free(new_node);
+            delete new_node;
             return kErrorCode_StorageNull;
         }
 
-        u8* tmp = MM->malloc(current_src->size_);
+        u8* tmp = new u8[current_src->size_];
+
         if (NULL == tmp) {
             return kErrorCode_MallocNull;
         }
@@ -714,7 +645,7 @@ s16 DLL_LIST_concat(DLL_List* list, const DLL_List* list_src) {
     return kErrorCode_Ok;
 }
 
-s16 DLL_LIST_traverse(const DLL_List* list, void (*callback)(MemoryNode*)) {
+s16 adt_dll_list_s::traverse(const adt_dll_list_s* list, void (*callback)(memory_node_s*)) {
     
     if (NULL == list) {
         return kErrorCode_ListNull;
@@ -724,7 +655,7 @@ s16 DLL_LIST_traverse(const DLL_List* list, void (*callback)(MemoryNode*)) {
         return kErrorCode_StorageNull;
     }
     
-    MemoryNode* countaux = list->head_;
+    memory_node_s* countaux = list->head_;
 
     for (s16 i = 0; i < list->length_-1; i++) {
         
@@ -736,7 +667,7 @@ s16 DLL_LIST_traverse(const DLL_List* list, void (*callback)(MemoryNode*)) {
     return kErrorCode_Ok;
 }
 
-void DLL_LIST_print(DLL_List* list) {
+void adt_dll_list_s::print(adt_dll_list_s* list) {
 
     if (NULL == list) {
         printf("\t[DLL_List Info] list: NULL\n");
@@ -755,7 +686,7 @@ void DLL_LIST_print(DLL_List* list) {
         return;
     }
 
-    MemoryNode* currentNode = list->head_;
+    memory_node_s* currentNode = list->head_;
     int count = 0;
 
     while (currentNode != NULL) {
