@@ -35,12 +35,12 @@ s16 adt_list_s::destroy(adt_list_s* list)
     while (current != NULL) {
         next = current->next_;
 
-        delete[] current->data_;
-        delete[] current;
+        //delete current->data_;
+        //delete current;
         current = next;
     }
 
-    //delete[] list;
+   // delete list;
 
     return kErrorCode_Ok;
 }
@@ -148,7 +148,7 @@ s16 adt_list_s::resize(adt_list_s* list, u16 new_size)
 
              
 
-               delete[] countaux->data_;
+              delete[] countaux->data_;
                 //delete[] countaux;
                 count++;
             }
@@ -167,7 +167,7 @@ s16 adt_list_s::resize(adt_list_s* list, u16 new_size)
             while (count < list->length_ - 1) {
                 countaux = countaux->next_;
                 delete[] countaux->data_;
-                delete[] countaux;
+                //delete[] countaux;
 
                 count++;
             }
@@ -419,6 +419,8 @@ s16 adt_list_s::insertAt(adt_list_s* list, void* data, u16 bytes, u16 position)
         if (aux->next_ == NULL) {
             list->tail_ = aux;
         }
+
+        
     }
     list->length_++;
 
@@ -568,6 +570,7 @@ s16 adt_list_s::concat(adt_list_s* list, const adt_list_s* list_src)
 
         u8* tmp = new u8[current_src->size_];
         if (NULL == tmp) {
+
             return kErrorCode_MallocNull;
         }
 

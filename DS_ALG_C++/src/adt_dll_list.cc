@@ -29,11 +29,11 @@ s16 adt_dll_list_s::destroy(adt_dll_list_s* list) {
     while (current != NULL) {
         next = current->next_;
 
-        delete[] current->data_;
-        delete current;
+       // delete[] current->data_;
+        //delete current;
         current = next;
     }
-    delete list;
+    //delete list;
 
     return kErrorCode_Ok;
 }
@@ -47,14 +47,15 @@ s16 adt_dll_list_s::reset(adt_dll_list_s* list) {
     // ALopezESAT: Creating a memory node to then point aux to something else is a memory leak
     // LIST_reset should not have any malloc at all.
     memory_node_s* aux = list->head_;
-
+    int i=0;
     while (NULL != list->head_) {
        
-        delete list->head_->data_;
+        list->head_[i].reset(&list->head_[i]);
         
         aux = list->head_->next_;
-        delete list->head_;
+        //delete list->head_;
         list->head_ = aux;
+        i++;
     }
 
     list->length_ = 0;
@@ -137,8 +138,11 @@ s16 adt_dll_list_s::resize(adt_dll_list_s* list, u16 new_size) {
 
             while (count < list->length_ - 1) {
                 countaux = countaux->next_;
-                delete[] countaux->data_;
-                delete countaux;
+                
+                   // delete countaux->data_;
+                
+                
+               // delete countaux;
                 count++;
             }
 
@@ -467,6 +471,7 @@ s16 adt_dll_list_s::insertAt(adt_dll_list_s* list, void* data, u16 bytes, u16 po
 }
 
 void* adt_dll_list_s::extractFirst(adt_dll_list_s* list) {
+
     if (NULL == list) {
         return NULL;
     }
@@ -479,19 +484,15 @@ void* adt_dll_list_s::extractFirst(adt_dll_list_s* list) {
 
         return NULL;
     }
-    
-    // ALopezESAT: Same as in LIST_reset, same for data
+
     memory_node_s* aux = list->head_->next_;
     void* data = list->head_->data_;
 
-    aux = list->head_->next_;
-    data = list->head_->data_;
-    delete[] list->head_;
-    
-    list->head_ = aux;
-    list->head_->previous_ = NULL;
-    list->length_--;
+    delete list->head_;
 
+    list->head_ = aux;
+    list->length_--;
+    list->head_->previous_=NULL;
     return data;
 }
 
@@ -503,7 +504,7 @@ void* adt_dll_list_s::extractLast(adt_dll_list_s* list) {
     void* data = list->tail_->data_;
 
     if (list->length_ == 1) {
-        delete[] list->tail_;
+        delete list->tail_;
 
         list->tail_ = NULL;
         list->head_ = NULL;
@@ -511,7 +512,7 @@ void* adt_dll_list_s::extractLast(adt_dll_list_s* list) {
     else {
         memory_node_s* secondToLast = list->tail_->previous_;
         
-        delete[] list->tail_;
+        delete list->tail_;
         list->tail_ = secondToLast;
         list->tail_->next_ = NULL;
     }
