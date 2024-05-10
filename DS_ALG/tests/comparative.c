@@ -17,33 +17,37 @@
 
 #include "./../tests/test_base.c"
 #include "adt_dll_list.h"
+#include "adt_sorting_algorithm.h"
 
-void* data[1000];
+void* data[1500];
 Vector* vector_1 = NULL;
-Vector* vector_2 = NULL;
-List* list_1 = NULL;
-List* list_2 = NULL;
-DLL_List* list_dll_1 = NULL;
-DLL_List* list_dll_2 = NULL;
+//Vector* vector_2 = NULL;
+//List* list_1 = NULL;
+//List* list_2 = NULL;
+//DLL_List* list_dll_1 = NULL;
+//DLL_List* list_dll_2 = NULL;
+
 void TESTBASE_generateDataForComparative() {
 	//TODO some stuff
 	
 	
+	vector_1 = VECTOR_create(1500);
 	//vector_1 = VECTOR_create(500);
-	//vector_1 = VECTOR_create(500);
-	list_1 = LIST_create(1000);
+	//vector_1 = LIST_create(10);
 	//list_2 = LIST_create(1000);
 	//list_dll_1 = DLL_LIST_create(500);
 	//list_dll_2 = DLL_LIST_create(500);
 	
-	for (s16 i = 0; i < 1000; i++) {
+	for (s16 i = 0; i < 1500; i++) {
+		data[i] = MM->malloc(sizeof(u8));
+		*((u8*)data[i]) = rand();
+		//printf("%d\n", *((u8*)data[i]));
 
-		data[i] = MM->malloc(sizeof(u8) * 1);
-		//data[i][0] = 's';
-		
-		//data[i] = 'hola' + i;
+		vector_1->ops_->insertLast(vector_1, data[i], sizeof(u8));
 
+		//printf("%d\n", *((u8*) (vector_1->storage_[i].data_)));
 	}
+
 
 }
 
@@ -51,7 +55,7 @@ void calculateTimeForFunction() {
 	LARGE_INTEGER frequency;				// ticks per second
 	LARGE_INTEGER  time_start, time_end;    // ticks in interval
 	double elapsed_time = 0.0f;
-	u32 repetitions = 1000;
+	u32 repetitions = 1;
 
 	///////////////////////////////////////////////////////////////////////
 	// Frequency: ticks per second
@@ -65,12 +69,17 @@ void calculateTimeForFunction() {
 	// execute function to meassure 'repetitions' times
 	for (u32 rep = 0; rep < repetitions; ++rep) {
 		//TODO execute function
-		
-		list_1->ops_->insertFirst(list_1,data[rep],strlen(data[rep])+1);
-		//MM->free(data[rep]) for extracts;
+		//printf("%d\n", vector_1->storage_[rep].data_);
+		bubbleSort(vector_1, 1500);
+		//list_1->ops_->insertFirst(list_1,data[rep],strlen(data[rep])+1);
+		 //for extracts;
 	}
-	list_1->ops_->reset(list_1);
-	list_1->ops_->destroy(list_1);
+
+	for (u32 rep = 0; rep < 1500; ++rep) {
+		MM->free(data[rep]);
+	}
+	//list_1->ops_->reset(list_1);
+	//list_1->ops_->destroy(list_1);
 	// stop timer
 	QueryPerformanceCounter(&time_end);
 	///////////////////////////////////////////////////////////////////////
