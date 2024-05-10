@@ -14,17 +14,10 @@ PROJECT_NAMES = {
   "PR00_TestMemoryManager",
   "PR01_MemoryNode",
   "PR02_Vector",
-  "PR03_CircularVector",
-  "PR04_MovableVector",
   "PR05_List",
   "PR06_DLList",
-  "PR07_CircularList",
-  "PR08_CircularDLList",
   "PR09_Stack",
   "PR10_Queue",
-  "PR11_Logger",
-  "PR12_Comparative",
-  "PR13_SortingAlgorithms",
 }
 
 -- Solution workspace declaration:
@@ -135,24 +128,6 @@ project "PR02_Vector"
     path.join(PROJ_DIR, "tests/test_vector.cc"),
   }
 
-project "PR03_CircularVector"
-  files {
-    path.join(PROJ_DIR, "include/adt_memory_node.h"),
-    path.join(PROJ_DIR, "src/adt_memory_node.cc"),
-    path.join(PROJ_DIR, "include/adt_CircularVector.h"),
-    path.join(PROJ_DIR, "src/adt_CircularVector.c"),
-    path.join(PROJ_DIR, "tests/test_vector.c"),
-  }
-
-project "PR04_MovableVector"
-  files {
-    path.join(PROJ_DIR, "include/adt_memory_node.h"),
-    path.join(PROJ_DIR, "src/adt_memory_node.cc"),
-    path.join(PROJ_DIR, "include/adt_movable_vector.h"),
-    path.join(PROJ_DIR, "src/adt_movable_vector.c"),
-    path.join(PROJ_DIR, "tests/test_movable_vector.c"),
-  }
-
 project "PR05_List"
   files {
     path.join(PROJ_DIR, "include/adt_memory_node.h"),
@@ -169,24 +144,6 @@ files {
   path.join(PROJ_DIR, "include/adt_dll_list.h"),
   path.join(PROJ_DIR, "src/adt_dll_list.cc"),
   path.join(PROJ_DIR, "tests/test_dll_list.cc"),
-}
-
-project "PR07_CircularList"
-  files {
-    path.join(PROJ_DIR, "include/adt_memory_node.h"),
-    path.join(PROJ_DIR, "src/adt_memory_node.cc"),
-    path.join(PROJ_DIR, "include/adt_CircularList.h"),
-    path.join(PROJ_DIR, "src/adt_CircularList.c"),
-    path.join(PROJ_DIR, "tests/test_list.c"),
-  }
-
-project "PR08_CircularDLList"
-files {
-  path.join(PROJ_DIR, "include/adt_memory_node.h"),
-  path.join(PROJ_DIR, "src/adt_memory_node.cc"),
-  path.join(PROJ_DIR, "include/adt_circular_dll_list.h"),
-  path.join(PROJ_DIR, "src/adt_circular_dll_list.c"),
-  path.join(PROJ_DIR, "tests/test_dll_list.c"),
 }
   
 project "PR09_Stack"
@@ -210,41 +167,3 @@ project "PR10_Queue"
     path.join(PROJ_DIR, "src/adt_queue.cc"),
     path.join(PROJ_DIR, "tests/test_queue.cc"),
   }
-
- project "PR11_Logger"
-  files {
-    path.join(PROJ_DIR, "include/adt_memory_node.h"),
-    path.join(PROJ_DIR, "src/adt_memory_node.cc"),
-    path.join(PROJ_DIR, "include/adt_logger.h"),
-    path.join(PROJ_DIR, "src/adt_logger.c"),
-    path.join(PROJ_DIR, "include/adt_list.h"),
-    path.join(PROJ_DIR, "src/adt_list.cc"),
-    path.join(PROJ_DIR, "include/adt_queue.h"),
-    path.join(PROJ_DIR, "src/adt_queue.cc"),
-  
-    path.join(PROJ_DIR, "tests/test_logger.c"),
-  }
-
-project "PR12_Comparative"
-  files {
-    path.join(PROJ_DIR, "include/adt_memory_node.h"),
-    path.join(PROJ_DIR, "src/adt_memory_node.cc"),
-    path.join(PROJ_DIR, "src/adt_vector.cc"),
-    path.join(PROJ_DIR, "include/adt_vector.h"),
-    path.join(PROJ_DIR, "include/adt_list.h"),
-    path.join(PROJ_DIR, "src/adt_list.cc"),  
-    path.join(PROJ_DIR, "include/adt_dll_list.h"),
-    path.join(PROJ_DIR, "src/adt_dll_list.cc"),
-  
-    path.join(PROJ_DIR, "tests/comparative.c"),
-  }
-
-  project "PR13_SortingAlgorithms"
-  files {
-    path.join(PROJ_DIR, "include/adt_sorting_algorithm.h"),
-    path.join(PROJ_DIR, "src/adt_sorting_algorithm.c"),
-    path.join(PROJ_DIR, "include/adt_memory_node.h"),
-    path.join(PROJ_DIR, "include/adt_vector.h"),
-    path.join(PROJ_DIR, "tests/sorting_algorithm_test.c"),
-  }
-
