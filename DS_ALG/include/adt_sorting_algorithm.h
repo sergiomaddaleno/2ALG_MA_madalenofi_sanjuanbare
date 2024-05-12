@@ -38,5 +38,31 @@ inline void bubbleSort(Vector* vector, int n) {
     printf("\n");
 }
 
+inline void selectionSort(Vector* vector, int n) {
+    int i, j, min_idx, temp;
+
+    for (i = 0; i < n - 1; i++) {
+        printf("%d, ", *((u8*)(vector->storage_[i].data_)));
+    }
+    printf("\n");
+
+    for (i = 0; i < n - 1; i++) {
+        min_idx = i;
+        for (j = i + 1; j < n; j++) {
+            if (*(u8*)vector->storage_[j].data_ < *(u8*)vector->storage_[min_idx].data_) {
+                min_idx = j;
+            }
+        }
+        temp = vector->storage_[min_idx].data_;
+        vector->storage_[min_idx].data_ = vector->storage_[i].data_;
+        vector->storage_[i].data_ = temp;
+    }
+
+    for (i = 0; i < n - 1; i++) {
+        printf("%d, ", *((u8*)(vector->storage_[i].data_)));
+    }
+    printf("\n");
+}
+
 #endif //__ADT_SORTING_ALGORITHM_H__ vector->storage_[i].data_
 

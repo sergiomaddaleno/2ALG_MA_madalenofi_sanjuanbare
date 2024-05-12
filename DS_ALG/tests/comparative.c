@@ -19,7 +19,7 @@
 #include "adt_dll_list.h"
 #include "adt_sorting_algorithm.h"
 
-void* data[1500];
+void* data[250];
 Vector* vector_1 = NULL;
 //Vector* vector_2 = NULL;
 //List* list_1 = NULL;
@@ -31,14 +31,14 @@ void TESTBASE_generateDataForComparative() {
 	//TODO some stuff
 	
 	
-	vector_1 = VECTOR_create(1500);
-	//vector_1 = VECTOR_create(500);
+	vector_1 = VECTOR_create(250);
+	//vector_1 = VECTOR_create(250);
 	//vector_1 = LIST_create(10);
-	//list_2 = LIST_create(1000);
-	//list_dll_1 = DLL_LIST_create(500);
-	//list_dll_2 = DLL_LIST_create(500);
+	//list_2 = LIST_create(250);
+	//list_dll_1 = DLL_LIST_create(250);
+	//list_dll_2 = DLL_LIST_create(250);
 	
-	for (s16 i = 0; i < 1500; i++) {
+	for (s16 i = 0; i < 250; i++) {
 		data[i] = MM->malloc(sizeof(u8));
 		*((u8*)data[i]) = rand();
 		//printf("%d\n", *((u8*)data[i]));
@@ -70,12 +70,12 @@ void calculateTimeForFunction() {
 	for (u32 rep = 0; rep < repetitions; ++rep) {
 		//TODO execute function
 		//printf("%d\n", vector_1->storage_[rep].data_);
-		bubbleSort(vector_1, 1500);
+		selectionSort(vector_1, 250);
 		//list_1->ops_->insertFirst(list_1,data[rep],strlen(data[rep])+1);
 		 //for extracts;
 	}
 
-	for (u32 rep = 0; rep < 1500; ++rep) {
+	for (u32 rep = 0; rep < 250; ++rep) {
 		MM->free(data[rep]);
 	}
 	//list_1->ops_->reset(list_1);
