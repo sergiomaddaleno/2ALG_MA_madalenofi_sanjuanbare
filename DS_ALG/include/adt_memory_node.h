@@ -186,13 +186,48 @@ struct memory_node_ops_s {
  */
   void(*print) (MemoryNode *node);
 
-
+  /**
+ * @brief Retrieves the next memory node in the list.
+ *
+ * This function returns the next node in the memory node list. If the provided node
+ * is `NULL`, it returns `NULL`.
+ *
+ * @param node A pointer to the current MemoryNode structure.
+ * @return A pointer to the next MemoryNode structure, or `NULL` if the current node is `NULL`.
+ */
   MemoryNode*(*next) (MemoryNode* node);
 
+  /**
+ * @brief Retrieves the previous memory node in the list.
+ *
+ * This function returns the previous node in the memory node list. If the provided node
+ * is `NULL`, it returns `NULL`.
+ *
+ * @param node A pointer to the current MemoryNode structure.
+ * @return A pointer to the previous MemoryNode structure, or `NULL` if the current node is `NULL`.
+ */
   MemoryNode* (*previous)(MemoryNode* node);
 
+  /**
+ * @brief Sets the next memory node for the given node.
+ *
+ * This function sets the next node in the memory node list for the provided node.
+ * If the provided node or the next node is `NULL`, it does nothing.
+ *
+ * @param node A pointer to the current MemoryNode structure.
+ * @param next_node A pointer to the next MemoryNode structure to be set.
+ */
   void(*setNext) (MemoryNode* node, MemoryNode* next_node);
 
+  /**
+ * @brief Sets the previous memory node for the given node.
+ *
+ * This function sets the previous node in the memory node list for the provided node.
+ * If the provided node or the previous node is `NULL`, it does nothing.
+ *
+ * @param node A pointer to the current MemoryNode structure.
+ * @param previous_node A pointer to the previous MemoryNode structure to be set.
+ */
   void (*setPrevious)(MemoryNode* node, MemoryNode* previous_node);
 };
 
